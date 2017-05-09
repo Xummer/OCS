@@ -15,6 +15,11 @@
 		C16366E01E67A51A0010A9D6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C16366DE1E67A51A0010A9D6 /* LaunchScreen.storyboard */; };
 		C16366EB1E67A51A0010A9D6 /* OCSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366EA1E67A51A0010A9D6 /* OCSTests.m */; };
 		C16366F61E67A51A0010A9D6 /* OCSUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366F51E67A51A0010A9D6 /* OCSUITests.m */; };
+		C16367091E67F5AC0010A9D6 /* QQLuaPluginManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C16367081E67F5AC0010A9D6 /* QQLuaPluginManager.m */; };
+		C1DB9EA21EC098180017C4E1 /* OCSNativeCStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = C1DB9EA11EC098180017C4E1 /* OCSNativeCStruct.m */; };
+		C1DB9EA41EC098B40017C4E1 /* OCSExecutableManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C1DB9EA31EC098B40017C4E1 /* OCSExecutableManager.m */; };
+		C1DB9EA61EC099220017C4E1 /* OCSVirtualMachine.m in Sources */ = {isa = PBXBuildFile; fileRef = C1DB9EA51EC099220017C4E1 /* OCSVirtualMachine.m */; };
+		C1DB9EA91EC099670017C4E1 /* OCSEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = C1DB9EA81EC099670017C4E1 /* OCSEngine.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +56,13 @@
 		C16366F11E67A51A0010A9D6 /* OCSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OCSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C16366F51E67A51A0010A9D6 /* OCSUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSUITests.m; sourceTree = "<group>"; };
 		C16366F71E67A51A0010A9D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C16367071E67F5AC0010A9D6 /* QQLuaPluginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QQLuaPluginManager.h; sourceTree = "<group>"; };
+		C16367081E67F5AC0010A9D6 /* QQLuaPluginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QQLuaPluginManager.m; sourceTree = "<group>"; };
+		C1DB9EA11EC098180017C4E1 /* OCSNativeCStruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSNativeCStruct.m; sourceTree = "<group>"; };
+		C1DB9EA31EC098B40017C4E1 /* OCSExecutableManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSExecutableManager.m; sourceTree = "<group>"; };
+		C1DB9EA51EC099220017C4E1 /* OCSVirtualMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSVirtualMachine.m; sourceTree = "<group>"; };
+		C1DB9EA71EC099670017C4E1 /* OCSEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSEngine.h; sourceTree = "<group>"; };
+		C1DB9EA81EC099670017C4E1 /* OCSEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSEngine.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +113,9 @@
 		C16366CF1E67A5190010A9D6 /* OCS */ = {
 			isa = PBXGroup;
 			children = (
+				C1DB9E991EC097BE0017C4E1 /* OCSPatch */,
+				C16367071E67F5AC0010A9D6 /* QQLuaPluginManager.h */,
+				C16367081E67F5AC0010A9D6 /* QQLuaPluginManager.m */,
 				C16366D31E67A5190010A9D6 /* AppDelegate.h */,
 				C16366D41E67A5190010A9D6 /* AppDelegate.m */,
 				C16366D61E67A5190010A9D6 /* ViewController.h */,
@@ -138,6 +153,74 @@
 				C16366F71E67A51A0010A9D6 /* Info.plist */,
 			);
 			path = OCSUITests;
+			sourceTree = "<group>";
+		};
+		C1DB9E991EC097BE0017C4E1 /* OCSPatch */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9E9A1EC097BE0017C4E1 /* OCSVirtualMachine */,
+			);
+			path = OCSPatch;
+			sourceTree = "<group>";
+		};
+		C1DB9E9A1EC097BE0017C4E1 /* OCSVirtualMachine */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9E9B1EC097BE0017C4E1 /* OCSVirtualMachine */,
+			);
+			path = OCSVirtualMachine;
+			sourceTree = "<group>";
+		};
+		C1DB9E9B1EC097BE0017C4E1 /* OCSVirtualMachine */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9E9C1EC097BE0017C4E1 /* OCSEngine */,
+			);
+			path = OCSVirtualMachine;
+			sourceTree = "<group>";
+		};
+		C1DB9E9C1EC097BE0017C4E1 /* OCSEngine */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9EA71EC099670017C4E1 /* OCSEngine.h */,
+				C1DB9EA81EC099670017C4E1 /* OCSEngine.m */,
+				C1DB9E9D1EC097BE0017C4E1 /* Bridge */,
+				C1DB9E9F1EC097BE0017C4E1 /* Executable */,
+				C1DB9EA01EC097BE0017C4E1 /* VirtualMachine */,
+			);
+			path = OCSEngine;
+			sourceTree = "<group>";
+		};
+		C1DB9E9D1EC097BE0017C4E1 /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9E9E1EC097BE0017C4E1 /* NativeCBridge */,
+			);
+			path = Bridge;
+			sourceTree = "<group>";
+		};
+		C1DB9E9E1EC097BE0017C4E1 /* NativeCBridge */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9EA11EC098180017C4E1 /* OCSNativeCStruct.m */,
+			);
+			path = NativeCBridge;
+			sourceTree = "<group>";
+		};
+		C1DB9E9F1EC097BE0017C4E1 /* Executable */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9EA31EC098B40017C4E1 /* OCSExecutableManager.m */,
+			);
+			path = Executable;
+			sourceTree = "<group>";
+		};
+		C1DB9EA01EC097BE0017C4E1 /* VirtualMachine */ = {
+			isa = PBXGroup;
+			children = (
+				C1DB9EA51EC099220017C4E1 /* OCSVirtualMachine.m */,
+			);
+			path = VirtualMachine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -276,9 +359,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1DB9EA41EC098B40017C4E1 /* OCSExecutableManager.m in Sources */,
+				C1DB9EA91EC099670017C4E1 /* OCSEngine.m in Sources */,
+				C16367091E67F5AC0010A9D6 /* QQLuaPluginManager.m in Sources */,
+				C1DB9EA21EC098180017C4E1 /* OCSNativeCStruct.m in Sources */,
 				C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */,
 				C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */,
 				C16366D21E67A5190010A9D6 /* main.m in Sources */,
+				C1DB9EA61EC099220017C4E1 /* OCSVirtualMachine.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,6 +604,7 @@
 				C16366FC1E67A51A0010A9D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C16366FD1E67A51A0010A9D6 /* Build configuration list for PBXNativeTarget "OCSTests" */ = {
 			isa = XCConfigurationList;
@@ -524,6 +613,7 @@
 				C16366FF1E67A51A0010A9D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C16367001E67A51A0010A9D6 /* Build configuration list for PBXNativeTarget "OCSUITests" */ = {
 			isa = XCConfigurationList;
@@ -532,6 +622,7 @@
 				C16367021E67A51A0010A9D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
