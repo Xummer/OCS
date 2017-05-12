@@ -128,10 +128,20 @@ int sub_2a0be22(int arg0) {
 
 // sub_2a0c01c
 void OCSVirtualMachineExecuteWithArr(void *content, void *codeBlock, int arg2, CFMutableArrayRef argList, int arg4) {
-    if (r5) {
+    if (vm) {
         // loc_2a0c07a
         if (codeBlock) {
-            
+            if (!vm->isRunning /* vm + 0x14 */) {
+                // loc_2a0c0a6
+                /* vm + 0x8 */
+                /* vm + 0x4 */
+                
+                
+            }
+            else {
+                printf("[OCS ERROR]");
+                printf("OCSVirtualMachine is already running.");
+            }
         }
         else {
             // loc_2a0c368

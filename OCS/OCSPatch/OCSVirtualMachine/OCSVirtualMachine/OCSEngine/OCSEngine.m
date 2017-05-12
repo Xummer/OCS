@@ -12,6 +12,12 @@
 #import <objc/objc.h>
 #import <pthread.h>
 
+static void *getExcutableDataFunc; // *0x35d3dc0
+static NSMutableDictionary *dictClsMethodName; // *0x367d22c
+static dispatch_queue_t classMethodNameReadWriteQueue; // *00x367d228
+static NSMutableDictionary *dict3; // *0x367d234
+static dispatch_queue_t classExecutableRootReadWriteQueue; // *0x367d230
+
 // sub_2a14b60
 static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation) {
     NSMethodSignature *methodSignature = [invocation methodSignature];
@@ -146,9 +152,46 @@ int sub_2a1514a() {
 + (void)setUpEnvironment {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        // TODO
+        // sub_2a13ed0
+        classMethodNameReadWriteQueue = dispatch_queue_create("ocscript.OCSEngine.classMethodNameDic.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
+        if (!dictClsMethodName) {
+            dictClsMethodName = [[NSMutableDictionary alloc] init];
+        }
+        classExecutableRootReadWriteQueue = dispatch_queue_create("ocscript.OCSEngine.classExecutableRootReadWriteQueueID.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
+        if (!dict3) {
+            dict3 = [[NSMutableDictionary alloc] init];
+        }
+        if (!getExcutableDataFunc) {
+            getExcutableDataFunc = &OCSGetExecutableData;
+        }
+        
+        OCSSetUpCFuncEnvironment();
     });
 }
+
+/*
+void sub_2a13ed0(void * _block) {
+    r0 = _block;
+    stack[2044] = r4;
+    stack[2045] = r5;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x10) + 0x8;
+    *0x367d228 = dispatch_queue_create("ocscript.OCSEngine.classMethodNameDic.read-write-qeueu", __dispatch_queue_attr_concurrent);
+    if (*0x367d22c == 0x0) {
+        *0x367d22c = [[NSMutableDictionary alloc] init];
+    }
+    *0x367d230 = dispatch_queue_create("ocscript.OCSEngine.classExecutableRootReadWriteQueueID.read-write-qeueu", __dispatch_queue_attr_concurrent);
+    if (*0x367d234 == 0x0) {
+        *0x367d234 = [[NSMutableDictionary alloc] init];
+    }
+    if (*0x35d3dc0 == 0x0) {
+        *0x35d3dc0 = 0x2a13fb5;
+    }
+    r0 = sub_2a13760();
+    return;
+}
+ */
 
 + (void)getClassNameWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
     OCSGetExecutable(fileName, errorCode);

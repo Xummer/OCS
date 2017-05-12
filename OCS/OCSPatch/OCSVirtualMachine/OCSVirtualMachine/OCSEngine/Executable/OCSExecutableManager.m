@@ -33,17 +33,28 @@ OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
         
         __block id fetchedValue;
         dispatch_sync(readWriteQueue, ^{
-            fetchedValue = CFDictionaryGetValue(dict, <#const void *key#>);
+            // sub_2a0b934
+            fetchedValue = CFDictionaryGetValue(dict, (__bridge const void *)(executableName));
         });
         
         if (!fetchedValue) {
             dispatch_barrier_sync(readWriteQueue, ^{
-                const void * value = CFDictionaryGetValue(dict, <#const void *key#>);
-                if (value) {
+                // sub_2a0b966
+                fetchedValue = CFDictionaryGetValue(dict, (__bridge const void *)(executableName));
+                if (!fetchedValue) {
+                    if (!getExcutableDataFunc) {
+                        // loc_2a0ba1c
+                        NSLog(@"OCSExecutableManagerLoadDataCallback_fun && \"OCSExecutableManagerLoadDataCallback_fun is NULL\"");
+                    }
+                    else {
+                        // loc_2a0b99e
+                        fetchedValue =
+                        OCSExecutableCreate(executableName, getExcutableDataFunc(executableName), ??);
+                    }
+                }
+                else {
                     // loc_2a0ba18
                 }
-                else if (<#expression#>)
-                    });
         }
     }
     else {
