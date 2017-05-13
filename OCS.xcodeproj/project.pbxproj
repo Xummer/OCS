@@ -41,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C135A0FC1EC6EB68009844EF /* OCSVM_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSVM_code.h; sourceTree = "<group>"; };
 		C16366CD1E67A5190010A9D6 /* OCS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OCS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C16366D11E67A5190010A9D6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C16366D31E67A5190010A9D6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -189,6 +190,7 @@
 				C1DB9E9D1EC097BE0017C4E1 /* Bridge */,
 				C1DB9E9F1EC097BE0017C4E1 /* Executable */,
 				C1DB9EA01EC097BE0017C4E1 /* VirtualMachine */,
+				C135A0FC1EC6EB68009844EF /* OCSVM_code.h */,
 			);
 			path = OCSEngine;
 			sourceTree = "<group>";

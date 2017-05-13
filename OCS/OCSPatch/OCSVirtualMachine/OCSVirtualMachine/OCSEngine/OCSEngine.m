@@ -7,16 +7,8 @@
 //
 
 #import "OCSEngine.h"
-#import <objc/runtime.h>
-#import <objc/message.h>
-#import <objc/objc.h>
+#import "OCSVM_code.h"
 #import <pthread.h>
-
-static void *getExcutableDataFunc; // *0x35d3dc0
-static NSMutableDictionary *dictClsMethodName; // *0x367d22c
-static dispatch_queue_t classMethodNameReadWriteQueue; // *00x367d228
-static NSMutableDictionary *dict3; // *0x367d234
-static dispatch_queue_t classExecutableRootReadWriteQueue; // *0x367d230
 
 // sub_2a14b60
 static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation) {
@@ -161,8 +153,8 @@ int sub_2a1514a() {
         if (!dict3) {
             dict3 = [[NSMutableDictionary alloc] init];
         }
-        if (!getExcutableDataFunc) {
-            getExcutableDataFunc = &OCSGetExecutableData;
+        if (!OCSExecutableManagerLoadDataCallback_fun) {
+            OCSExecutableManagerLoadDataCallback_fun = &OCSGetExecutableData;
         }
         
         OCSSetUpCFuncEnvironment();

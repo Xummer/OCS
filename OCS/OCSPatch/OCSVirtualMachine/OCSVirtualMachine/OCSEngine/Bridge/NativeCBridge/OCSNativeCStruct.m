@@ -6,19 +6,9 @@
 //  Copyright © 2017年 Xummer. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import "OCSVM_code.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <mach-o/dyld.h>
-
-static const struct mach_header* image_header; //*0x35d3dc8;
-static NSUInteger int_35d3dcc; //*0x35d3dcc;
-static CFMutableDictionaryRef dictCFunction; // *0x367d208
-static CFMutableDictionaryRef dict_367d20c; // *0x367d20c
-static CFMutableDictionaryRef dict_367d210; // *0x367d210
-static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c
-static CFMutableDictionaryRef dictStructType; // *0x367d220
-static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214
 
 // sub_2a123ba
 void

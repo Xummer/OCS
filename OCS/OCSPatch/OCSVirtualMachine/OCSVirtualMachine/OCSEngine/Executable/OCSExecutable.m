@@ -6,51 +6,367 @@
 //  Copyright © 2017年 Xummer. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
-typedef struct OCSExeCodeBlock_t {
-    CFStringRef fileName; // +0x14
-    CFStringRef clsName; // +0x18
-}OCSExeCodeBlock ; // 0x1c
+#import "OCSVM_code.h"
 
 // sub_2a137d4
-void OCSExecutableCreate(NSString *fileName, NSData *data, int arg2) {
+OCS_Executable*
+OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
     if (data) {
         
         // XTest: 记得释放
-        OCSExeCodeBlock *codeBlock = malloc(sizeof(OCSExeCodeBlock));
+        OCS_Executable *exe = malloc(sizeof(OCS_Executable));
         
         // loc_2a137f2
-        codeBlock->fileName = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)fileName);
+        exe->fileName = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)fileName);
         
-        if ([data length] > 4) {
-            const char *bytes = [data bytes];
-            
-            
-//            if (((bytes[0] << 0x18 | bytes[1] << 0x10 | bytes[2] << 0x8 | bytes[3]) == 0xdabb1e67) &&
-//                ((bytes[4] << 0x8 | bytes[5]) == 0) &&
-//                ((bytes[6] << 0x8 | bytes[7]) == 0x2))
-            if ((*((uint32_t *)bytes) == 0xdabb1e67) &&
-                (*(uint16_t *)(bytes + 4) == 0) &&
-                (*(uint16_t *)(bytes + 6) == 0x2))
-            {
-                //loc_2a13878:
-                if (*(uint16_t *)(bytes + 8) == 0x20) {
-                    // loc_2a13886
-                    codeBlock->clsName = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[0xc], kCFStringEncodingUTF8);
+        const char *bytes = [data bytes];
+        
+#define OCS_READ_VALUE(type, offset) (*(type *)(bytes + offset))
+#define OCSBYTE_FROM(n) ((int8_t)bytes[n]&0xff)
+#define OCS2BYTE_FROM(n) ((int16_t)OCSBYTE_FROM(n) << 0x8 | OCSBYTE_FROM(n + 1))
+#define OCS4BYTE_FROM(n) ((int32_t)OCS2BYTE_FROM(n) << 0x10 | OCS2BYTE_FROM(n + 2))
+#define OCS8BYTE_FROM(n) ((int64_t)OCS4BYTE_FROM(n) << 0x20 | OCS4BYTE_FROM(n + 4))
+        
+        if ((OCS4BYTE_FROM(0) == 0xdabb1e67) &&
+            (OCS2BYTE_FROM(4) == 0) &&
+            (OCS2BYTE_FROM(6) == 0x2))
+            //            if ((*((uint32_t *)bytes) == 0xdabb1e67) &&
+            //                (*(uint16_t *)(bytes + 4) == 0) &&
+            //                (*(uint16_t *)(bytes + 6) == 0x2))
+        {
+            //loc_2a13878:
+            if (OCS2BYTE_FROM(8) == 0x20) {
+                // loc_2a13886
+                exe->clsName = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[0xc], kCFStringEncodingUTF8);
+                
+                int16_t clsLen = OCS2BYTE_FROM(0xa);
+                
+                //                    NSLog(@"0x%x", clsLen);
+                
+                int32_t methodNamesOffset = OCS4BYTE_FROM(clsLen+0x11);
+                
+                //                    NSLog(@"0x%x", methodNamesOffset); // 0x0a52
+                
+                //                    int8_t r8 = OCSBYTE_FROM(offset);
+                //
+                //                    NSLog(@"r8 0x%x", r8);
+                
+                int32_t size /*r4*/ = OCS4BYTE_FROM(methodNamesOffset); // 00 00 15 70
+                exe->size = size;
+                
+                exe->methodNames = malloc(size);
+                
+                int32_t tableOffset = methodNamesOffset+0x4;
+                
+                memcpy(exe->methodNames, &bytes[tableOffset], size);
+                
+                NSLog(@"%s", &exe->methodNames[5]);
+                
+                int32_t constPoolOffset /*r10*/ = OCS4BYTE_FROM(clsLen+0xd);
+                
+                //                    NSLog(@"r10 0x%x", constPoolOffset); // 0x32
+                
+                int32_t constPoolCount = OCS4BYTE_FROM(constPoolOffset);
+                
+                exe->constPoolCount = constPoolCount;
+                
+                //                    NSLog(@"r5 0x%x", constPoolCount); // 00 00 00 D8 (216)
+                
+                // loc_2a13e3c
+                NSCAssert(exe->constPoolCount < 65536, @"exe->constPoolCount < 65536 && \"const pool count shuold not exceed 65536\"");
+                
+                // loc_2a13956
+                OCS_ConstantPool *constPool = malloc(constPoolCount * sizeof(OCS_ConstantPool));
+                exe->constPool = constPool;
+                
+                if (constPoolCount == 0) {
+                    // loc_2a13c3c
+                    //                            stack[2035] = r5;
+                    //                            stack[2018] = r8;
                 }
                 else {
-                    // loc_2a13e18:
-                    NSLog(@"(kArchMagicNum == kOCSExecutableArchMagicNum) && \"OCSExecutable architecture not match,update OCScript File \"");
+                    // loc_2a1397e
+                    //                            stack[2031] = r4;
+                    //                            r11 = r10 + 0x4;
+                    //                            r4 = 0x0;
+                    //                            r10 = 0x0;
+                    //                            stack[2032] = @selector(raise:format:);
+                    
+                    
+                    int32_t nextOffset = constPoolOffset + 0x4;
+                    //                            int32_t delta = 0;
+                    
+                    for (int32_t i = 0; i < constPoolCount; i ++) {
+                        // loc_2a13998
+                        //                                r1 = *(int8_t *)r11;
+                        //                                r5 = r11 + 0x4;
+                        //                                r0 = r1 - 0x1;
+                        //                                if (r0 > 0x8)
+                        
+                        int8_t constPoolItemTag = OCSBYTE_FROM(nextOffset);
+                        
+                        NSLog(@"-0x%x", constPoolItemTag);
+                        
+                        int32_t itemLen = 0x4;
+                        
+                        if (constPoolItemTag > OCS_CONSTANT_8) {
+                            // loc_2a13bc0
+                            [NSException raise:@"OCSCommonException" format:@"Invalid ConstPoolItem Tag while parsing data constTag:%d", constPoolItemTag];
+                            //                                r11 = r5;
+                        }
+                        else {
+                            // loc_2a139a6
+                            OCS_ConstantPool cp;
+                            switch (constPoolItemTag) {
+                                case OCS_CONSTANT_0://0x0009:
+                                    // loc_2a139bc
+                                {
+                                    //                                            stack[2023] = *(r8 + 0x4);
+                                    //                                            *(*(r8 + 0x4) + r4) = 0x1;
+                                    //                                            *(0x4 + *(r8 + 0x4) + r4) = *(int8_t *)(r11 + 0x5) << 0x10 | *(int8_t *)(r11 + 0x4) * 0x1000000 | *(int8_t *)(r11 + 0x6) * 0x100 | *(int8_t *)(r11 + 0x7);
+                                    //                                            goto loc_2a13a74;
+                                    cp.tag = OCS_CONSTANT_0;
+                                    cp.u.c_int = OCS4BYTE_FROM(nextOffset + 0x4);
+                                    exe->constPool[i] = cp;
+                                    
+                                    // loc_2a13a74
+                                    itemLen = 0x8;
+                                    
+                                }
+                                    break;
+                                case OCS_CONSTANT_1://0x001f:
+                                    // loc_2a139e8
+                                {
+                                    cp.tag = OCS_CONSTANT_1;
+                                    cp.u.c_long = OCS8BYTE_FROM(nextOffset + 0x4);
+                                    exe->constPool[i] = cp;
+                                    
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                case OCS_CONSTANT_2://0x004e:
+                                    // loc_2a13a46
+                                {
+                                    cp.tag = OCS_CONSTANT_2;
+                                    cp.u.c_float = OCS4BYTE_FROM(nextOffset + 0x4);
+                                    exe->constPool[i] = cp;
+                                    
+                                    // loc_2a13a74
+                                    itemLen = 0x8;
+                                }
+                                    break;
+                                case OCS_CONSTANT_3://0x0068:
+                                    // loc_2a13a7a
+                                {
+                                    cp.tag = OCS_CONSTANT_3;
+                                    cp.u.c_double = OCS8BYTE_FROM(nextOffset + 0x4);
+                                    exe->constPool[i] = cp;
+                                    
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                case OCS_CONSTANT_4://0x0093:
+                                    // loc_2a13ad0
+                                {
+                                    cp.tag = OCS_CONSTANT_4;
+                                    int32_t startOffset = OCS4BYTE_FROM(nextOffset + 0x8);
+                                    
+                                    OCS_String c_s;
+                                    
+                                    c_s.offset = startOffset;
+                                    
+                                    CFStringRef strRef = CFStringCreateWithCString(kCFAllocatorDefault, &exe->methodNames[startOffset], kCFStringEncodingUTF8);
+                                    
+                                    NSLog(@"5 str: %@", strRef);
+                                    
+                                    // loc_2a13c1c
+                                    c_s.value = strRef;
+                                    cp.u.c_string = &c_s;
+                                    exe->constPool[i] = cp;
+                                    
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                case OCS_CONSTANT_CLASS://0x00b3:
+                                    // loc_2a13b10
+                                {
+                                    cp.tag = OCS_CONSTANT_CLASS;
+                                    int32_t startOffset = OCS4BYTE_FROM(nextOffset + 0x8);
+                                    
+                                    OCS_Class c_c;
+                                    
+                                    c_c.offset = startOffset;
+                                    
+                                    Class cls = objc_getClass(&exe->methodNames[startOffset]);
+                                    
+                                    NSLog(@"6 cls: %@", cls);
+                                    
+                                    // loc_2a13c1c
+                                    c_c.value = cls;
+                                    cp.u.c_class = &c_c;
+                                    exe->constPool[i] = cp;
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                case OCS_CONSTANT_SEL://0x00ce:
+                                    // loc_2a13b46
+                                {
+                                    cp.tag = OCS_CONSTANT_SEL;
+                                    int32_t startOffset = OCS4BYTE_FROM(nextOffset + 0x8);
+                                    
+                                    OCS_SEL c_s;
+                                    
+                                    c_s.offset = startOffset;
+                                    
+                                    SEL sel = sel_registerName(&exe->methodNames[startOffset]);
+                                    
+                                    NSLog(@"7 SEL: %@", NSStringFromSelector(sel));
+                                    
+                                    // loc_2a13bb4
+                                    c_s.value = sel;
+                                    cp.u.c_sel = &c_s;
+                                    exe->constPool[i] = cp;
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                case OCS_CONSTANT_PROTOCOL://0x00ea:
+                                    // loc_2a13b7e
+                                {
+                                    cp.tag = OCS_CONSTANT_PROTOCOL;
+                                    int32_t startOffset = OCS4BYTE_FROM(nextOffset + 0x8);
+                                    
+                                    OCS_Protocol c_p;
+                                    
+                                    c_p.offset = startOffset;
+                                    
+                                    Protocol* protocol = objc_getProtocol(&exe->methodNames[startOffset]);
+                                    
+                                    NSLog(@"8 Ptc: %@", protocol);
+                                    
+                                    // loc_2a13bb4
+                                    c_p.value = protocol;
+                                    cp.u.c_protocol = &c_p;
+                                    exe->constPool[i] = cp;
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                case OCS_CONSTANT_8://0x0121:
+                                    // loc_2a13bec
+                                {
+                                    cp.tag = OCS_CONSTANT_8;
+                                    int32_t startOffset = OCS4BYTE_FROM(nextOffset + 0x8);
+                                    
+                                    OCS_Char c_cs;
+                                    c_cs.offset = startOffset;
+                                    
+                                    NSLog(@"9 ??: %s", &exe->methodNames[startOffset]);
+                                    
+                                    
+                                    // loc_2a13bb4
+                                    c_cs.value = &exe->methodNames[startOffset];
+                                    cp.u.c_cString = &c_cs;
+                                    exe->constPool[i] = cp;
+                                    // loc_2a13c1e:
+                                    itemLen = 0xc;
+                                }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        
+                        // loc_2a13c22
+                        //                                r10 = r10 + 0x1;
+                        //                                r4 = r4 + 0x10;
+                        //                                if (r10 < stack[2035]) goto loc_2a13998;
+                        
+                        nextOffset += itemLen;
+                        //                                delta += 0x10;
+                    }
+                    
+                    // loc_2a13c30
+                    
                 }
+                
+                // loc_2a13c42
+                int32_t codeOffset /*r4*/ = OCS4BYTE_FROM(clsLen+0x15);
+                int32_t codeCount /*r5*/ = OCS4BYTE_FROM(codeOffset);
+                CFMutableDictionaryRef codesDict = CFDictionaryCreateMutable(CFAllocatorGetDefault(), codeCount, &kCFTypeDictionaryKeyCallBacks, 0);
+                
+                if (codeCount > 0) {
+                    // loc_2a13c80
+                    int32_t r6_offset = codeOffset + 0x4;
+                    
+                    for (int32_t i = 0; i < codeCount; i ++) {
+                        // loc_2a13c84
+                        int32_t delta = OCS4BYTE_FROM(r6_offset + 0x10);
+                        
+                        CFStringRef keyStr =
+                        CFStringCreateWithCString(kCFAllocatorDefault, &exe->methodNames[delta], kCFStringEncodingUTF8);
+                        
+                        NSLog(@"%@", keyStr);
+                        OCS_CodeBlock* codeBlock = malloc(sizeof(OCS_CodeBlock));
+                        codeBlock->methodSignature = keyStr;
+                        
+                        size_t codeSize = OCS4BYTE_FROM(r6_offset);
+                        codeBlock->codeSize = codeSize;
+                        
+                        // loc_2a13d82:
+                        NSCAssert(codeBlock->codeSize < 65536, @"codeBlock->codeSize < 65536 && \"code block size shuold not exceed 65536\"");
+                        
+                        // loc_2a13d16
+                        r6_offset += 0x14;
+                        void *buf = malloc(codeSize);
+                        codeBlock->buf = buf;
+                        memcpy(buf, &bytes[r6_offset], codeSize);
+                        codeBlock->localVarCount = OCS4BYTE_FROM(r6_offset + 0x4);
+                        
+                        // loc_2a13da8;
+                        NSCAssert(codeBlock->localVarCount < 256, @"codeBlock->localVarCount < 256 && \"local var count shuold not exceed 256\"");
+                        
+                        codeBlock->stackSize = OCS4BYTE_FROM(r6_offset + 0x8);
+                        // loc_2a13d46
+                        NSCAssert(codeBlock->stackSize < 65536, @"codeBlock->stackSize < 65536 && \"stack size shuold not exceed 65536\"");
+                        
+                        // loc_2a13d64
+                        CFDictionarySetValue(codesDict, keyStr, codeBlock);
+                        
+                        r6_offset += codeSize;
+                        
+                    }
+                    
+                    // loc_2a13d7a
+                    
+                }
+                
+                // loc_2a13d7a
+                exe->dictCodes = codesDict;
+                return exe;
+                
+            }
+            else {
+                // loc_2a13e18:
+                NSCAssert(NO, @"(kArchMagicNum == kOCSExecutableArchMagicNum) && \"OCSExecutable architecture not match,update OCScript File \"");
             }
         }
         
+#undef OCSBYTE_FROM
+#undef OCS2BYTE_FROM
+#undef OCS4BYTE_FROM
+#undef OCS8BYTE_FROM
     }
     else {
         // loc_2a13df4
-        NSLog(@"data && \"Create OCSExecutable from nil NSData\"");
+        NSCAssert(data, @"data && \"Create OCSExecutable from nil NSData\"");
     }
+    
+    return nil;
 }
 
 /*
@@ -420,7 +736,8 @@ loc_2a13df4:
  */
 
 // sub_2a13e60
-void _OCSCodeBlockReleaseCallBack() {}
+void
+_OCSCodeBlockReleaseCallBack() {}
 
 /*
 int sub_2a13e60() {

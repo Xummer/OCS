@@ -6,10 +6,7 @@
 //  Copyright © 2017年 Xummer. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <objc/runtime.h>
-#import <objc/message.h>
-#import <objc/objc.h>
+#import "OCSVM_code.h"
 
 // sub_2a0bda8
 void OCSStackBlockCreate() {
@@ -73,13 +70,12 @@ int sub_2a0bdee() {
  */
 
 // sub_2a0be22
-void OCSVirtualMachineDestroy(id vm) {
-    if (vm) {
-        NSLog(@"vm->currentFrame == NULL && \"Destroy a VirtualMachine with Frame Still Active.\"");
-    }
-    else {
-        NSLog(@"vm && \"Destroy NULL OCSVirtualMachine\"");
-    }
+void
+OCSVirtualMachineDestroy(OCS_VirtualMachine* vm) {
+    NSCAssert(vm, @"vm && \"Destroy NULL OCSVirtualMachine\"");
+    NSCAssert(vm->currentFrame == NULL, @"vm->currentFrame == NULL && \"Destroy a VirtualMachine with Frame Still Active.\"");
+//    CFRelease
+    
 }
 
 /*
@@ -127,7 +123,8 @@ int sub_2a0be22(int arg0) {
  */
 
 // sub_2a0c01c
-void OCSVirtualMachineExecuteWithArr(void *content, void *codeBlock, int arg2, CFMutableArrayRef argList, int arg4) {
+void
+OCSVirtualMachineExecuteWithArr(void *content, void *codeBlock, int arg2, CFMutableArrayRef argList, int arg4) {
     if (vm) {
         // loc_2a0c07a
         if (codeBlock) {
