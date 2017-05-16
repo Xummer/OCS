@@ -20,7 +20,7 @@ OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
         dispatch_queue_create("ocscript.executable-manager.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
         dictClassNameTables = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
         exeClassNameTablesQueue = dispatch_queue_create("ocscript.executable-manager.exeClassNameTablesQueue", DISPATCH_QUEUE_CONCURRENT);
-        cache = [NSCache new];
+        codeBlockCache = [NSCache new];
     });
     
     __block OCS_Executable* exec;
@@ -140,12 +140,12 @@ int sub_2a0b75c(int arg0, int arg1) {
 
 // ??
 // sub_2a0bac0
-const void *
+OCS_CodeBlock *
 OCSGetCodeBlock(NSString *clsName, NSString *arg1) {
     NSString *key = [NSString stringWithFormat:@"%@_%@", clsName, arg1];
-    __block const void *pointer = [[cache objectForKey:key] pointerValue];
-    if (!pointer) {
-        
+    __block OCS_CodeBlock *codeBlock = [[codeBlockCache objectForKey:key] pointerValue];
+    
+    if (!codeBlock) {
         dispatch_sync(exeClassNameTablesQueue, ^{
             // sub_2a0bc50
             Class cls = NSClassFromString(clsName);
@@ -162,15 +162,14 @@ OCSGetCodeBlock(NSString *clsName, NSString *arg1) {
                         if (c > 0) {
                             // loc_2a0bcf6
                             // loc_2a0bcfa
-                            CFDictionaryRef dict;
+                            OCS_Executable* exec;
                             CFIndex i;
                             for (i = 0; i < c; i++) {
-                                dict = CFArrayGetValueAtIndex(arr, i);
-                                if (dict) {
+                                exec = (OCS_Executable *)CFArrayGetValueAtIndex(arr, i);
+                                if (exec) {
                                     // loc_2a0bd04
-                                    const void *pt = CFDictionaryGetValue(dict,(__bridge const void *)(key));
-                                    [cache setObject:[NSValue valueWithPointer:pt] forKey:key];
-                                    pointer = pt;
+                                    codeBlock = (OCS_CodeBlock *)CFDictionaryGetValue(exec->dictCodes,(__bridge const void *)(key));
+                                    [codeBlockCache setObject:[NSValue valueWithPointer:codeBlock] forKey:key];
                                     return;
                                 }
                             }
@@ -183,12 +182,9 @@ OCSGetCodeBlock(NSString *clsName, NSString *arg1) {
         });
     }
     
+    NSCAssert(codeBlock, @"codeBlock && \"codeBlock is NULL\"");
     
-    if (!pointer) {
-        NSLog(@"codeBlock && \"codeBlock is NULL\"");
-    }
-    
-    return pointer;
+    return codeBlock;
 }
 
 /*

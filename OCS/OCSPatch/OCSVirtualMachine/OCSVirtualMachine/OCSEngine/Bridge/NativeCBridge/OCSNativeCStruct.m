@@ -159,6 +159,22 @@ int sub_2a12b8e(int arg0) {
 }
 */
 
+// sub_2a12c70
+void
+sub_2a12c70() {}
+
+/*
+int sub_2a12c70(int arg0) {
+    stack[2045] = r4;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0xc) + 0x4;
+    r0 = CFDictionaryGetValue(*0x367d220, *(arg0 + 0x18));
+    *(*(*(arg0 + 0x14) + 0x4) + 0x10) = r0;
+    return r0;
+}
+ */
+ 
 // sub_2a12e24
 void OCSCreateCopyStruct() {}
 
@@ -300,120 +316,4 @@ OCSSetUpCFuncEnvironment() {
  r0 = sub_2a123ba();
  return r0;
  }
- */
-
-
-// sub_2a13fb4
-NSData *
-OCSGetExecutableData(NSString *fileName) {
-    dispatch_sync(classExecutableRootReadWriteQueue, ^{
-        // sub_2a14b20
-        [dict3 objectForKey:];
-    });
-    
-    NSString *path = [*(stack[2021] + 0x18) stringByAppendingPathComponent:fileName];
-    
-#if TARGET_IPHONE_SIMULATOR
-    // DONOTHING
-#else
-    
-#if __LP64__
-    NSString *fullPath = [path stringByAppendingPathExtension:@"64.ocs"];
-#else
-    NSString *fullPath = [path stringByAppendingPathExtension:@"32.ocs"];
-#endif
-    
-#endif // TARGET_IPHONE_SIMULATOR
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:fullPath]) {
-        [NSException raise:@"OCSERROR" format:@"executable not find! path:%@", fullPath];
-    }
-    
-    return [NSData dataWithContentsOfFile:fullPath];
-}
-
-/*
-int sub_2a14b20(int arg0) {
-    stack[2045] = r4;
-    stack[2046] = r7;
-    stack[2047] = lr;
-    r7 = (sp - 0xc) + 0x4;
-    r0 = [*0x367d234 objectForKey:*(arg0 + 0x18)];
-    *(*(*(arg0 + 0x14) + 0x4) + 0x18) = r0;
-    return r0;
-}
- */
-
-/*
-int sub_2a13fb4(int arg0) {
-    r0 = arg0;
-    stack[2043] = r4;
-    stack[2044] = r5;
-    stack[2045] = r6;
-    stack[2046] = r7;
-    stack[2047] = lr;
-    r7 = (sp - 0x14) + 0xc;
-    stack[4611686018427389944] = r8;
-    stack[4611686018427389945] = r10;
-    stack[4611686018427389946] = r11;
-    r4 = sp - 0x60;
-    asm { bfc        r4, #0x0, #0x4 };
-    sp = r4;
-    asm { vst1.64    {d8, d9, d10, d11}, [r4, #0x80]! };
-    asm { vst1.64    {d12, d13, d14, d15}, [r4, #0x80] };
-    sp = sp - 0x80;
-    r4 = r0;
-    r5 = 0x0;
-    stack[2020] = r5;
-    stack[2021] = sp + 0x30;
-    r2 = 0x367d230;
-    stack[2022] = 0x52000000;
-    r1 = 0x2a14b0f;
-    r6 = __NSConcreteStackBlock;
-    stack[2023] = 0x1c;
-    r9 = 0x2a14b21;
-    r0 = 0x2a14b19;
-    r12 = 0x2f01e10;
-    asm { strd       r1, r0, [sp, #0x98 + var_58] };
-    r1 = 0xc2000000;
-    r0 = *r2;
-    r2 = sp + 0x18;
-    stack[2026] = r5;
-    stack[2013] = r6;
-    asm { stm.w      r2, {r1, r5, sb, ip} };
-    r1 = sp + 0x14;
-    asm { strd       r3, r4, [sp, #0x98 + var_70] };
-    r0 = dispatch_sync(r0, r1);
-    stack[2033] = ___objc_personality_v0;
-    stack[2034] = 0x2e4ff24;
-    stack[2035] = r7;
-    stack[2037] = sp;
-    stack[2036] = 0x2a14167;
-    stack[2028] = 0x1;
-    r0 = sp + 0x4c;
-    r0 = _Unwind_SjLj_Register();
-    r0 = [*(stack[2021] + 0x18) stringByAppendingPathComponent:r4];
-    stack[2028] = 0x2;
-    stack[2012] = [r0 stringByAppendingPathExtension:@"32.ocs"];
-    stack[2028] = 0x3;
-    r0 = [NSFileManager defaultManager];
-    stack[2028] = 0x4;
-    if (([r0 fileExistsAtPath:stack[2012]] & 0xff) == 0x0) {
-        stack[2028] = 0x5;
-        r0 = [NSException raise:@"OCSERROR" format:@"executable not find! path:%@", stack[2012], stack[2009], stack[2010], stack[2011], stack[2012], stack[2013], stack[2014], stack[2015], stack[2016], stack[2017], stack[2018], stack[2019], stack[2020], stack[2021], stack[2022], stack[2023], stack[2024]];
-    }
-    stack[2028] = 0x6;
-    r4 = [NSData dataWithContentsOfFile:stack[2012]];
-    r0 = sp + 0x30;
-    r1 = 0x8;
-    r0 = _Block_object_dispose();
-    r0 = sp + 0x4c;
-    r0 = _Unwind_SjLj_Unregister();
-    r0 = r4;
-    r4 = sp + 0x80;
-    asm { vld1.64    {d8, d9, d10, d11}, [r4, #0x80]! };
-    asm { vld1.64    {d12, d13, d14, d15}, [r4, #0x80] };
-    sp = r7 - 0x18;
-    return r0;
-}
  */

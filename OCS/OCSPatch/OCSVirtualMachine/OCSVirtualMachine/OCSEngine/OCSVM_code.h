@@ -71,8 +71,8 @@ typedef struct OCS_Executable_t {
     int32_t constPoolCount; // +0x0
     OCS_ConstantPool *constPool; // +0x4
     size_t size; // +0x8
-    CFMutableDictionaryRef dictCodes;// +0x10
     void *methodNames; // +0xc
+    CFMutableDictionaryRef dictCodes;// +0x10 // <CFString, OCS_CodeBlock*>
     CFStringRef fileName; // +0x14
     CFStringRef clsName; // +0x18
 } OCS_Executable ; // 0x1c
@@ -84,14 +84,34 @@ typedef struct {
     OCS_ConstantPool *constPool; // +0xc
     int32_t localVarCount;  // +0x10
     int32_t stackSize; // +0x14
-    CFStringRef methodSignature; // +0x18
+    CFStringRef method; // +0x18  -|initWithModel:param:|@@:@@
 } OCS_CodeBlock; // 0x1c
 
+typedef struct OCS_StackBlock_t {
+    struct OCS_StackBlock_t *prev; // +0x0
+    struct OCS_StackBlock_t *next; // +0x4
+    int32_t allocSize; // +0x8
+    void* stack;// +0xc
+} OCS_StackBlock;
+
+typedef struct OCS_Frame_t {
+    struct OCS_Frame_t *next; // +0x0
+    // +0x4
+    OCS_Class *cls; // class +0x8
+    OCS_CodeBlock *codeBlock; // +0xc
+    int32_t pc; // +0x10
+} OCS_Frame; // 0x39c
+
 typedef struct OCS_VirtualMachine_t {
-    void* currentFrame; // +0x0
-    // +0xc
-    CFTypeRef name;// +0x1c
-} OCS_VirtualMachine;
+    OCS_Frame* currentFrame; // +0x0
+    int32_t stackPointer; // +0x4
+    OCS_StackBlock* stackBlock; // +0x8
+    OCS_StackBlock* _0xc; // +0xc  register
+    int32_t _0x10; // +0x10
+    int32_t state; // +0x14
+    pthread_t thread; // +0x18
+    CFStringRef exptionCallStackInfo; // +0x1c
+} OCS_VirtualMachine; // 0x20
 
 
 static void *OCSExecutableManagerLoadDataCallback_fun; // *0x35d3dc0
@@ -100,9 +120,9 @@ static NSUInteger int_35d3dcc; //*0x35d3dcc;
 
 static CFMutableDictionaryRef dictExecutables; // *0x367d1f0  <executableName, OCS_Executable*>
 static dispatch_queue_t OCSExecutableManagerReadWriteQueue; // *0x367d1f4
-static CFMutableDictionaryRef dictClassNameTables; // *0x367d1f8 <className, OCS_Executable*>
+static CFMutableDictionaryRef dictClassNameTables; // *0x367d1f8 <className, <CFMutableArrayRef>OCS_Executable*>
 static dispatch_queue_t exeClassNameTablesQueue; // *0x367d1fc
-static NSCache *cache; // *0x367d200
+static NSCache *codeBlockCache; // *0x367d200 <className, OCS_CodeBlock*>
 
 static CFMutableDictionaryRef dictCFunction; // *0x367d208
 static CFMutableDictionaryRef dict_367d20c; // *0x367d20c
@@ -111,13 +131,51 @@ static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c
 static CFMutableDictionaryRef dictStructType; // *0x367d220
 static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214
 
-static NSMutableDictionary *dictClsMethodName; // *0x367d22c
+static NSMutableDictionary *OCSOverrideClsMethodNameDic; // *0x367d22c <NSString * className, <NSMutableDictionary *> overrideMethods>
 static dispatch_queue_t classMethodNameReadWriteQueue; // *00x367d228
-static NSMutableDictionary *dict3; // *0x367d234
+static NSMutableDictionary *classExecutableRoot; // *0x367d234 <NSString * filePath, NSString * rootPath>
 static dispatch_queue_t classExecutableRootReadWriteQueue; // *0x367d230
+
+// sub_2a0bac0
+OCS_CodeBlock *
+OCSGetCodeBlock(NSString *clsName, NSString *arg1);
+
+// sub_2a0bdee
+OCS_VirtualMachine*
+OCSVirtualMachineCreate();
+
+// sub_2a0be22
+void
+OCSVirtualMachineDestroy(OCS_VirtualMachine* vm);
+
+// sub_2a0be9c
+void
+OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread);
+
+// sub_2a0b75c
+OCS_Executable*
+OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
 
 // sub_2a137d4
 OCS_Executable*
 OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode);
+
+// sub_2a13760
+void
+OCSSetUpCFuncEnvironment();
+
+// sub_2a13790
+id
+OCSGetCurrentThreadVMExptionCallStackInfo();
+
+// sub_2a13fb4
+NSData *
+OCSGetExecutableData(NSString *fileName);
+
+// sub_2a1514a
+OCS_VirtualMachine*
+OCSGetCurrentThreadVirtualMachine();
+
+
 
 #endif /* OCSVM_code_h */

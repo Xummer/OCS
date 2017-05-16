@@ -43,19 +43,26 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
         // loc_2a14dc8
         [methodSignature methodReturnType];
         NSString *clsStr = NSStringFromClass([assignSlf class]);
+        OCS_CodeBlock *codeBlock;
         
-        dispatch_sync(/*<*0x367d228>*/, ^{
+        dispatch_sync(classMethodNameReadWriteQueue, ^{
+            // sub_2a14f74
             Class cls = NSClassFromString(clsStr);
-            if (cls && ![cls isEqual:[NSObject class]]) {
-                do {
+            if (cls) {
+                while (![cls isEqual:[NSObject class]]) {
                     NSString *clsName = NSStringFromClass(cls);
                     cls = class_getSuperclass(cls);
-                    const void *value = CFDictionaryGetValue(/*<*0x367d22c>*/, clsName);
-                    if (!value) goto ; //??
+                    NSDictionary *dictOverrideMethod = OCSOverrideClsMethodNameDic[clsName];
+                    if (dictOverrideMethod) {
+                        codeBlock = dictOverrideMethod[ selectorName ];
+                        if (codeBlock) {
+                            break;
+                        }
+                    }
                     if (!cls) {
                         break;
                     }
-                } while (![cls isEqual:[NSObject class]]);
+                }
             }
         });
         
@@ -65,7 +72,6 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
     else {
         // loc_2a14c28
         // loc_2a14c70
-        []
         
     }
 }
@@ -77,19 +83,19 @@ void close_thread (void* thread) {
 }
 
 // sub_2a1514a
-void*
-sub_2a1514a() {
-    void* content;
+OCS_VirtualMachine*
+OCSGetCurrentThreadVirtualMachine() {
+    OCS_VirtualMachine* vm;
     if (pthread_main_np()) {
         // main thread
-        static void* mainThreadContent /* <*0x367d244> */;
+        static OCS_VirtualMachine* mainThreadVM /* <*0x367d244> */;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            mainThreadContent = sub_2a0bdee();
+            mainThreadVM = OCSVirtualMachineCreate();
         });
         
-        content = mainThreadContent;
-        OCSVirtualMachineAttachThread(content, pthread_self());
+        vm = mainThreadVM;
+        OCSVirtualMachineAttachThread(vm, pthread_self());
     }
     else {
         static pthread_key_t pkey; /* <*0x367d250> */;
@@ -98,13 +104,14 @@ sub_2a1514a() {
             pthread_key_create(&pkey, close_thread);
         });
         
-        content = pthread_getspecific(pkey);
-        if (!content) {
-            content = sub_2a0bdee();
-            OCSVirtualMachineAttachThread(content, pthread_self());
-            pthread_setspecific(pkey, content);
+        vm = pthread_getspecific(pkey);
+        if (!vm) {
+            vm = OCSVirtualMachineCreate();
+            OCSVirtualMachineAttachThread(vm, pthread_self());
+            pthread_setspecific(pkey, vm);
         }
     }
+    return vm;
 }
 
 /*
@@ -146,12 +153,12 @@ int sub_2a1514a() {
     dispatch_once(&onceToken, ^{
         // sub_2a13ed0
         classMethodNameReadWriteQueue = dispatch_queue_create("ocscript.OCSEngine.classMethodNameDic.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
-        if (!dictClsMethodName) {
-            dictClsMethodName = [[NSMutableDictionary alloc] init];
+        if (!OCSOverrideClsMethodNameDic) {
+            OCSOverrideClsMethodNameDic = [[NSMutableDictionary alloc] init];
         }
         classExecutableRootReadWriteQueue = dispatch_queue_create("ocscript.OCSEngine.classExecutableRootReadWriteQueueID.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
-        if (!dict3) {
-            dict3 = [[NSMutableDictionary alloc] init];
+        if (!classExecutableRoot) {
+            classExecutableRoot = [[NSMutableDictionary alloc] init];
         }
         if (!OCSExecutableManagerLoadDataCallback_fun) {
             OCSExecutableManagerLoadDataCallback_fun = &OCSGetExecutableData;
@@ -185,43 +192,48 @@ void sub_2a13ed0(void * _block) {
 }
  */
 
-+ (void)getClassNameWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
-    OCSGetExecutable(fileName, errorCode);
++ (NSString *)getClassNameWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
+    OCS_Executable* exec = OCSGetExecutable(fileName, errorCode);
     if (*errorCode) {
+        return nil;
     }
     else {
+        return (__bridge NSString *)exec->clsName;
     }
 }
 
++ (id)CurrentThreadOCSVMExptionCallStackInfo {
+    return OCSGetCurrentThreadVMExptionCallStackInfo();
+}
+
++ (id)CurrentThreadOCSVMStackInfo {
+    return OCSGetCurrentThreadStackInfo();
+}
+
+// <OCS_CodeBlock *>
 + (NSArray *)getMethodsNameWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
     NSArray *result;
-    OCSGetExecutable(fileName, errorCode);
+    OCS_Executable* exec = OCSGetExecutable(fileName, errorCode);
     if (*errorCode) {
         result = nil;
     }
     else {
-        CFDictionaryRef theDict = ??;
-        CFIndex size = CFDictionaryGetCount(theDict);
-        void* keys = malloc(size << 0x2);
-        void* values = malloc(size << 0x2);
+        CFDictionaryRef theDict = exec->dictCodes;
+        CFIndex count = CFDictionaryGetCount(theDict);
+        const void ** keys = malloc(count * sizeof(CFStringRef *));
+        const void ** values = malloc(count * sizeof(OCS_CodeBlock *));
         CFDictionaryGetKeysAndValues(theDict, keys, values);
         
         NSMutableArray *marr = [NSMutableArray array];
         
-        if (size >= 1) {
-            void** item = values;
-            do {
-                id obj = (__bridge id)(*item);
-                [marr addObject:obj];
-                item = item + 4;
-                size --;
-            } while (size > 0);
-            free(keys);
+        for (uint32_t i = 0; i < count; i ++) {
+//            CFStringRef key = keys[i];
+            OCS_CodeBlock *value = ((OCS_CodeBlock *)values[i]);
+            [marr addObject:(__bridge id _Nonnull)(value)];
         }
-        else {
-            if (keys) {
-                free(keys);
-            }
+        
+        if (keys) {
+            free(keys);
         }
         
         if (values) {
@@ -234,6 +246,97 @@ void sub_2a13ed0(void * _block) {
     return result;
 }
 
++ (void)runWithExecutablesRoot:(NSString *)rootPath
+                     fileNames:(NSArray *)fileNames
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [[self class] setUpEnvironment];
+    });
+    
+    for (NSString *fileName in fileNames) {
+        dispatch_barrier_async(classExecutableRootReadWriteQueue, ^{
+            // sub_2a144c6
+            NSString *p = [classExecutableRoot objectForKey:fileName];
+            if (!p) {
+                [classExecutableRoot setObject:rootPath forKey:fileNames];
+            }
+        });
+        
+        NSUInteger errorCode = 0;
+        [[self class] runWithFileName:fileName errorCode:&errorCode];
+    }
+    
+}
+
++ (void)runWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
+    dispatch_barrier_sync(classMethodNameReadWriteQueue, ^{
+       // sub_2a145a0
+        NSString *clsName =
+        [[self class] getClassNameWithFileName:fileName errorCode:errorCode];
+        NSDictionary *overrideMethods =
+        [[self class] overrideMethodsWithFileName:fileName errorCode:errorCode];
+        if (*errorCode) {
+            
+        }
+        else {
+            NSMutableDictionary *dict = [OCSOverrideClsMethodNameDic objectForKey:clsName];
+            if (dict) {
+                [dict addEntriesFromDictionary:overrideMethods];
+            }
+            else {
+                dict = [NSMutableDictionary dictionaryWithDictionary:overrideMethods];
+            }
+            [OCSOverrideClsMethodNameDic setObject:dict forKey:clsName];
+        }
+    });
+}
+
+// <NSString* /*methodName*/, OCS_CodeBlock* /*codeBlock*/>
++ (NSDictionary *)overrideMethodsWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
+    NSArray *arrMethods = [[self class] getMethodsNameWithFileName:fileName errorCode:errorCode];
+    
+    if (*errorCode) {
+        return nil;
+    }
+    else {
+        NSString *clsName = [[self class] getClassNameWithFileName:fileName errorCode:errorCode];
+        if (*errorCode) {
+            return nil;
+        }
+        else {
+            Class cls = NSClassFromString(clsName);
+            NSMutableDictionary *mDict = [NSMutableDictionary dictionary];
+            
+            for (NSUInteger i = 0; i < [arrMethods count]; i ++) {
+                OCS_CodeBlock *codeBlock = (__bridge OCS_CodeBlock *)(arrMethods[ i ]);
+                NSString *method = (__bridge NSString *)codeBlock->method;
+                NSArray *arrComponents = [method componentsSeparatedByString:@"|"];
+                NSString *methodStr = arrComponents[ 1 ];
+                mDict[ methodStr ] = (__bridge id _Nullable)(codeBlock);
+                Class realCls;
+                if (![arrComponents[0] isEqualToString:@"-"]) {
+                    realCls = objc_getMetaClass([clsName UTF8String]);
+                }
+                else {
+                    realCls = cls;
+                }
+                
+                const char *typeDes;
+                if (class_respondsToSelector(realCls, NSSelectorFromString(methodStr))) {
+                    typeDes = NULL;
+                }
+                else {
+                    typeDes = [arrComponents[3] UTF8String];
+                }
+                
+                [[self class] overrideMethodWithClass:realCls selectorName:methodStr isClassMethod:NO typeDescription:typeDes];
+            }
+            
+            return  [NSDictionary dictionaryWithDictionary:mDict];
+        }
+    }
+}
 
 + (void)overrideMethodWithClass:(Class)cls selectorName:(NSString *)selName isClassMethod:(BOOL)isClsMthd typeDescription:(const char *)typeDes {
     SEL sel = NSSelectorFromString(selName);
@@ -287,15 +390,6 @@ void sub_2a13ed0(void * _block) {
     
     NSString *JPSelName = [NSString stringWithFormat:@"_JP%@", selName];
     class_addMethod(cls, NSSelectorFromString(JPSelName), msgForwardIMP, typeDes);
-    
-}
-
-+ (void)runWithExecutablesRoot:(id)root fileNames:(NSArray *)fileNames {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [[self class] setUpEnvironment];
-    });
-    
     
 }
 

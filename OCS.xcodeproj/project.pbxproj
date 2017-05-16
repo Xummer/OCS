@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C12D56F91ECAA34200CC313A /* OCSInnerException.m in Sources */ = {isa = PBXBuildFile; fileRef = C12D56F81ECAA34100CC313A /* OCSInnerException.m */; };
 		C16366D21E67A5190010A9D6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D11E67A5190010A9D6 /* main.m */; };
 		C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D41E67A5190010A9D6 /* AppDelegate.m */; };
 		C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D71E67A51A0010A9D6 /* ViewController.m */; };
@@ -41,6 +42,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C12D56F71ECAA34100CC313A /* OCSInnerException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSInnerException.h; sourceTree = "<group>"; };
+		C12D56F81ECAA34100CC313A /* OCSInnerException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSInnerException.m; sourceTree = "<group>"; };
 		C135A0FC1EC6EB68009844EF /* OCSVM_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSVM_code.h; sourceTree = "<group>"; };
 		C16366CD1E67A5190010A9D6 /* OCS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OCS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C16366D11E67A5190010A9D6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -191,6 +194,8 @@
 				C1DB9E9F1EC097BE0017C4E1 /* Executable */,
 				C1DB9EA01EC097BE0017C4E1 /* VirtualMachine */,
 				C135A0FC1EC6EB68009844EF /* OCSVM_code.h */,
+				C12D56F71ECAA34100CC313A /* OCSInnerException.h */,
+				C12D56F81ECAA34100CC313A /* OCSInnerException.m */,
 			);
 			path = OCSEngine;
 			sourceTree = "<group>";
@@ -370,6 +375,7 @@
 				C186544A1EC30D4F00FA1E7B /* OCSExecutable.m in Sources */,
 				C1DB9EA21EC098180017C4E1 /* OCSNativeCStruct.m in Sources */,
 				C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */,
+				C12D56F91ECAA34200CC313A /* OCSInnerException.m in Sources */,
 				C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */,
 				C16366D21E67A5190010A9D6 /* main.m in Sources */,
 				C1DB9EA61EC099220017C4E1 /* OCSVirtualMachine.m in Sources */,

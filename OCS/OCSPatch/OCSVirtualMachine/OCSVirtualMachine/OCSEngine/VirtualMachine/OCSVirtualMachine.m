@@ -9,8 +9,16 @@
 #import "OCSVM_code.h"
 
 // sub_2a0bda8
-void OCSStackBlockCreate() {
+OCS_StackBlock *
+OCSStackBlockCreate(OCS_StackBlock* prev, OCS_StackBlock* next, int32_t size) {
+    NSCAssert(size >= 1, @"size >= 1");
     
+    OCS_StackBlock *stackBlock = malloc(0xc + (size + size * 0x2) * 0x4);
+    stackBlock->prev = prev;
+    stackBlock->next = next;
+    stackBlock->allocSize = size;
+    
+    return stackBlock;
 }
 
 /*
@@ -42,7 +50,25 @@ int sub_2a0bda8(int arg0, int arg1, int arg2) {
  */
 
 // sub_2a0bdee
-void * sub_2a0bdee() {}
+OCS_VirtualMachine *
+OCSVirtualMachineCreate() {
+    OCS_VirtualMachine *vm = malloc(sizeof(OCS_VirtualMachine));
+    vm->state = 0;
+    
+    OCS_StackBlock *stack = malloc(sizeof(OCS_StackBlock));
+    stack->next = NULL;
+    stack->prev = NULL;
+    vm->stackBlock = stack;
+    vm->_0xc = stack;
+    stack->allocSize = 0x4c;
+    vm->_0x10 = 0x4c;
+    vm->stackPointer = &stack->stack;
+    
+    vm->currentFrame = NULL;
+    vm->thread = NULL;
+    vm->exptionCallStackInfo = NULL;
+    return vm;
+}
 
 /*
 int sub_2a0bdee() {
@@ -74,8 +100,17 @@ void
 OCSVirtualMachineDestroy(OCS_VirtualMachine* vm) {
     NSCAssert(vm, @"vm && \"Destroy NULL OCSVirtualMachine\"");
     NSCAssert(vm->currentFrame == NULL, @"vm->currentFrame == NULL && \"Destroy a VirtualMachine with Frame Still Active.\"");
-//    CFRelease
+    if (vm->exptionCallStackInfo) {
+        CFRelease(vm->exptionCallStackInfo);
+        vm->exptionCallStackInfo = NULL;
+    }
     
+    OCS_StackBlock *pos;
+    for (pos = vm->_0xc; pos->next != NULL; pos = pos->next) {
+        free(pos);
+    }
+    
+    free(vm);
 }
 
 /*
@@ -122,32 +157,215 @@ int sub_2a0be22(int arg0) {
 }
  */
 
-// sub_2a0c01c
+// sub_2a0be9c
 void
-OCSVirtualMachineExecuteWithArr(void *content, void *codeBlock, int arg2, CFMutableArrayRef argList, int arg4) {
-    if (vm) {
-        // loc_2a0c07a
-        if (codeBlock) {
-            if (!vm->isRunning /* vm + 0x14 */) {
-                // loc_2a0c0a6
-                /* vm + 0x8 */
-                /* vm + 0x4 */
-                
-                
-            }
-            else {
-                printf("[OCS ERROR]");
-                printf("OCSVirtualMachine is already running.");
-            }
+OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread) {
+    NSCAssert(vm, @"vm && \"Attach thread on NULL OCSVirtualMachine.\"");
+    NSCAssert(thread, @"thread && \"Attach NULL thread on OCSVirtualMachine\"");
+    if (vm && thread) {
+        vm->thread = thread;
+    }
+}
+
+/*
+void sub_2a0be9c(int arg0, int arg1) {
+    r1 = arg1;
+    r0 = arg0;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = sp - 0x8;
+    if (r0 != 0x0) {
+        if (r1 != 0x0) {
+            *(r0 + 0x18) = r1;
         }
         else {
-            // loc_2a0c368
-            NSLog(@"codeBlock && \"Execute NULL OCSCodeBlock\"");
+            r2 = 0xb9;
+            r0 = "OCSVirtualMachineAttachThread";
+            r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/VirtualMachine/OCSVirtualMachine.m";
+            r3 = "thread && \"Attach NULL thread on OCSVirtualMachine\"";
+            r0 = __assert_rtn();
         }
     }
     else {
-        // loc_2a0c33e
-        NSLog(@"vm && \"Execute on NULL OCSVirtualMachine\"");
+        r2 = 0xb8;
+        r0 = "OCSVirtualMachineAttachThread";
+        r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/VirtualMachine/OCSVirtualMachine.m";
+        r3 = "vm && \"Attach thread on NULL OCSVirtualMachine.\"";
+        r0 = __assert_rtn();
+    }
+    return;
+}
+ */
+
+// sub_2a0bef0
+void
+_appendVMStackInfo(NSMutableString *infos, OCS_Frame *frame) {
+    if (infos && frame) {
+        [infos appendFormat:@"[class:%@] ", frame->cls->value];
+        [infos appendFormat:@"[methodName:%@] ", frame->codeBlock->method];
+        [infos appendFormat:@"[pc:%d]", frame->pc];
+        [infos appendString:@"\n"];
+    }
+}
+
+/*
+void sub_2a0bef0(int arg0, int arg1) {
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    r4 = arg0;
+    r5 = arg1;
+    if ((r4 != 0x0) && (r5 != 0x0)) {
+        r3 = [**(r5 + 0x10) class];
+        r0 = [r4 appendFormat:@"[class:%@] "];
+        r3 = *(*(r5 + 0xc) + 0x18);
+        r0 = [r4 appendFormat:@"[methodName:%@] "];
+        r3 = *(r5 + 0x8);
+        r0 = [r4 appendFormat:@"[pc:%d]"];
+        r2 = @"\n";
+        r1 = @selector(appendString:);
+        r0 = r4;
+        r0 = loc_2dee71c();
+    }
+    return;
+}
+ */
+
+// sub_2a0bf7e
+NSString *
+_getVMStackInfo(OCS_VirtualMachine *vm) {
+    if (vm) {
+        NSMutableString *infos =
+        [NSMutableString stringWithFormat:@"[VMState:%zd]\n ", vm->state];
+        if (vm->currentFrame) {
+            
+            int32_t i = 0;
+            OCS_Frame *frame = vm->currentFrame;
+            while (frame) {
+                [infos appendFormat:@"%zd ", i];
+                _appendVMStackInfo(infos, vm->currentFrame);
+                frame = frame->next;
+                i ++;
+            }
+            
+            return infos;
+        }
+    }
+    
+    return nil;
+}
+
+/*
+int sub_2a0bf7e(int arg0) {
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    stack[4611686018427389945] = r8;
+    stack[4611686018427389946] = r10;
+    sp = sp - 0x1c;
+    r5 = arg0;
+    if (r5 != 0x0) {
+        r0 = [NSMutableString stringWithFormat:@"[VMState:%zd]\n ", *(r5 + 0x14)];
+        r5 = *r5;
+        r4 = r0;
+        if (r5 != 0x0) {
+            r2 = @"%zd ";
+            r3 = 0x0;
+            r0 = objc_msgSend(r4, *@selector(appendFormat:));
+            r0 = sub_2a0bef0(r4, r5);
+            r5 = *r5;
+            if (r5 != 0x0) {
+                r8 = *@selector(appendFormat:);
+                r6 = 0x1;
+                r10 = @"%zd ";
+                do {
+                    r2 = @"%zd ";
+                    r3 = r6;
+                    r0 = objc_msgSend(r4, r8);
+                    r0 = sub_2a0bef0(r4, r5);
+                    r5 = *r5;
+                    r6 = r6 + 0x1;
+                } while (r5 != 0x0);
+            }
+        }
+        else {
+            r4 = 0x0;
+        }
+    }
+    else {
+        r4 = 0x0;
+    }
+    r0 = r4;
+    return r0;
+}
+ */
+
+// sub_2a0c01c
+void
+OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, int arg2, CFMutableArrayRef argList, int arg4) {
+    NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
+    NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
+    // loc_2a0c080
+    // if (*(stack[2021] + 0x14) != 0x1)
+    
+    if (vm->state != 0x1 /* vm + 0x14 */) {
+        // loc_2a0c0a6
+        //        stack[2023] = *(stack[2021] + 0x8);
+        //        stack[2024] = *(stack[2021] + 0x4);
+        //        r2 = stack[2024];
+        //        r3 = (SAR(0xc + stack[2023] + (*(stack[2023] + 0x8) + *(stack[2023] + 0x8) * 0x2) * 0x4 - r2, 0x2)) * 0xaaaaaaab;
+        //        r0 = stack[2023];
+        //        r1 = *(r4 + 0x10) + *(r4 + 0x14);
+        //        if (r3 >= r1) goto loc_2a0c126;
+        
+        OCS_StackBlock *stackBlock = vm->stackBlock;/* vm + 0x8 */ // ??
+        //        vm->stackPointer; /* vm + 0x4 */
+        
+        int32_t needSize = codeBlock->localVarCount + codeBlock->stackSize;
+        
+        int32_t rest = (SAR(0xc + stackBlock + (stackBlock->allocSize + stackBlock->allocSize * 0x2) * 0x4 - vm->stackPointer, 0x2)) * 0xaaaaaaab;
+        
+        if (rest < needSize) {
+            OCS_StackBlock *tmpStackBlock = stackBlock;
+            
+            // loc_2a0c0e0
+            do {
+                tmpStackBlock = tmpStackBlock->next;
+                if (!tmpStackBlock) {
+                    // loc_2a0c0ec
+                    
+                    OCS_StackBlock *pos;
+                    for (pos = stackBlock; pos->next != NULL; pos = pos->next)
+                        ;
+                    int32_t size = MAX(vm->_0x10, needSize); // ??
+                    tmpStackBlock = OCSStackBlockCreate(pos, NULL, size);
+                    pos->next = tmpStackBlock;
+                    vm->_0x10 += size;
+                    break;
+                }
+            } while (tmpStackBlock->allocSize < needSize);
+            
+            // loc_2a0c11a
+            vm->stackBlock = tmpStackBlock;
+            vm->stackPointer = &tmpStackBlock->stack;
+        }
+        
+        // loc_2a0c126
+        
+        
+        OCS_Frame *f_2014 = vm->currentFrame;
+        CFArrayCreateMutable
+        
+    }
+    else {
+        printf("[OCS ERROR]");
+        printf("OCSVirtualMachine is already running.");
     }
 }
 
@@ -434,48 +652,12 @@ loc_2a0c33e:
     return r0;
 }
  */
-
-// sub_2a0be9c
-void OCSVirtualMachineAttachThread(void *contnet, pthread_t thread) {}
-
-/*
-void sub_2a0be9c(int arg0, int arg1) {
-    r1 = arg1;
-    r0 = arg0;
-    stack[2046] = r7;
-    stack[2047] = lr;
-    r7 = sp - 0x8;
-    if (r0 != 0x0) {
-        if (r1 != 0x0) {
-            *(r0 + 0x18) = r1;
-        }
-        else {
-            r2 = 0xb9;
-            r0 = "OCSVirtualMachineAttachThread";
-            r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/VirtualMachine/OCSVirtualMachine.m";
-            r3 = "thread && \"Attach NULL thread on OCSVirtualMachine\"";
-            r0 = __assert_rtn();
-        }
-    }
-    else {
-        r2 = 0xb8;
-        r0 = "OCSVirtualMachineAttachThread";
-        r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/VirtualMachine/OCSVirtualMachine.m";
-        r3 = "vm && \"Attach thread on NULL OCSVirtualMachine.\"";
-        r0 = __assert_rtn();
-    }
-    return;
-}
- */
-
+ 
 // sub_2a0e360
-void _virtualMachineEval(id arg) {
-    if (arg) {
-        
-    }
-    else {
-        NSLog(@"vm && \"Eval on NULL OCSVirtualMachine\"");
-    }
+void
+_virtualMachineEval(OCS_VirtualMachine *vm) {
+    NSCAssert(vm, @"vm && \"Eval on NULL OCSVirtualMachine\"");
+    
 }
 
 /*
@@ -550,13 +732,20 @@ int sub_2a0e360(int arg0) {
 */
 
 // sub_2a1111e
-void _virtualMachineRegisterCStruct(id vm) {
-    if (vm) {
-        
+void
+_virtualMachineRegisterCStruct(OCS_VirtualMachine *vm) {
+    NSCAssert(vm, @"vm && \"Register CStruct on NULL OCSVirtualMachine\"");
+    NSCAssert(vm->currentFrame, @"vm->currentFrame && \"OCSVirtualMachine Frame is NULL\"");
+    
+    /*
+    int sub_2a128de(int arg0) {
+        r1 = arg0;
+        r0 = *0x367d208;
+        r0 = CFDictionaryGetValue(dictCFunction, r1);
+        return r0;
     }
-    else {
-        NSLog(@"vm && \"Register CStruct on NULL OCSVirtualMachine\"");
-    }
+     */
+//    loc_2def484(vm->currentFrame->(/* 0x18 */));
 }
 
 /*
@@ -589,11 +778,672 @@ int sub_2a1111e(int arg0) {
 }
 */
 
+// sub_2a113de
+void _getObjectStructIvar() {
+
+}
+
+/*
+int sub_2a113de(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
+    stack[2049] = arg5;
+    stack[2048] = arg4;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    stack[4611686018427389944] = r8;
+    stack[4611686018427389945] = r10;
+    stack[4611686018427389946] = r11;
+    sp = sp - 0x20;
+    r8 = arg0;
+    r6 = arg1;
+    r11 = arg3;
+    r0 = [r6 class];
+    r0 = class_getInstanceVariable(r0, arg2);
+    r4 = r0;
+    if (*(int8_t *)ivar_getTypeEncoding(r0) == 0x7b) {
+        r10 = arg5;
+        r1 = r6 + ivar_getOffset(r4);
+        r0 = r11;
+        if ((arg4 & 0xff) != 0x0) {
+            r0 = sub_2a12e02(r0, r1);
+        }
+        else {
+            r0 = sub_2a12da8(r0, r1);
+        }
+        r5 = r0;
+        r1 = r5;
+        r0 = sub_2a1111e(r8);
+        r0 = 0x11;
+        *r10 = r0;
+        *(r10 + 0x4) = r5;
+    }
+    else {
+        r2 = 0xaf7;
+        r0 = "_getObjectStructIvar";
+        r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/VirtualMachine/OCSVirtualMachine.m";
+        r3 = "NO && \"IVar must be Struct Type, for scalar type, use _getObjectIvar instead.\"";
+        r0 = __assert_rtn();
+    }
+    return r0;
+}
+ */
+
+// sub_2a11474
+void
+sub_2a11474() {}
+
+/*
+int sub_2a11474(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
+    stack[2050] = arg6;
+    stack[2049] = arg5;
+    stack[2048] = arg4;
+    r3 = arg3;
+    r2 = arg2;
+    r1 = arg1;
+    r0 = arg0;
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    stack[4611686018427389944] = r8;
+    stack[4611686018427389945] = r10;
+    stack[4611686018427389946] = r11;
+    r4 = sp - 0x50;
+    asm { bfc        r4, #0x0, #0x3 };
+    sp = r4;
+    stack[2032] = r1;
+    r4 = r0;
+    r10 = r3;
+    r5 = r2;
+    r6 = [r5 methodSignatureForSelector:r10, r3, stack[2028], stack[2029], stack[2030], stack[2031], stack[2032], stack[2033], stack[2034], stack[2035], stack[2036], stack[2037], stack[2038], r5, stack[2040], stack[2041], stack[2042]];
+    if (r6 == 0x0) goto loc_2a11a44;
+    
+loc_2a114ac:
+    r11 = [NSInvocation invocationWithMethodSignature:r6];
+    r0 = [r11 setTarget:r5];
+    if ((arg4 & 0xff) != 0x0) {
+        stack[2034] = r4;
+        r8 = NSSelectorFromString([NSString stringWithFormat:@"__OCS_SUPER_%@", NSStringFromSelector(r10)]);
+        r0 = [r5 superclass];
+        r0 = class_getInstanceMethod(r0, r10);
+        r10 = method_getImplementation(r0);
+        r5 = [r5 class];
+        r0 = method_getTypeEncoding(r0);
+        r0 = class_addMethod(r5, r8, r10, r0);
+        r5 = r11;
+        r2 = r8;
+        r1 = @selector(setSelector:);
+        r0 = r11;
+    }
+    else {
+        stack[2034] = r4;
+        r5 = r11;
+        r2 = r10;
+        r1 = @selector(setSelector:);
+        r0 = r11;
+    }
+    r0 = [r0 setSelector:r2];
+    r0 = objc_msgSend(r6, *@selector(numberOfArguments));
+    if (objc_msgSend(r6, *@selector(numberOfArguments)) < 0x3) goto loc_2a117ea;
+    
+loc_2a115b8:
+    r4 = arg5;
+    r8 = *@selector(numberOfArguments);
+    r11 = 0x2;
+    r10 = @selector(getArgumentTypeAtIndex:);
+    stack[2035] = @selector(setArgument:atIndex:);
+    stack[2033] = @selector(raise:format:);
+    goto loc_2a115ec;
+    
+loc_2a115ec:
+    r0 = [r6 getArgumentTypeAtIndex:r11];
+    r1 = *(int8_t *)r0;
+    if (r1 == 0x72) {
+        asm { ldrbeq     r1, [r0, #0x1] };
+    }
+    r1 = sign_extend_32(r1);
+    if (r1 > 0x5d) goto loc_2a11636;
+    
+loc_2a11604:
+    if (r1 > 0x48) goto loc_2a11666;
+    
+loc_2a11608:
+    if (r1 > 0x43) goto loc_2a11698;
+    
+loc_2a11610:
+    goto *0x2a11614[r0];
+    
+loc_2a116c8:
+    r0 = *(r4 + 0x4);
+    goto loc_2a116ca;
+    
+loc_2a116ca:
+    stack[2036] = r0;
+    goto loc_2a117ca;
+    
+loc_2a117ca:
+    r1 = @selector(setArgument:atIndex:);
+    r2 = sp + 0x20;
+    r0 = r5;
+    goto loc_2a117d0;
+    
+loc_2a117d0:
+    r3 = r11;
+    goto loc_2a117d2;
+    
+loc_2a117d2:
+    r0 = objc_msgSend(r0, r1);
+    r11 = r11 + 0x1;
+    r4 = r4 + 0xc;
+    if (r11 < objc_msgSend(r6, r8)) goto loc_2a115ec;
+    
+loc_2a117ea:
+    r4 = r5;
+    r0 = [r4 invoke];
+    stack[2038] = *0x3f647e8;
+    stack[2036] = *(int64_t *)0x3f647e0;
+    r0 = [r6 methodReturnType];
+    r1 = *(int8_t *)r0;
+    if (r1 == 0x72) {
+        asm { ldrbeq     r1, [r0, #0x1] };
+    }
+    r6 = stack[2034];
+    r1 = sign_extend_32(r1);
+    if (r1 > 0x5d) goto loc_2a11860;
+    
+loc_2a11836:
+    if (r1 > 0x48) goto loc_2a1188e;
+    
+loc_2a1183a:
+    if (r1 > 0x43) goto loc_2a118e0;
+    
+loc_2a11844:
+    goto *0x2a11848[r0];
+    
+loc_2a11852:
+    r1 = 0xf;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a11a1c:
+    stack[2036] = r1;
+    r2 = sp + 0x20 | 0x4;
+    r0 = objc_msgSend(r4, *@selector(getReturnValue:));
+    goto loc_2a11a2c;
+    
+loc_2a11a2c:
+    r0 = *0x3f647e8;
+    *(r6 + 0x8) = r0;
+    *(int64_t *)r6 = stack[2036];
+    sp = r7 - 0x18;
+    return r0;
+    
+loc_2a11916:
+    stack[2028] = r0;
+    r0 = [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s"];
+    goto loc_2a11a2c;
+    
+loc_2a1194c:
+    r1 = 0xe;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a11880:
+    r1 = 0x1;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a1195a:
+    r1 = 0x2;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a118e0:
+    if (r1 == 0x23) goto loc_2a11a02;
+    
+loc_2a118e6:
+    if (r1 != 0x2a) goto loc_2a11916;
+    
+loc_2a118ea:
+    r5 = sp + 0x20 | 0x4;
+    r8 = @selector(getReturnValue:);
+    goto loc_2a1198a;
+    
+loc_2a1198a:
+    stack[2036] = 0x10;
+    r0 = [r4 getReturnValue:r5];
+    goto loc_2a11a2c;
+    
+loc_2a11a02:
+    r1 = 0xd;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a1188e:
+    if (r1 > 0x50) goto loc_2a11900;
+    
+loc_2a11892:
+    if (r1 == 0x49) goto loc_2a119e6;
+    
+loc_2a11898:
+    if (r1 != 0x4c) goto loc_2a11916;
+    
+loc_2a1189c:
+    r1 = 0x8;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119e6:
+    r1 = 0x6;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a11900:
+    if (r1 == 0x51) goto loc_2a119f4;
+    
+loc_2a11904:
+    if (r1 != 0x53) goto loc_2a11916;
+    
+loc_2a11908:
+    r1 = 0x4;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119f4:
+    r1 = 0xa;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a11860:
+    if (r1 > 0x76) goto loc_2a118aa;
+    
+loc_2a11868:
+    goto *0x2a1186c[r0];
+    
+loc_2a11968:
+    stack[2036] = 0xc;
+    r5 = sp + 0x20 | 0x4;
+    r0 = [r4 getReturnValue:r5];
+    goto loc_2a1198a;
+    
+loc_2a1199a:
+    r1 = 0xb;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119a8:
+    r1 = 0x5;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119b6:
+    r1 = 0x7;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119c4:
+    r1 = 0x9;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119d2:
+    r1 = 0x3;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a119e0:
+    stack[2036] = 0x0;
+    goto loc_2a11a2c;
+    
+loc_2a118aa:
+    if (r1 == 0x5e) goto loc_2a11a10;
+    
+loc_2a118b0:
+    if (r1 == 0x7b) {
+        stack[2036] = 0x11;
+        r5 = sub_2a12d70(arg6);
+        r0 = [r4 getReturnValue:*(r5 + 0x8)];
+        r1 = r5;
+        stack[2037] = r5;
+        r0 = sub_2a1111e(stack[2032]);
+    }
+    else {
+        stack[2028] = r0;
+        r0 = [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s"];
+    }
+    goto loc_2a11a2c;
+    
+loc_2a11a10:
+    r1 = 0x10;
+    r0 = @selector(getReturnValue:);
+    goto loc_2a11a1c;
+    
+loc_2a116e4:
+    stack[2028] = r0;
+    r0 = @class(NSException);
+    r1 = @selector(raise:format:);
+    r2 = @"OCSCommonException";
+    r3 = @"Unsupported argument type: %s";
+    goto loc_2a117d2;
+    
+loc_2a1161e:
+    stack[2036] = 0x0;
+    if (*r4 == 0x1) {
+        r0 = *(int8_t *)(r4 + 0x4);
+        if (r0 != 0x0) {
+            asm { movsne     r0, #0x1 };
+        }
+    }
+    else {
+        r0 = sub_2a11ca8(r4);
+    }
+    goto loc_2a11774;
+    
+loc_2a11774:
+    stack[2036] = r0;
+    goto loc_2a117ca;
+    
+loc_2a11654:
+    stack[2036] = 0x0;
+    if (*r4 <= 0x2) {
+        r0 = *(int8_t *)(r4 + 0x4);
+    }
+    else {
+        r0 = sub_2a11d08(r4);
+    }
+    goto loc_2a11774;
+    
+loc_2a11698:
+    if ((r1 == 0x23) || (r1 == 0x2a)) goto loc_2a116c8;
+    goto loc_2a116e4;
+    
+loc_2a11666:
+    if (r1 > 0x50) goto loc_2a116a2;
+    
+loc_2a1166a:
+    if (r1 == 0x49) goto loc_2a116bc;
+    
+loc_2a1166e:
+    if (r1 != 0x4c) goto loc_2a116e4;
+    
+loc_2a11672:
+    stack[2036] = 0x0;
+    if (*r4 >= 0x8) {
+        r0 = sub_2a11dd4(r4);
+    }
+    else {
+        r0 = *(r4 + 0x4);
+    }
+    goto loc_2a116ca;
+    
+loc_2a116bc:
+    stack[2036] = 0x0;
+    if (*r4 <= 0x6) {
+        r0 = *(r4 + 0x4);
+    }
+    else {
+        r0 = sub_2a11d8c(r4);
+    }
+    goto loc_2a116ca;
+    
+loc_2a116a2:
+    if (r1 == 0x51) goto loc_2a116ce;
+    
+loc_2a116a6:
+    if (r1 != 0x53) goto loc_2a116e4;
+    
+loc_2a116aa:
+    stack[2036] = 0x0;
+    if (*r4 <= 0x4) {
+        r0 = *(int16_t *)(r4 + 0x4);
+    }
+    else {
+        r0 = sub_2a11d48(r4);
+    }
+    stack[2036] = r0;
+    goto loc_2a117ca;
+    
+loc_2a116ce:
+    r0 = 0x0;
+    asm { strd       r0, r0, [sp, #0x48 + var_28] };
+    r0 = *r4;
+    r1 = r0 - 0x9;
+    if (r1 <= 0x1) {
+        r0 = *(r4 + 0x4);
+        r1 = *(r4 + 0x8);
+    }
+    else {
+        r2 = r0 - 0x1;
+        r0 = 0x0;
+        if (r2 <= 0xb) {
+            r3 = r1 + r2 * 0x4;
+            r1 = 0x0;
+            switch (0x0) {
+                case 0:
+                    r1 = SAR(sign_extend_32(*(int8_t *)(r4 + 0x4)), 0x1f);
+                    break;
+                case 1:
+                    r1 = SAR(sign_extend_32(*(int16_t *)(r4 + 0x4)), 0x1f);
+                    break;
+                case 2:
+                    r1 = SAR(*(r4 + 0x4), 0x1f);
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    r0 = *(r4 + 0x4);
+                    r0 = __fixsfdi();
+                    break;
+                case 5:
+                    d16 = *(int64_t *)(r4 + 0x4);
+                    r0 = d16 & 0xffff;
+                    r1 = d16 >> 0x10;
+                    r0 = __fixdfdi();
+                    break;
+            }
+        }
+        else {
+            r1 = 0x0;
+        }
+    }
+    asm { strd       r0, r1, [sp, #0x48 + var_28] };
+    goto loc_2a117ca;
+    
+loc_2a11636:
+    if (r1 > 0x73) goto loc_2a11686;
+    
+loc_2a1163e:
+    goto *0x2a11642[r0];
+    
+loc_2a11714:
+    r0 = 0x0;
+    asm { strd       r0, r0, [sp, #0x48 + var_28] };
+    if (*r4 == 0xc) {
+        d16 = *(int64_t *)(r4 + 0x4);
+    }
+    else {
+        s0 = sub_2a11e78(r4);
+        asm { vcvt.f64.s32 d16, s0 };
+    }
+    stack[2036] = d16;
+    goto loc_2a117ca;
+    
+loc_2a11726:
+    stack[2036] = 0x0;
+    if (*r4 == 0xb) {
+        s0 = *(r4 + 0x4);
+    }
+    else {
+        r0 = sub_2a11e1c(r4);
+    }
+    stack[2036] = s0;
+    d0 = d0 | d0;
+    goto loc_2a117ca;
+    
+loc_2a11686:
+    if (r1 == 0x5e) goto loc_2a116c8;
+    
+loc_2a1168a:
+    if (r1 != 0x7b) goto loc_2a116e4;
+    
+loc_2a1168e:
+    r1 = @selector(setArgument:atIndex:);
+    r2 = *(*(r4 + 0x4) + 0x8);
+    r0 = r5;
+    goto loc_2a117d0;
+    
+loc_2a11a44:
+    r6 = @class(NSString);
+    r5 = [r5 class];
+    r0 = NSStringFromSelector(r10);
+    r3 = sp + 0x2c;
+    r1 = @selector(stringWithFormat:);
+    r2 = @"[%@ %@]: unrecognized selector sent to instance %p";
+    asm { strd       r0, r3, [sp, #0x48 + var_48] };
+    r3 = r5;
+    r4 = objc_msgSend(r6, *r1);
+    r0 = [NSException alloc];
+    r0 = [r0 initWithName:@"NSInvalidArgumentException" reason:r4 userInfo:0x0];
+    r0 = objc_exception_throw(r0);
+    return r0;
+}
+ */
+
+// sub_2a11ad0
+void
+sub_2a11ad0() {}
+
+/*
+int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
+    stack[2052] = arg8;
+    stack[2051] = arg7;
+    stack[2050] = arg6;
+    stack[2049] = arg5;
+    stack[2048] = arg4;
+    r3 = arg3;
+    r2 = arg2;
+    r1 = arg1;
+    r0 = arg0;
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    stack[4611686018427389944] = r8;
+    stack[4611686018427389945] = r10;
+    stack[4611686018427389946] = r11;
+    r4 = sp - 0x90;
+    asm { bfc        r4, #0x0, #0x3 };
+    sp = r4;
+    r8 = r0;
+    r11 = arg6;
+    d16 = *(int64_t *)0x3f647e0;
+    r5 = sp + 0x18;
+    r0 = *0x3f647e8;
+    stack[2039] = *___stack_chk_guard;
+    asm { strd       r3, r2, [sp, #0x88 + var_54] };
+    stack[2016] = r0;
+    stack[2018] = r11;
+    stack[2019] = 0x2;
+    stack[2014] = d16;
+    r0 = sub_2a11ee4(r1, r5, sp + 0x8, arg5, arg7, 0x0);
+    r3 = arg8;
+    *stack[2020] = 0x3f64864;
+    *stack[2021] = sp + 0x38;
+    *(stack[2020] + 0x4) = 0x3f64864;
+    if ((arg4 & 0xff) != 0x0) {
+        r10 = NSSelectorFromString([NSString stringWithFormat:@"__OCS_SUPER_%@", NSStringFromSelector(stack[2025])]);
+        r0 = [stack[2026] superclass];
+        r0 = class_getInstanceMethod(r0, stack[2025]);
+        r4 = method_getImplementation(r0);
+        r5 = [stack[2026] class];
+        r0 = method_getTypeEncoding(r0);
+        r0 = class_addMethod(r5, r10, r4, r0);
+        r3 = arg8;
+        r1 = sp + 0x3c;
+        r0 = stack[2021];
+    }
+    else {
+        r0 = stack[2021];
+        r1 = sp + 0x34;
+    }
+    *(r0 + 0x4) = r1;
+    r2 = r3 + 0x2;
+    r0 = stack[2020];
+    r3 = r11 + 0x2;
+    r1 = stack[2024];
+    asm { strd       r1, r0, [sp, #0x88 + var_88] };
+    r0 = sp + 0x3c;
+    r1 = 0x1;
+    if (sub_2a1824e() == 0x0) {
+        r3 = stack[2021];
+        r2 = stack[2023];
+        if (stack[2014] == 0x11) {
+            r1 = 0x2e604f4;
+        }
+        else {
+            r1 = 0x2e5c1b8;
+        }
+        r0 = sub_2a163c4(sp + 0x3c, *r1, r2, r3);
+    }
+    r0 = sub_2a1236a(sp + 0x18);
+    *(r8 + 0x8) = stack[2016];
+    *(int64_t *)r8 = stack[2014];
+    r0 = *___stack_chk_guard - *___stack_chk_guard;
+    if (r0 == 0x0) {
+        asm { sub.weq    r4, r7, #0x18 };
+    }
+    if (CPU_FLAGS & E) {
+        asm { moveq      sp, r4 };
+    }
+    if (CPU_FLAGS & E) {
+        asm { pop.weq    {r8, sl, fp} };
+    }
+    if (CPU_FLAGS & E) {
+        return r0;
+    }
+    r0 = __stack_chk_fail();
+    return r0;
+}
+ */
+
+// sub_2a11c56
+void
+sub_2a11c56() {}
+
+/*
+int sub_2a11c56(int arg0, int arg1, int arg2) {
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    stack[4611686018427389945] = r8;
+    stack[4611686018427389946] = r10;
+    sp = sp - 0x1c;
+    r6 = sub_2a12d70(arg2);
+    r0 = [*(*r6 + 0x4) totalSize];
+    r0 = memset(*(r6 + 0x8), 0x0, r0);
+    r1 = r6;
+    r0 = sub_2a1111e(arg1);
+    *arg0 = 0x11;
+    *(arg0 + 0x4) = r6;
+    *(arg0 + 0x8) = 0x0;
+    return 0x11;
+}
+ */
+
 // sub_2a13770
-void sub_2a13770(NSString *className, NSString *arg1, int arg2, CFMutableArrayRef argList) {
-    const void *codeBlock = OCSGetCodeBlock(className, arg1);
-    void *content = sub_2a1514a();
-    OCSVirtualMachineExecuteWithArr(content, codeBlock, arg2, argList, ??);
+void
+sub_2a13770(NSString *className, NSString *arg1, int arg2, CFMutableArrayRef argList) {
+    OCS_CodeBlock *codeBlock = OCSGetCodeBlock(className, arg1);
+    OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
+    OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList, ??);
 }
 
 /*
@@ -610,3 +1460,32 @@ void sub_2a13770(int arg0, int arg1, int arg2, int arg3) {
     return;
 }
 */
+
+// sub_2a13790
+NSString *
+OCSGetCurrentThreadVMExptionCallStackInfo() {
+    OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
+    if (vm && vm->exptionCallStackInfo) {
+        return [(__bridge NSString *)vm->exptionCallStackInfo copy];
+    }
+    
+    return nil;
+}
+
+// sub_2a137c4
+NSString *
+OCSGetCurrentThreadStackInfo() {
+    OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
+    return _getVMStackInfo(vm);
+}
+
+/*
+void sub_2a137c4() {
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = sp - 0x8;
+    r0 = sub_2a1514a();
+    r0 = sub_2a0bf7e(r0);
+    return;
+}
+ */
