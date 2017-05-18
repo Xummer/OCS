@@ -360,7 +360,24 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         
         
         OCS_Frame *f_2014 = vm->currentFrame;
-        CFArrayCreateMutable
+        CFMutableArrayRef arr = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+        
+        int32_t state_2025 = vm->state;
+        vm->state = 1;
+        vm->stackPointer += (codeBlock->localVarCount + codeBlock->localVarCount * 2) * 0x4;
+        _virtualMachineEval(vm);
+        vm->stackPointer;
+        
+        int32_t r_r6 = stack[2022];
+        if (r_r6 > 0x5d) {
+            // loc_2a0c1b0
+        }
+        else if (r_r6 > 0x48) {
+            // loc_2a0c1e2
+        }
+        else if (r_r6 - 0x3a > 0x9) {
+            // loc_2a0c244
+        }
         
     }
     else {
@@ -658,6 +675,9 @@ void
 _virtualMachineEval(OCS_VirtualMachine *vm) {
     NSCAssert(vm, @"vm && \"Eval on NULL OCSVirtualMachine\"");
     
+    OCS_Frame *r11 = vm->currentFrame;
+    OCS_CodeBlock *codes = r11->codeBlock;
+    codes->buf
 }
 
 /*

@@ -36,12 +36,12 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
     
     // loc_2a14bf2:
     size_t size = numberOfArguments - 2;
-    void *buf = malloc(size);
+    void *buf /*r4*/ = malloc(size);
     memset(buf, 0, size);
-    CFMutableArrayRef argList = CFArrayCreateMutable(kCFAllocatorDefault, 0, nil);
+    CFMutableArrayRef argList = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
     if (numberOfArguments < 3) {
         // loc_2a14dc8
-        [methodSignature methodReturnType];
+        [methodSignature /*stack[2022]*/ methodReturnType];
         NSString *clsStr = NSStringFromClass([assignSlf class]);
         OCS_CodeBlock *codeBlock;
         
@@ -66,7 +66,7 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
             }
         });
         
-        sub_2a13770(clsStr, /*<*(stack[2036] + 0x10)>*/, /*<sp + 0x30>*/, argList);
+        sub_2a13770(clsStr, selectorName, /*<sp + 0x30>*/, argList);
         
     }
     else {
