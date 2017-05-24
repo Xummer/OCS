@@ -8,12 +8,14 @@
 
 #import "OCSVM_code.h"
 
+#define STACK_CELL_SIZE     12 // 64 bit 2^4 = 16
+
 // sub_2a0bda8
 OCS_StackBlock *
 OCSStackBlockCreate(OCS_StackBlock* prev, OCS_StackBlock* next, int32_t size) {
     NSCAssert(size >= 1, @"size >= 1");
     
-    OCS_StackBlock *stackBlock = malloc(0xc + (size + size * 0x2) * 0x4);
+    OCS_StackBlock *stackBlock = malloc(offsetof(OCS_StackBlock, stack) + size * STACK_CELL_SIZE);
     stackBlock->prev = prev;
     stackBlock->next = next;
     stackBlock->allocSize = size;
@@ -61,7 +63,7 @@ OCSVirtualMachineCreate() {
     vm->stackBlock = stack;
     vm->_0xc = stack;
     stack->allocSize = 0x4c;
-    vm->_0x10 = 0x4c;
+    vm->stackSize = 0x4c;
     vm->stackPointer = &stack->stack;
     
     vm->currentFrame = NULL;
@@ -106,8 +108,10 @@ OCSVirtualMachineDestroy(OCS_VirtualMachine* vm) {
     }
     
     OCS_StackBlock *pos;
-    for (pos = vm->_0xc; pos->next != NULL; pos = pos->next) {
-        free(pos);
+    for (pos = vm->_0xc; pos->next != NULL;) {
+        OCS_StackBlock *sb = pos;
+        pos = pos->next;
+        free(sb);
     }
     
     free(vm);
@@ -247,7 +251,7 @@ _getVMStackInfo(OCS_VirtualMachine *vm) {
             while (frame) {
                 [infos appendFormat:@"%zd ", i];
                 _appendVMStackInfo(infos, vm->currentFrame);
-                frame = frame->next;
+                frame = frame->back;
                 i ++;
             }
             
@@ -308,7 +312,7 @@ int sub_2a0bf7e(int arg0) {
 
 // sub_2a0c01c
 void
-OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, int arg2, CFMutableArrayRef argList, int arg4) {
+OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, int arg2, CFMutableArrayRef argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
     // loc_2a0c080
@@ -329,7 +333,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         
         int32_t needSize = codeBlock->localVarCount + codeBlock->stackSize;
         
-        int32_t rest = (SAR(0xc + stackBlock + (stackBlock->allocSize + stackBlock->allocSize * 0x2) * 0x4 - vm->stackPointer, 0x2)) * 0xaaaaaaab;
+        int32_t rest = (stackBlock->allocSize * STACK_CELL_SIZE - (vm->stackPointer - (int32_t)&stackBlock->stack)) / STACK_CELL_SIZE;
         
         if (rest < needSize) {
             OCS_StackBlock *tmpStackBlock = stackBlock;
@@ -343,10 +347,10 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
                     OCS_StackBlock *pos;
                     for (pos = stackBlock; pos->next != NULL; pos = pos->next)
                         ;
-                    int32_t size = MAX(vm->_0x10, needSize); // ??
+                    int32_t size = MAX(vm->stackSize, needSize); // ??
                     tmpStackBlock = OCSStackBlockCreate(pos, NULL, size);
                     pos->next = tmpStackBlock;
-                    vm->_0x10 += size;
+                    vm->stackSize += size;
                     break;
                 }
             } while (tmpStackBlock->allocSize < needSize);
@@ -364,19 +368,61 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         
         int32_t state_2025 = vm->state;
         vm->state = 1;
-        vm->stackPointer += (codeBlock->localVarCount + codeBlock->localVarCount * 2) * 0x4;
+        vm->stackPointer +=  codeBlock->localVarCount * STACK_CELL_SIZE;
         _virtualMachineEval(vm);
         vm->stackPointer;
         
         int32_t r_r6 = stack[2022];
-        if (r_r6 > 0x5d) {
+        if (r_r6 > ']') { // 0x5d
             // loc_2a0c1b0
+            if (r_r6 - 0x63 > 0x13) {
+                // loc_2a0c1f0
+                if (r_r6 != 0x5e) {
+                    if (r_r6 == 0x7b) {
+//                        malloc(<#size_t __size#>)
+                    }
+                    else {
+                        [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
+                    }
+                }
+                else {
+                    malloc(0x4);
+                }
+                // loc_2a0c2ce
+            }
+            else {
+                // loc_2a0c1b8
+                goto *0x2a0c1bc[r0];
+            }
         }
         else if (r_r6 > 0x48) {
             // loc_2a0c1e2
+            if (r_r6 <= 0x50) {
+                
+            }
+            else {
+                if (r_r6 != 0x51) {
+                    if (r_r6 == 0x53) {
+                        malloc(0x2);
+                    }
+                    else {
+                        [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
+                    }
+                }
+                else {
+                    malloc(0x8);
+                }
+            }
+            
+            // loc_2a0c2ce
         }
         else if (r_r6 - 0x3a > 0x9) {
             // loc_2a0c244
+        }
+        else {
+            // loc_2a0c1a2
+            goto *0x2a0c1a6[r0];
+            
         }
         
     }
@@ -674,10 +720,23 @@ loc_2a0c33e:
 void
 _virtualMachineEval(OCS_VirtualMachine *vm) {
     NSCAssert(vm, @"vm && \"Eval on NULL OCSVirtualMachine\"");
+    /* vm r5*/
+    OCS_Frame *fp = vm->currentFrame;
+    OCS_CodeBlock *codes = fp->codeBlock; /*sl*/
+    //  loc_2a0e50a
+    int32_t pc = fp->pc; /*r6*/
+    /*r3 codes->buf*/
+    int8_t opCode = ((int8_t)(codes->buf[pc]));
+    if (opCode > 0xef) {
+        // loc_2a0ed28
+        [NSException raise:@"OCSCommonException" format:@"Invalid Opcode %d", opCode];
+    }
+    else {
+        CFArrayGetValueAtIndex(fp->arr, codes->buf[pc+1]);
+        vm->stackPointer
+    }
     
-    OCS_Frame *r11 = vm->currentFrame;
-    OCS_CodeBlock *codes = r11->codeBlock;
-    codes->buf
+    
 }
 
 /*
@@ -1463,7 +1522,7 @@ void
 sub_2a13770(NSString *className, NSString *arg1, int arg2, CFMutableArrayRef argList) {
     OCS_CodeBlock *codeBlock = OCSGetCodeBlock(className, arg1);
     OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
-    OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList, ??);
+    OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList);
 }
 
 /*

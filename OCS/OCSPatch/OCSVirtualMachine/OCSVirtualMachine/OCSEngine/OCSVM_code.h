@@ -79,38 +79,39 @@ typedef struct OCS_Executable_t {
 
 typedef struct {
     size_t codeSize; // +0x0
-    void *buf; // +0x4
+    const char *buf; // +0x4
     int32_t constPoolCount; // +0x8
     OCS_ConstantPool *constPool; // +0xc
-    int32_t localVarCount;  // +0x10
-    int32_t stackSize; // +0x14
+    int32_t localVarCount;  // +0x10     |64 +0x20
+    int32_t stackSize; // +0x14     |64 +0x30
     CFStringRef method; // +0x18  -|initWithModel:param:|@@:@@
 } OCS_CodeBlock; // 0x1c
 
 typedef struct OCS_StackBlock_t {
     struct OCS_StackBlock_t *prev; // +0x0
     struct OCS_StackBlock_t *next; // +0x4
-    int32_t allocSize; // +0x8
+    int32_t allocSize; // +0x8     |64 +0x10
     void* stack;// +0xc
 } OCS_StackBlock;
 
 typedef struct OCS_Frame_t {
-    struct OCS_Frame_t *next; // +0x0
+    struct OCS_Frame_t *back; // +0x0
     // +0x4
-    OCS_Class *cls; // class +0x8
+    int32_t pc; // class +0x8
     OCS_CodeBlock *codeBlock; // +0xc
-    int32_t pc; // +0x10
+    OCS_Class *cls; // +0x10
+    CFArrayRef arr; // +0x14;
 } OCS_Frame; // 0x39c
 
 typedef struct OCS_VirtualMachine_t {
     OCS_Frame* currentFrame; // +0x0
-    int32_t stackPointer; // +0x4
-    OCS_StackBlock* stackBlock; // +0x8
-    OCS_StackBlock* _0xc; // +0xc  register
-    int32_t _0x10; // +0x10
-    int32_t state; // +0x14
-    pthread_t thread; // +0x18
-    CFStringRef exptionCallStackInfo; // +0x1c
+    int32_t stackPointer; // +0x4     |64 +0x8
+    OCS_StackBlock* stackBlock; // +0x8     |64 +0x18
+    OCS_StackBlock* _0xc; // +0xc     |64
+    int32_t stackSize; // +0x10     |64
+    int32_t state; // +0x14     |64 +0x28
+    pthread_t thread; // +0x18     |64
+    CFStringRef exptionCallStackInfo; // +0x1c     |64
 } OCS_VirtualMachine; // 0x20
 
 
