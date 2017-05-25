@@ -111,7 +111,7 @@ typedef struct OCS_Frame_t {
 
 typedef struct OCS_VirtualMachine_t {
     OCS_Frame* currentFrame; // +0x0
-    int32_t stackPointer; // +0x4     |64 +0x8
+    void* stackPointer; // +0x4     |64 +0x8
     OCS_StackBlock* stackBlock; // +0x8     |64 +0x18
     OCS_StackBlock* _0xc; // +0xc     |64
     int32_t stackSize; // +0x10     |64

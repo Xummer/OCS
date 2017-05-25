@@ -329,11 +329,11 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         //        if (r3 >= r1) goto loc_2a0c126;
         
         OCS_StackBlock *stackBlock = vm->stackBlock;/* vm + 0x8 */ // ??
-        int32_t sp = vm->stackPointer; /* vm + 0x4 */
+        void *sp = vm->stackPointer; /* vm + 0x4 */
         
         int32_t needSize = codeBlock->localVarCount + codeBlock->stackSize;
         
-        int32_t rest = (stackBlock->allocSize * STACK_CELL_SIZE - (vm->stackPointer - (int32_t)&stackBlock->stack)) / STACK_CELL_SIZE;
+        int32_t rest = (stackBlock->allocSize * STACK_CELL_SIZE - ((int32_t)vm->stackPointer - (int32_t)&stackBlock->stack)) / STACK_CELL_SIZE;
         
         if (rest < needSize) {
             OCS_StackBlock *tmpStackBlock = stackBlock;
@@ -367,7 +367,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         f.back = vm->currentFrame;
         f.pc = 0;
         f.codeBlock = codeBlock;
-        
+        f._0x14 = argList;
         
 //        OCS_Frame *f_2014 = vm->currentFrame;
         CFMutableArrayRef arrCStructs = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
@@ -759,6 +759,14 @@ _virtualMachineEval(OCS_VirtualMachine *vm) {
         [NSException raise:@"OCSCommonException" format:@"Invalid Opcode %d", opCode];
     }
     else {
+        
+        // 1
+        // sub_2a0e360+4038
+        fp->pc = fp->pc + 1;
+        // sub_2a0e360+426
+        
+        
+        // ??
         [vm->stackPointer + 0x4, #0x4] = CFArrayGetValueAtIndex(fp->_0x14, codes->buf[pc+1]);
         r1 = vm->stackPointer;
         //  sub_2a0e360+3406
