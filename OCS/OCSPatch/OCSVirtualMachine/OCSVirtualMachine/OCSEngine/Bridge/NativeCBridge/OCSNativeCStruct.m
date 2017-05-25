@@ -10,6 +10,42 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <mach-o/dyld.h>
 
+// sub_2a11118
+void
+OCSDestroyStruct(OCS_Struct *s) {
+    NSCAssert(s, @"s && \"Destroy NULL OCSStruct\"");
+    if (s->_0x4 == 0) {
+        free(s->_0x8);
+    }
+    
+    free(s);
+}
+
+/*
+int sub_2a11118(int arg0) {
+    r0 = arg0;
+    stack[2045] = r4;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0xc) + 0x4;
+    r4 = r0;
+    if (r4 != 0x0) {
+        if (*(int8_t *)(r4 + 0x4) == 0x0) {
+            r0 = free(*(r4 + 0x8));
+        }
+        r0 = loc_2dee7e8(r4);
+    }
+    else {
+        r2 = 0x9a;
+        r0 = "OCSDestroyStruct";
+        r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/Bridge/NativeCBridge/OCSNativeCStruct.m";
+        r3 = "s && \"Destroy NULL OCSStruct\"";
+        r0 = __assert_rtn();
+    }
+    return r0;
+}
+ */
+
 // sub_2a123ba
 void
 OCSSetUpNativeCFunc() {

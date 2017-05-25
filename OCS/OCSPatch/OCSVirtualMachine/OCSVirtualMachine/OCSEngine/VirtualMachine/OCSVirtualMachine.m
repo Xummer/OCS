@@ -205,7 +205,7 @@ void sub_2a0be9c(int arg0, int arg1) {
 void
 _appendVMStackInfo(NSMutableString *infos, OCS_Frame *frame) {
     if (infos && frame) {
-        [infos appendFormat:@"[class:%@] ", frame->cls->value];
+        [infos appendFormat:@"[class:%@] ", [frame->cls->value class]];
         [infos appendFormat:@"[methodName:%@] ", frame->codeBlock->method];
         [infos appendFormat:@"[pc:%d]", frame->pc];
         [infos appendString:@"\n"];
@@ -329,7 +329,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         //        if (r3 >= r1) goto loc_2a0c126;
         
         OCS_StackBlock *stackBlock = vm->stackBlock;/* vm + 0x8 */ // ??
-        //        vm->stackPointer; /* vm + 0x4 */
+        int32_t sp = vm->stackPointer; /* vm + 0x4 */
         
         int32_t needSize = codeBlock->localVarCount + codeBlock->stackSize;
         
@@ -362,15 +362,24 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         
         // loc_2a0c126
         
+        OCS_Frame f;
         
-        OCS_Frame *f_2014 = vm->currentFrame;
-        CFMutableArrayRef arr = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+        f.back = vm->currentFrame;
+        f.pc = 0;
+        f.codeBlock = codeBlock;
+        
+        
+//        OCS_Frame *f_2014 = vm->currentFrame;
+        CFMutableArrayRef arrCStructs = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+        
+        f.arrCStruct = arrCStructs;
         
         int32_t state_2025 = vm->state;
         vm->state = 1;
         vm->stackPointer +=  codeBlock->localVarCount * STACK_CELL_SIZE;
+        vm->currentFrame = &f;
         _virtualMachineEval(vm);
-        vm->stackPointer;
+//        vm->stackPointer;
         
         int32_t r_r6 = stack[2022];
         if (r_r6 > ']') { // 0x5d
@@ -418,6 +427,16 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         }
         else if (r_r6 - 0x3a > 0x9) {
             // loc_2a0c244
+            if (r_r6 != 0x24) {
+                if (r_r6 == 0x2a) {
+                    malloc(0x4);
+                }
+                else {
+                    [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
+                }
+            }
+            
+            // loc_2a0c2ce
         }
         else {
             // loc_2a0c1a2
@@ -425,6 +444,14 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
             
         }
         
+        // loc_2a0c2ce
+        CFArrayApplyFunction(arrCStructs, CFRangeMake(0, CFArrayGetCount(arrCStructs)), OCSDestroyStruct, NULL);
+        CFRelease(arrCStructs);
+        
+        vm->state = state_2025;
+        vm->stackPointer = sp;
+        vm->stackBlock = stackBlock;
+        vm->currentFrame = vm->currentFrame->back;
     }
     else {
         printf("[OCS ERROR]");
@@ -732,8 +759,14 @@ _virtualMachineEval(OCS_VirtualMachine *vm) {
         [NSException raise:@"OCSCommonException" format:@"Invalid Opcode %d", opCode];
     }
     else {
-        CFArrayGetValueAtIndex(fp->arr, codes->buf[pc+1]);
-        vm->stackPointer
+        [vm->stackPointer + 0x4, #0x4] = CFArrayGetValueAtIndex(fp->_0x14, codes->buf[pc+1]);
+        r1 = vm->stackPointer;
+        //  sub_2a0e360+3406
+        r0 = vm->stackPointer + 0xc;
+        // sub_2a0e360+3540
+        vm->stackPointer = r0;
+        // sub_2a0e360+416
+        fp->pc += 0x2;
     }
     
     
@@ -815,16 +848,7 @@ void
 _virtualMachineRegisterCStruct(OCS_VirtualMachine *vm) {
     NSCAssert(vm, @"vm && \"Register CStruct on NULL OCSVirtualMachine\"");
     NSCAssert(vm->currentFrame, @"vm->currentFrame && \"OCSVirtualMachine Frame is NULL\"");
-    
-    /*
-    int sub_2a128de(int arg0) {
-        r1 = arg0;
-        r0 = *0x367d208;
-        r0 = CFDictionaryGetValue(dictCFunction, r1);
-        return r0;
-    }
-     */
-//    loc_2def484(vm->currentFrame->(/* 0x18 */));
+    CFArrayAppendValue(vm->currentFrame->arrCStruct, <#const void *value#>)
 }
 
 /*

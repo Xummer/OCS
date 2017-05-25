@@ -52,6 +52,11 @@ typedef struct OCS_Char_t {
     int32_t     offset;
 } OCS_Char;
 
+typedef struct OCS_Struct_t {
+    int8_t _0x4; // +0x4
+    void* _0x8; // +0x8
+} OCS_Struct;
+
 typedef struct {
     OCS_ConstantPoolTag tag;
     union {
@@ -97,10 +102,11 @@ typedef struct OCS_StackBlock_t {
 typedef struct OCS_Frame_t {
     struct OCS_Frame_t *back; // +0x0
     // +0x4
-    int32_t pc; // class +0x8
-    OCS_CodeBlock *codeBlock; // +0xc
-    OCS_Class *cls; // +0x10
-    CFArrayRef arr; // +0x14;
+    int32_t pc; // class +0x8   |64 +0x10
+    OCS_CodeBlock *codeBlock; // +0xc   |64 +0x18
+    OCS_Class *cls; // +0x10    |64 +0x20
+    CFArrayRef _0x14; // +0x14;
+    CFArrayRef arrCStruct; // +0x18 CStruct
 } OCS_Frame; // 0x39c
 
 typedef struct OCS_VirtualMachine_t {
@@ -156,6 +162,10 @@ OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread);
 // sub_2a0b75c
 OCS_Executable*
 OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
+
+// sub_2a11118
+void
+OCSDestroyStruct(OCS_Struct *s, void *context);
 
 // sub_2a137d4
 OCS_Executable*
