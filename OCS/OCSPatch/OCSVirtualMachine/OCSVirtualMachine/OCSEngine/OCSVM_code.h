@@ -54,6 +54,7 @@ typedef struct OCS_Char_t {
 } OCS_Char;
 
 typedef struct OCS_Struct_t {
+    int32_t _0x0; 
     int8_t _0x4; // +0x4
     void* _0x8; // +0x8
 } OCS_Struct;

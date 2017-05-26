@@ -133,7 +133,33 @@ OCSSetUpStructType() {
 // sub_2a12b8e
 OCS_Struct *
 OCSGetStructType(NSString *typeString) {
+    NSCAssert(typeString, @"structTypeEncode && \"Get StructType With typeName NULL\"");
     
+    __block OCS_Struct *s = NULL;
+    dispatch_sync(structTypeDictReadWriteQueue, ^{
+        // sub_2a12c70
+        s = (OCS_Struct *)CFDictionaryGetValue(dictStructType, (__bridge CFStringRef)typeString);
+    });
+    
+    if (!s) {
+        dispatch_barrier_sync(structTypeDictReadWriteQueue, ^{
+            // sub_2a12ca2
+            s = (OCS_Struct *)CFDictionaryGetValue(dictStructType, (__bridge CFStringRef)typeString);
+            if (!s) {
+                if (!typeString) {
+                    [NSException raise:@"OCSException" format:@"OCSGetStructType structTypeEncode == NULL"];
+                }
+                
+                s = malloc(sizeof(OCS_Struct *));
+                s->_0x0 = 0;
+                s->_0x4 = [OCSStructTypeParser parseStructEncode:typeString];
+                
+                CFDictionarySetValue(dictStructType, (__bridge CFStringRef)typeString, s);
+            }
+        });
+    }
+    
+    return s;
 }
 
 /*
@@ -197,10 +223,6 @@ int sub_2a12b8e(int arg0) {
 }
 */
 
-// sub_2a12c70
-void
-sub_2a12c70() {}
-
 /*
 int sub_2a12c70(int arg0) {
     stack[2045] = r4;
@@ -212,7 +234,36 @@ int sub_2a12c70(int arg0) {
     return r0;
 }
  */
- 
+
+/*
+int sub_2a12ca2(int arg0) {
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    r7 = (sp - 0x14) + 0xc;
+    r4 = arg0;
+    *(*(*(r4 + 0x14) + 0x4) + 0x10) = CFDictionaryGetValue(*0x367d220, *(r4 + 0x18));
+    r0 = *(*(*(r4 + 0x14) + 0x4) + 0x10);
+    if (r0 == 0x0) {
+        if (*(r4 + 0x18) == 0x0) {
+            r0 = [NSException raise:@"OCSException" format:@"OCSGetStructType structTypeEncode == NULL"];
+            r2 = *(r4 + 0x18);
+        }
+        r5 = [[OCSStructTypeParser parseStructEncode:r2] retain];
+        *(*(*(r4 + 0x14) + 0x4) + 0x10) = malloc(0x8);
+        **(*(*(r4 + 0x14) + 0x4) + 0x10) = 0x0;
+        *(*(*(*(r4 + 0x14) + 0x4) + 0x10) + 0x4) = r5;
+        r1 = *(r4 + 0x18);
+        r0 = *0x367d220;
+        r2 = *(*(*(r4 + 0x14) + 0x4) + 0x10);
+        r0 = CFDictionarySetValue(r0, r1, r2);
+    }
+    return r0;
+}
+ */
+
 // sub_2a12e24
 void OCSCreateCopyStruct() {}
 
