@@ -64,6 +64,7 @@
 		C16367071E67F5AC0010A9D6 /* QQLuaPluginManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QQLuaPluginManager.h; sourceTree = "<group>"; };
 		C16367081E67F5AC0010A9D6 /* QQLuaPluginManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QQLuaPluginManager.m; sourceTree = "<group>"; };
 		C18654491EC30D4F00FA1E7B /* OCSExecutable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSExecutable.m; sourceTree = "<group>"; };
+		C18D00D61ED81A7C00DE64E0 /* OCSNativeCStruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSNativeCStruct.h; sourceTree = "<group>"; };
 		C1DB9EA11EC098180017C4E1 /* OCSNativeCStruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSNativeCStruct.m; sourceTree = "<group>"; };
 		C1DB9EA31EC098B40017C4E1 /* OCSExecutableManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSExecutableManager.m; sourceTree = "<group>"; };
 		C1DB9EA51EC099220017C4E1 /* OCSVirtualMachine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSVirtualMachine.m; sourceTree = "<group>"; };
@@ -211,6 +212,7 @@
 		C1DB9E9E1EC097BE0017C4E1 /* NativeCBridge */ = {
 			isa = PBXGroup;
 			children = (
+				C18D00D61ED81A7C00DE64E0 /* OCSNativeCStruct.h */,
 				C1DB9EA11EC098180017C4E1 /* OCSNativeCStruct.m */,
 			);
 			path = NativeCBridge;

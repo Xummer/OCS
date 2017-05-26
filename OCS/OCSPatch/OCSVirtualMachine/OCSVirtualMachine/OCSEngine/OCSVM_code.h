@@ -14,6 +14,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <objc/objc.h>
+#import "OCSNativeCStruct.h"
 
 typedef enum {
     OCS_CONSTANT_0 = 1,
@@ -170,10 +171,6 @@ OCSDestroyStruct(OCS_Struct *s, void *context);
 // sub_2a137d4
 OCS_Executable*
 OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode);
-
-// sub_2a13760
-void
-OCSSetUpCFuncEnvironment();
 
 // sub_2a13790
 id

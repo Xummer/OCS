@@ -384,10 +384,10 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         int32_t r_r6 = stack[2022];
         if (r_r6 > ']') { // 0x5d
             // loc_2a0c1b0
-            if (r_r6 - 0x63 > 0x13) {
+            if (r_r6 > 'v') { // 0x76
                 // loc_2a0c1f0
-                if (r_r6 != 0x5e) {
-                    if (r_r6 == 0x7b) {
+                if (r_r6 != '^') { // 0x5e
+                    if (r_r6 == '{') { // 0x7b
 //                        malloc(<#size_t __size#>)
                     }
                     else {
@@ -404,14 +404,14 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
                 goto *0x2a0c1bc[r0];
             }
         }
-        else if (r_r6 > 0x48) {
+        else if (r_r6 > 'H') { // 0x48
             // loc_2a0c1e2
-            if (r_r6 <= 0x50) {
+            if (r_r6 <= 'P') {
                 
             }
             else {
-                if (r_r6 != 0x51) {
-                    if (r_r6 == 0x53) {
+                if (r_r6 != 'Q') {
+                    if (r_r6 == 'S') {
                         malloc(0x2);
                     }
                     else {
@@ -427,8 +427,8 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         }
         else if (r_r6 - 0x3a > 0x9) {
             // loc_2a0c244
-            if (r_r6 != 0x24) {
-                if (r_r6 == 0x2a) {
+            if (r_r6 != '$') { // 0x24
+                if (r_r6 == '*') {
                     malloc(0x4);
                 }
                 else {

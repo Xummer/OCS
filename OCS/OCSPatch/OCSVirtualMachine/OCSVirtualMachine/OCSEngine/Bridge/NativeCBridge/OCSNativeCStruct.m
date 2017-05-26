@@ -279,6 +279,7 @@ sub_2a1344e() {
             int_35d3dcc = 0;
             image_header = _dyld_get_image_header(i);
             printf("imageName:%s base:%zd\n", [imgeName UTF8String], image_header);
+            break;
         }
     }
 }
