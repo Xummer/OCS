@@ -35,7 +35,7 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
     }
     
     // loc_2a14bf2:
-    size_t size = numberOfArguments - 2;
+    size_t size /*r8*/ = numberOfArguments /* r11 */ - 2;
     void *buf /*r4*/ = malloc(size);
     memset(buf, 0, size);
     CFMutableArrayRef argList = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
@@ -71,8 +71,10 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
     }
     else {
         // loc_2a14c28
+        r5 = 0;
         // loc_2a14c70
-        
+        r11 = r5 + 2;
+        [invocation getArgument:&arg atIndex:i]
     }
 }
 

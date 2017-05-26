@@ -131,8 +131,10 @@ OCSSetUpStructType() {
 }
 
 // sub_2a12b8e
-void
-OCSGetStructType() {}
+OCS_Struct *
+OCSGetStructType(NSString *typeString) {
+    
+}
 
 /*
 int sub_2a12b8e(int arg0) {
