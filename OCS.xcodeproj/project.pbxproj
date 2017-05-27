@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		C12D56F91ECAA34200CC313A /* OCSInnerException.m in Sources */ = {isa = PBXBuildFile; fileRef = C12D56F81ECAA34100CC313A /* OCSInnerException.m */; };
+		C162DF3D1ED90D3900222862 /* OCSStructTypeI.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF3A1ED90D3900222862 /* OCSStructTypeI.m */; };
+		C162DF3E1ED90D3900222862 /* OCSStructTypeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF3C1ED90D3900222862 /* OCSStructTypeParser.m */; };
+		C162DF411ED90F8300222862 /* OCSTypyCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF401ED90F8300222862 /* OCSTypyCommon.m */; };
+		C162DF441ED90FA800222862 /* OCSTypyBase.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF431ED90FA800222862 /* OCSTypyBase.m */; };
+		C162DF471ED90FEF00222862 /* OCSTypeStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF461ED90FEF00222862 /* OCSTypeStruct.m */; };
 		C16366D21E67A5190010A9D6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D11E67A5190010A9D6 /* main.m */; };
 		C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D41E67A5190010A9D6 /* AppDelegate.m */; };
 		C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D71E67A51A0010A9D6 /* ViewController.m */; };
@@ -45,6 +50,16 @@
 		C12D56F71ECAA34100CC313A /* OCSInnerException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSInnerException.h; sourceTree = "<group>"; };
 		C12D56F81ECAA34100CC313A /* OCSInnerException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSInnerException.m; sourceTree = "<group>"; };
 		C135A0FC1EC6EB68009844EF /* OCSVM_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSVM_code.h; sourceTree = "<group>"; };
+		C162DF391ED90D3900222862 /* OCSStructTypeI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSStructTypeI.h; sourceTree = "<group>"; };
+		C162DF3A1ED90D3900222862 /* OCSStructTypeI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSStructTypeI.m; sourceTree = "<group>"; };
+		C162DF3B1ED90D3900222862 /* OCSStructTypeParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSStructTypeParser.h; sourceTree = "<group>"; };
+		C162DF3C1ED90D3900222862 /* OCSStructTypeParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSStructTypeParser.m; sourceTree = "<group>"; };
+		C162DF3F1ED90F8300222862 /* OCSTypyCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSTypyCommon.h; sourceTree = "<group>"; };
+		C162DF401ED90F8300222862 /* OCSTypyCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSTypyCommon.m; sourceTree = "<group>"; };
+		C162DF421ED90FA800222862 /* OCSTypyBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSTypyBase.h; sourceTree = "<group>"; };
+		C162DF431ED90FA800222862 /* OCSTypyBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSTypyBase.m; sourceTree = "<group>"; };
+		C162DF451ED90FEF00222862 /* OCSTypeStruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSTypeStruct.h; sourceTree = "<group>"; };
+		C162DF461ED90FEF00222862 /* OCSTypeStruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSTypeStruct.m; sourceTree = "<group>"; };
 		C16366CD1E67A5190010A9D6 /* OCS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OCS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C16366D11E67A5190010A9D6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C16366D31E67A5190010A9D6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -214,6 +229,16 @@
 			children = (
 				C18D00D61ED81A7C00DE64E0 /* OCSNativeCStruct.h */,
 				C1DB9EA11EC098180017C4E1 /* OCSNativeCStruct.m */,
+				C162DF3B1ED90D3900222862 /* OCSStructTypeParser.h */,
+				C162DF3C1ED90D3900222862 /* OCSStructTypeParser.m */,
+				C162DF391ED90D3900222862 /* OCSStructTypeI.h */,
+				C162DF3A1ED90D3900222862 /* OCSStructTypeI.m */,
+				C162DF3F1ED90F8300222862 /* OCSTypyCommon.h */,
+				C162DF401ED90F8300222862 /* OCSTypyCommon.m */,
+				C162DF421ED90FA800222862 /* OCSTypyBase.h */,
+				C162DF431ED90FA800222862 /* OCSTypyBase.m */,
+				C162DF451ED90FEF00222862 /* OCSTypeStruct.h */,
+				C162DF461ED90FEF00222862 /* OCSTypeStruct.m */,
 			);
 			path = NativeCBridge;
 			sourceTree = "<group>";
@@ -371,12 +396,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C162DF441ED90FA800222862 /* OCSTypyBase.m in Sources */,
 				C1DB9EA41EC098B40017C4E1 /* OCSExecutableManager.m in Sources */,
 				C1DB9EA91EC099670017C4E1 /* OCSEngine.m in Sources */,
 				C16367091E67F5AC0010A9D6 /* QQLuaPluginManager.m in Sources */,
 				C186544A1EC30D4F00FA1E7B /* OCSExecutable.m in Sources */,
+				C162DF471ED90FEF00222862 /* OCSTypeStruct.m in Sources */,
 				C1DB9EA21EC098180017C4E1 /* OCSNativeCStruct.m in Sources */,
+				C162DF3E1ED90D3900222862 /* OCSStructTypeParser.m in Sources */,
 				C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */,
+				C162DF411ED90F8300222862 /* OCSTypyCommon.m in Sources */,
+				C162DF3D1ED90D3900222862 /* OCSStructTypeI.m in Sources */,
 				C12D56F91ECAA34200CC313A /* OCSInnerException.m in Sources */,
 				C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */,
 				C16366D21E67A5190010A9D6 /* main.m in Sources */,

@@ -9,6 +9,7 @@
 #import "OCSVM_code.h"
 #import <CoreGraphics/CoreGraphics.h>
 #import <mach-o/dyld.h>
+#import "OCSStructTypeParser.h"
 
 // sub_2a11118
 void

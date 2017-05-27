@@ -12,4 +12,6 @@
 
 + (id)componentsOfMembersEncode:(NSString *)mEcode;
 
++ (id)parseStructEncode:(NSString *)structEncode;
+
 @end
