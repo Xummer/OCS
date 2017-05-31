@@ -410,7 +410,15 @@ void sub_2a13ed0(void * _block) {
         NSMutableDictionary *mDict = [NSMutableDictionary dictionary];
         
         for (NSString *method in arrMethodsName) {
-            
+            NSArray *arrComponents = [[self class] componentsSeparatedByString:method];
+            if ([arrComponents count] >= 3) {
+                if (![arrComponents[0] isEqualToString:@"^"]) {
+                    [arrComponents[0] isEqualToString:@"-"]
+                    
+                    NSString *selector = [[self class] selectorNameInMethodNameComponents:arrComponents];
+                    [mDict setObject:selector forKey:method];
+                }
+            }
         }
         
         return [NSDictionary dictionaryWithDictionary:mDict];
