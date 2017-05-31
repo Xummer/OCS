@@ -123,15 +123,17 @@ typedef struct OCS_VirtualMachine_t {
 } OCS_VirtualMachine; // 0x20
 
 
-static void *OCSExecutableManagerLoadDataCallback_fun; // *0x35d3dc0
+static void *_OCSExecutableManagerLoadDataCallback_fun; // *0x35d3dc0 | *0x760634
+static void *_vmRunBlock;
 static const struct mach_header* image_header; //*0x35d3dc8;
 static NSUInteger int_35d3dcc; //*0x35d3dcc;
 
-static CFMutableDictionaryRef dictExecutables; // *0x367d1f0  <executableName, OCS_Executable*>
-static dispatch_queue_t OCSExecutableManagerReadWriteQueue; // *0x367d1f4
-static CFMutableDictionaryRef dictClassNameTables; // *0x367d1f8 <className, <CFMutableArrayRef>OCS_Executable*>
-static dispatch_queue_t exeClassNameTablesQueue; // *0x367d1fc
-static NSCache *codeBlockCache; // *0x367d200 <className, OCS_CodeBlock*>
+static CFMutableDictionaryRef dictExecutables; // *0x367d1f0  <executableName, OCS_Executable*> | *0x720674
+static dispatch_queue_t OCSExecutableManagerReadWriteQueue; // *0x367d1f4 | *0x720670
+static CFMutableDictionaryRef dictClassNameTables; // *0x367d1f8 <className, <CFMutableArrayRef>OCS_Executable*> | *0x72067c
+static dispatch_queue_t exeClassNameTablesQueue; // *0x367d1fc | *0x720678
+static NSMutableDictionary *codeBlockCache; // *0x367d200 <className, OCS_CodeBlock*> | *0x720684
+static dispatch_queue_t classMethodBlockQueue; // | *0x720680
 
 static CFMutableDictionaryRef dictCFunction; // *0x367d208
 static CFMutableDictionaryRef dict_367d20c; // *0x367d20c
@@ -140,30 +142,30 @@ static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c
 static CFMutableDictionaryRef dictStructType; // *0x367d220
 static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214
 
-static NSMutableDictionary *OCSOverrideClsMethodNameDic; // *0x367d22c <NSString * className, <NSMutableDictionary *> overrideMethods>
-static dispatch_queue_t classMethodNameReadWriteQueue; // *00x367d228
-static NSMutableDictionary *classExecutableRoot; // *0x367d234 <NSString * filePath, NSString * rootPath>
-static dispatch_queue_t classExecutableRootReadWriteQueue; // *0x367d230
+static NSMutableDictionary *OCSOverrideClsMethodNameDic; // *0x367d22c <NSString * className, <NSMutableDictionary <NSString * methodName (-|init|@:), ??> *> overrideMethods> | *0x7206c4
+static dispatch_queue_t classMethodNameReadWriteQueue; // *00x367d228 | *0x7206c0
+static NSMutableDictionary *classExecutableRoot; // *0x367d234 <NSString * filePath, NSString * rootPath> | *0x7206cc
+static dispatch_queue_t classExecutableRootReadWriteQueue; // *0x367d230 | *0x7206c8
 
 // sub_2a0bac0
 OCS_CodeBlock *
-OCSGetCodeBlock(NSString *clsName, NSString *arg1);
+_OCSGetCodeBlock(NSString *clsName, NSString *arg1);
 
 // sub_2a0bdee
 OCS_VirtualMachine*
-OCSVirtualMachineCreate();
+_OCSVirtualMachineCreate();
 
 // sub_2a0be22
 void
-OCSVirtualMachineDestroy(OCS_VirtualMachine* vm);
+_OCSVirtualMachineDestroy(OCS_VirtualMachine* vm);
 
 // sub_2a0be9c
 void
-OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread);
+_OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread);
 
 // sub_2a0b75c
 OCS_Executable*
-OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
+_OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
 
 // sub_2a11118
 void
@@ -171,20 +173,28 @@ OCSDestroyStruct(OCS_Struct *s, void *context);
 
 // sub_2a137d4
 OCS_Executable*
-OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode);
+_OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode);
 
 // sub_2a13790
 id
-OCSGetCurrentThreadVMExptionCallStackInfo();
+_CurrentThreadOCSVMExptionCallStackInfo();
 
 // sub_2a13fb4
 NSData *
-OCSGetExecutableData(NSString *fileName);
+_loadData(NSString *fileName);
 
 // sub_2a1514a
 OCS_VirtualMachine*
-OCSGetCurrentThreadVirtualMachine();
+_OCSGetCurrentThreadVirtualMachine();
 
 
+#ifdef DEBUG
+#define OCSLog(format, ...) \
+NSLog((@"%s (%@:Line %d) " format), \
+__PRETTY_FUNCTION__, [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__,\
+## __VA_ARGS__); \
+#else
+#define OCSLog(format, ...)
+#endif ///< DEBUG
 
 #endif /* OCSVM_code_h */

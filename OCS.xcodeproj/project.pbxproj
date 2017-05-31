@@ -13,6 +13,12 @@
 		C162DF411ED90F8300222862 /* OCSTypyCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF401ED90F8300222862 /* OCSTypyCommon.m */; };
 		C162DF441ED90FA800222862 /* OCSTypyBase.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF431ED90FA800222862 /* OCSTypyBase.m */; };
 		C162DF471ED90FEF00222862 /* OCSTypeStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF461ED90FEF00222862 /* OCSTypeStruct.m */; };
+		C162DF661EDE99A200222862 /* OCSConfigureFileEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF651EDE99A200222862 /* OCSConfigureFileEngine.m */; };
+		C162DF6F1EDE9D0000222862 /* OCSDynamicClassTool.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF6E1EDE9D0000222862 /* OCSDynamicClassTool.m */; };
+		C162DF751EDEB38C00222862 /* OCSIvarLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF741EDEB38C00222862 /* OCSIvarLayout.m */; };
+		C162DF831EDEB5F000222862 /* OCSBlockABI.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF821EDEB5F000222862 /* OCSBlockABI.m */; };
+		C162DF861EDEB65300222862 /* OCSDynamicProtocolTool.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF851EDEB65300222862 /* OCSDynamicProtocolTool.m */; };
+		C162DF891EDEB70F00222862 /* OCSModules.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF881EDEB70F00222862 /* OCSModules.m */; };
 		C16366D21E67A5190010A9D6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D11E67A5190010A9D6 /* main.m */; };
 		C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D41E67A5190010A9D6 /* AppDelegate.m */; };
 		C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C16366D71E67A51A0010A9D6 /* ViewController.m */; };
@@ -60,6 +66,17 @@
 		C162DF431ED90FA800222862 /* OCSTypyBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSTypyBase.m; sourceTree = "<group>"; };
 		C162DF451ED90FEF00222862 /* OCSTypeStruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSTypeStruct.h; sourceTree = "<group>"; };
 		C162DF461ED90FEF00222862 /* OCSTypeStruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSTypeStruct.m; sourceTree = "<group>"; };
+		C162DF641EDE99A200222862 /* OCSConfigureFileEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSConfigureFileEngine.h; sourceTree = "<group>"; };
+		C162DF651EDE99A200222862 /* OCSConfigureFileEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSConfigureFileEngine.m; sourceTree = "<group>"; };
+		C162DF6D1EDE9D0000222862 /* OCSDynamicClassTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSDynamicClassTool.h; sourceTree = "<group>"; };
+		C162DF6E1EDE9D0000222862 /* OCSDynamicClassTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSDynamicClassTool.m; sourceTree = "<group>"; };
+		C162DF731EDEB38C00222862 /* OCSIvarLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSIvarLayout.h; sourceTree = "<group>"; };
+		C162DF741EDEB38C00222862 /* OCSIvarLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSIvarLayout.m; sourceTree = "<group>"; };
+		C162DF821EDEB5F000222862 /* OCSBlockABI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSBlockABI.m; sourceTree = "<group>"; };
+		C162DF841EDEB65300222862 /* OCSDynamicProtocolTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSDynamicProtocolTool.h; sourceTree = "<group>"; };
+		C162DF851EDEB65300222862 /* OCSDynamicProtocolTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSDynamicProtocolTool.m; sourceTree = "<group>"; };
+		C162DF871EDEB70F00222862 /* OCSModules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSModules.h; sourceTree = "<group>"; };
+		C162DF881EDEB70F00222862 /* OCSModules.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSModules.m; sourceTree = "<group>"; };
 		C16366CD1E67A5190010A9D6 /* OCS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OCS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C16366D11E67A5190010A9D6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C16366D31E67A5190010A9D6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -212,6 +229,16 @@
 				C135A0FC1EC6EB68009844EF /* OCSVM_code.h */,
 				C12D56F71ECAA34100CC313A /* OCSInnerException.h */,
 				C12D56F81ECAA34100CC313A /* OCSInnerException.m */,
+				C162DF641EDE99A200222862 /* OCSConfigureFileEngine.h */,
+				C162DF651EDE99A200222862 /* OCSConfigureFileEngine.m */,
+				C162DF871EDEB70F00222862 /* OCSModules.h */,
+				C162DF881EDEB70F00222862 /* OCSModules.m */,
+				C162DF731EDEB38C00222862 /* OCSIvarLayout.h */,
+				C162DF741EDEB38C00222862 /* OCSIvarLayout.m */,
+				C162DF6D1EDE9D0000222862 /* OCSDynamicClassTool.h */,
+				C162DF6E1EDE9D0000222862 /* OCSDynamicClassTool.m */,
+				C162DF841EDEB65300222862 /* OCSDynamicProtocolTool.h */,
+				C162DF851EDEB65300222862 /* OCSDynamicProtocolTool.m */,
 			);
 			path = OCSEngine;
 			sourceTree = "<group>";
@@ -256,6 +283,7 @@
 			isa = PBXGroup;
 			children = (
 				C1DB9EA51EC099220017C4E1 /* OCSVirtualMachine.m */,
+				C162DF821EDEB5F000222862 /* OCSBlockABI.m */,
 			);
 			path = VirtualMachine;
 			sourceTree = "<group>";
@@ -396,21 +424,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C162DF661EDE99A200222862 /* OCSConfigureFileEngine.m in Sources */,
 				C162DF441ED90FA800222862 /* OCSTypyBase.m in Sources */,
 				C1DB9EA41EC098B40017C4E1 /* OCSExecutableManager.m in Sources */,
 				C1DB9EA91EC099670017C4E1 /* OCSEngine.m in Sources */,
 				C16367091E67F5AC0010A9D6 /* QQLuaPluginManager.m in Sources */,
+				C162DF831EDEB5F000222862 /* OCSBlockABI.m in Sources */,
+				C162DF891EDEB70F00222862 /* OCSModules.m in Sources */,
 				C186544A1EC30D4F00FA1E7B /* OCSExecutable.m in Sources */,
+				C162DF6F1EDE9D0000222862 /* OCSDynamicClassTool.m in Sources */,
 				C162DF471ED90FEF00222862 /* OCSTypeStruct.m in Sources */,
 				C1DB9EA21EC098180017C4E1 /* OCSNativeCStruct.m in Sources */,
 				C162DF3E1ED90D3900222862 /* OCSStructTypeParser.m in Sources */,
 				C16366D81E67A51A0010A9D6 /* ViewController.m in Sources */,
 				C162DF411ED90F8300222862 /* OCSTypyCommon.m in Sources */,
 				C162DF3D1ED90D3900222862 /* OCSStructTypeI.m in Sources */,
+				C162DF751EDEB38C00222862 /* OCSIvarLayout.m in Sources */,
 				C12D56F91ECAA34200CC313A /* OCSInnerException.m in Sources */,
 				C16366D51E67A5190010A9D6 /* AppDelegate.m in Sources */,
 				C16366D21E67A5190010A9D6 /* main.m in Sources */,
 				C1DB9EA61EC099220017C4E1 /* OCSVirtualMachine.m in Sources */,
+				C162DF861EDEB65300222862 /* OCSDynamicProtocolTool.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

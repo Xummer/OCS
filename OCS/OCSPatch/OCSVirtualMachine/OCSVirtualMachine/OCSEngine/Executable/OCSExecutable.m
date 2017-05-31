@@ -10,7 +10,7 @@
 
 // sub_2a137d4
 OCS_Executable*
-OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
+_OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
     if (data) {
         
         // XTest: 记得释放
@@ -737,7 +737,7 @@ loc_2a13df4:
 
 // sub_2a13e60
 void
-_OCSCodeBlockReleaseCallBack() {}
+__OCSCodeBlockReleaseCallBack() {}
 
 /*
 int sub_2a13e60() {
@@ -764,7 +764,7 @@ int sub_2a13e60() {
 
 // sub_2a13fb4
 NSData *
-OCSGetExecutableData(NSString *fileName) {
+_loadData(NSString *fileName) {
     __block NSString *rootPath;
     dispatch_sync(classExecutableRootReadWriteQueue, ^{
         // sub_2a14b20

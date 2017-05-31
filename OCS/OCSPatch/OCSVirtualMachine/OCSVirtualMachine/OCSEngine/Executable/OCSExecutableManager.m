@@ -10,18 +10,9 @@
 
 // sub_2a0b75c
 OCS_Executable*
-OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
+_OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
     NSCAssert(executableName, @"executableName && \"executableName is NULL\"");
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // sub_2a0b874
-        dictExecutables = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
-        OCSExecutableManagerReadWriteQueue =
-        dispatch_queue_create("ocscript.executable-manager.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
-        dictClassNameTables = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
-        exeClassNameTablesQueue = dispatch_queue_create("ocscript.executable-manager.exeClassNameTablesQueue", DISPATCH_QUEUE_CONCURRENT);
-        codeBlockCache = [NSCache new];
-    });
+    _setUpExecutableManagerEnvironment();
     
     __block OCS_Executable* exec;
     dispatch_sync(OCSExecutableManagerReadWriteQueue, ^{
@@ -35,11 +26,11 @@ OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
             exec = (OCS_Executable*)CFDictionaryGetValue(dictExecutables, (__bridge const void *)(executableName));
             if (!exec) {
                 // loc_2a0ba1c
-                NSCAssert(OCSExecutableManagerLoadDataCallback_fun, @"OCSExecutableManagerLoadDataCallback_fun && \"OCSExecutableManagerLoadDataCallback_fun is NULL\"");
+                NSCAssert(_OCSExecutableManagerLoadDataCallback_fun, @"OCSExecutableManagerLoadDataCallback_fun && \"OCSExecutableManagerLoadDataCallback_fun is NULL\"");
                 // loc_2a0b99e
                 
                 exec =
-                OCSExecutableCreate(executableName, ((NSData *(*)())OCSExecutableManagerLoadDataCallback_fun)(executableName), errorCode);
+                _OCSExecutableCreate(executableName, ((NSData *(*)())_OCSExecutableManagerLoadDataCallback_fun)(executableName), errorCode);
                 
                 if (*errorCode) {
                     
@@ -137,13 +128,29 @@ int sub_2a0b75c(int arg0, int arg1) {
 }
  */
 
+void
+_setUpExecutableManagerEnvironment() {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // sub_2a0b874
+        dictExecutables = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
+        OCSExecutableManagerReadWriteQueue =
+        dispatch_queue_create("ocscript.executable-manager.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
+        dictClassNameTables = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
+        exeClassNameTablesQueue = dispatch_queue_create("ocscript.executable-manager.exeClassNameTablesQueue", DISPATCH_QUEUE_CONCURRENT);
+        codeBlockCache = [NSMutableDictionary new];
+        classMethodBlockQueue = dispatch_queue_create("ocscript.ClassMethodBlockQueue-Queue", DISPATCH_QUEUE_CONCURRENT);
+    });
+}
 
 // ??
 // sub_2a0bac0
 OCS_CodeBlock *
-OCSGetCodeBlock(NSString *clsName, NSString *arg1) {
-    NSString *key = [NSString stringWithFormat:@"%@_%@", clsName, arg1];
-    __block OCS_CodeBlock *codeBlock = [[codeBlockCache objectForKey:key] pointerValue];
+_OCSGetCodeBlock(NSString *clsName, NSString *codeBlockName) {
+    NSString *keyStr = [NSString stringWithFormat:@"%@_%@", clsName, codeBlockName];
+    NSCAssert(clsName.length > 0 && codeBlockName.length > 0 && keyStr.length > 0, @"keyStr.length > 0 && \"OCSGetCodeBlock className codeBlockName is nil\"");
+    
+    __block OCS_CodeBlock *codeBlock = [[codeBlockCache objectForKey:keyStr] pointerValue];
     
     if (!codeBlock) {
         dispatch_sync(exeClassNameTablesQueue, ^{
@@ -168,8 +175,8 @@ OCSGetCodeBlock(NSString *clsName, NSString *arg1) {
                                 exec = (OCS_Executable *)CFArrayGetValueAtIndex(arr, i);
                                 if (exec) {
                                     // loc_2a0bd04
-                                    codeBlock = (OCS_CodeBlock *)CFDictionaryGetValue(exec->dictCodes,(__bridge const void *)(key));
-                                    [codeBlockCache setObject:[NSValue valueWithPointer:codeBlock] forKey:key];
+                                    codeBlock = (OCS_CodeBlock *)CFDictionaryGetValue(exec->dictCodes,(__bridge const void *)(keyStr));
+                                    [codeBlockCache setObject:[NSValue valueWithPointer:codeBlock] forKey:keyStr];
                                     return;
                                 }
                             }

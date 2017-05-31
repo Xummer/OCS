@@ -12,7 +12,7 @@
 
 // sub_2a0bda8
 OCS_StackBlock *
-OCSStackBlockCreate(OCS_StackBlock* prev, OCS_StackBlock* next, int32_t size) {
+_OCSStackBlockCreate(OCS_StackBlock* prev, OCS_StackBlock* next, int32_t size) {
     NSCAssert(size >= 1, @"size >= 1");
     
     OCS_StackBlock *stackBlock = malloc(offsetof(OCS_StackBlock, stack) + size * STACK_CELL_SIZE);
@@ -53,7 +53,7 @@ int sub_2a0bda8(int arg0, int arg1, int arg2) {
 
 // sub_2a0bdee
 OCS_VirtualMachine *
-OCSVirtualMachineCreate() {
+_OCSVirtualMachineCreate() {
     OCS_VirtualMachine *vm = malloc(sizeof(OCS_VirtualMachine));
     vm->state = 0;
     
@@ -99,7 +99,7 @@ int sub_2a0bdee() {
 
 // sub_2a0be22
 void
-OCSVirtualMachineDestroy(OCS_VirtualMachine* vm) {
+_OCSVirtualMachineDestroy(OCS_VirtualMachine* vm) {
     NSCAssert(vm, @"vm && \"Destroy NULL OCSVirtualMachine\"");
     NSCAssert(vm->currentFrame == NULL, @"vm->currentFrame == NULL && \"Destroy a VirtualMachine with Frame Still Active.\"");
     if (vm->exptionCallStackInfo) {
@@ -163,7 +163,7 @@ int sub_2a0be22(int arg0) {
 
 // sub_2a0be9c
 void
-OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread) {
+_OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread) {
     NSCAssert(vm, @"vm && \"Attach thread on NULL OCSVirtualMachine.\"");
     NSCAssert(thread, @"thread && \"Attach NULL thread on OCSVirtualMachine\"");
     if (vm && thread) {
@@ -203,7 +203,7 @@ void sub_2a0be9c(int arg0, int arg1) {
 
 // sub_2a0bef0
 void
-_appendVMStackInfo(NSMutableString *infos, OCS_Frame *frame) {
+_StackInfoAppend(NSMutableString *infos, OCS_Frame *frame) {
     if (infos && frame) {
         [infos appendFormat:@"[class:%@] ", [frame->cls->value class]];
         [infos appendFormat:@"[methodName:%@] ", frame->codeBlock->method];
@@ -240,7 +240,7 @@ void sub_2a0bef0(int arg0, int arg1) {
 
 // sub_2a0bf7e
 NSString *
-_getVMStackInfo(OCS_VirtualMachine *vm) {
+_OCSVMStackInfo(OCS_VirtualMachine *vm) {
     if (vm) {
         NSMutableString *infos =
         [NSMutableString stringWithFormat:@"[VMState:%zd]\n ", vm->state];
@@ -250,7 +250,7 @@ _getVMStackInfo(OCS_VirtualMachine *vm) {
             OCS_Frame *frame = vm->currentFrame;
             while (frame) {
                 [infos appendFormat:@"%zd ", i];
-                _appendVMStackInfo(infos, vm->currentFrame);
+                _StackInfoAppend(infos, vm->currentFrame);
                 frame = frame->back;
                 i ++;
             }
@@ -312,7 +312,7 @@ int sub_2a0bf7e(int arg0) {
 
 // sub_2a0c01c
 void
-OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, int arg2, CFMutableArrayRef argList) {
+_OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, int arg2, CFMutableArrayRef argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
     // loc_2a0c080
@@ -348,7 +348,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
                     for (pos = stackBlock; pos->next != NULL; pos = pos->next)
                         ;
                     int32_t size = MAX(vm->stackSize, needSize); // ??
-                    tmpStackBlock = OCSStackBlockCreate(pos, NULL, size);
+                    tmpStackBlock = _OCSStackBlockCreate(pos, NULL, size);
                     pos->next = tmpStackBlock;
                     vm->stackSize += size;
                     break;
@@ -378,7 +378,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         vm->state = 1;
         vm->stackPointer +=  codeBlock->localVarCount * STACK_CELL_SIZE;
         vm->currentFrame = &f;
-        _virtualMachineEval(vm);
+        __virtualMachineEval(vm);
 //        vm->stackPointer;
         
         int32_t r_r6 = stack[2022];
@@ -745,7 +745,7 @@ loc_2a0c33e:
  
 // sub_2a0e360
 void
-_virtualMachineEval(OCS_VirtualMachine *vm) {
+__virtualMachineEval(OCS_VirtualMachine *vm) {
     NSCAssert(vm, @"vm && \"Eval on NULL OCSVirtualMachine\"");
     /* vm r5*/
     OCS_Frame *fp = vm->currentFrame;
@@ -1551,10 +1551,10 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
 
 // sub_2a13770
 void
-sub_2a13770(NSString *className, NSString *arg1, int arg2, CFMutableArrayRef argList) {
-    OCS_CodeBlock *codeBlock = OCSGetCodeBlock(className, arg1);
-    OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
-    OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList);
+_OCSRunWithParaList(NSString *className, NSString *arg1, int arg2, CFMutableArrayRef argList) {
+    OCS_CodeBlock *codeBlock = _OCSGetCodeBlock(className, arg1);
+    OCS_VirtualMachine *vm = _OCSGetCurrentThreadVirtualMachine();
+    _OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList);
 }
 
 /*
@@ -1574,8 +1574,8 @@ void sub_2a13770(int arg0, int arg1, int arg2, int arg3) {
 
 // sub_2a13790
 NSString *
-OCSGetCurrentThreadVMExptionCallStackInfo() {
-    OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
+_CurrentThreadOCSVMExptionCallStackInfo() {
+    OCS_VirtualMachine *vm = _OCSGetCurrentThreadVirtualMachine();
     if (vm && vm->exptionCallStackInfo) {
         return [(__bridge NSString *)vm->exptionCallStackInfo copy];
     }
@@ -1585,9 +1585,9 @@ OCSGetCurrentThreadVMExptionCallStackInfo() {
 
 // sub_2a137c4
 NSString *
-OCSGetCurrentThreadStackInfo() {
-    OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
-    return _getVMStackInfo(vm);
+_CurrentThreadOCSVMStackInfo() {
+    OCS_VirtualMachine *vm = _OCSGetCurrentThreadVirtualMachine();
+    return _OCSVMStackInfo(vm);
 }
 
 /*
@@ -1597,6 +1597,49 @@ void sub_2a137c4() {
     r7 = sp - 0x8;
     r0 = sub_2a1514a();
     r0 = sub_2a0bf7e(r0);
+    return;
+}
+ */
+
+void
+_OCSRunBlockWithLayout {}
+
+/*
+void _OCSRunBlockWithLayout(int arg0, int arg1, int arg2) {
+    r2 = arg2;
+    stack[2043] = r4;
+    stack[2044] = r5;
+    stack[2045] = r6;
+    stack[2046] = r7;
+    stack[2047] = lr;
+    stack[4611686018427389942] = r5;
+    stack[4611686018427389943] = r6;
+    stack[4611686018427389944] = (sp - 0x14) + 0xc;
+    stack[4611686018427389945] = r8;
+    stack[4611686018427389946] = r10;
+    sp = sp - 0x28;
+    r6 = arg0;
+    r5 = r2;
+    r8 = arg1;
+    if (r6 != 0x0) {
+        r0 = _getBlockArgVarInfo(r6);
+        r1 = *(r0 + 0x8);
+        r4 = _OCSGetCodeBlock(*(r0 + 0xc), r1);
+        if (r4 != 0x0) {
+            r10 = _OCSGetCurrentThreadVirtualMachine();
+            r0 = _getSelfCaptureVar(r6, r1, r2, r3);
+            r2 = sp + 0x8;
+            stack[2040] = r0;
+            asm { strd       r6, r5, [sp, #0x20 + var_20] };
+            if (r0 == 0x0) {
+                asm { moveq      r2, r0 };
+            }
+            r0 = _OCSVirtualMachineExecuteWithArr(r10, r4, r2, r8, stack[2038], stack[2039]);
+        }
+        else {
+            r0 = NSLog(@"OCSRunBlockWithLayout, get codeBlock nil ");
+        }
+    }
     return;
 }
  */

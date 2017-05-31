@@ -49,11 +49,11 @@ int sub_2a11118(int arg0) {
 
 // sub_2a123ba
 void
-OCSSetUpNativeCFunc() {
+_OCSSetUpCFunctionEnvironment() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // sub_2a123e6
-        sub_2a1344e();
+        _initAppImagebase();
         CFMutableDictionaryRef dictRef =
         CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
         
@@ -122,7 +122,7 @@ void sub_2a123e6(void * _block) {
 
 // sub_2a12b08
 void
-OCSSetUpStructType() {
+_OCSSetUpCStructEnvironment() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // sub_2a12b34
@@ -133,7 +133,7 @@ OCSSetUpStructType() {
 
 // sub_2a12b8e
 OCS_Struct *
-OCSGetStructType(NSString *typeString) {
+_OCSGetStructType(NSString *typeString) {
     NSCAssert(typeString, @"structTypeEncode && \"Get StructType With typeName NULL\"");
     
     __block OCS_Struct *s = NULL;
@@ -317,7 +317,7 @@ int sub_2a12e24(int arg0, int arg1) {
 
 // sub_2a1344e
 void
-sub_2a1344e() {
+_initAppImagebase() {
     NSString *mainBundleName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     //Get count of all currently loaded DYLD
     uint32_t count = _dyld_image_count();
@@ -393,9 +393,9 @@ loc_2a13514:
 
 // sub_2a13760
 void
-OCSSetUpCFuncEnvironment() {
-    OCSSetUpStructType();
-    OCSSetUpNativeCFunc();
+_OCSSetUpEnvironment() {
+    _OCSSetUpCStructEnvironment();
+    _OCSSetUpCFunctionEnvironment();
 }
 
 /*
