@@ -8,6 +8,11 @@
 
 #import "OCSVM_code.h"
 
+void
+_setUpExecutableManagerEnvironment();
+
+
+
 // sub_2a0b75c
 OCS_Executable*
 _OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
@@ -127,6 +132,34 @@ int sub_2a0b75c(int arg0, int arg1) {
     return r0;
 }
  */
+
+void
+_OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableArray *dict, NSMutableDictionary *dict2) {
+    NSCAssert(executableName, @"executableName && \"executableName is NULL\"");
+    
+    NSString *path = [relativePath stringByAppendingPathComponent:executableName];
+    
+#if __LP64__
+    NSString *fullPath = [path stringByAppendingPathExtension:@"64.ocs"];
+#else
+    NSString *fullPath = [path stringByAppendingPathExtension:@"32.ocs"];
+#endif
+    
+    _setUpExecutableManagerEnvironment();
+    
+    __block NSData *data = nil;
+    
+    dispatch_barrier_sync(OCSExecutableManagerReadWriteQueue, ^{
+        NSCAssert(_OCSExecutableManagerLoadDataCallback_fun, @"OCSExecutableManagerLoadDataCallback_fun && \"OCSExecutableManagerLoadDataCallback_fun is NULL\"");
+        if ([[NSFileManager defaultManager] fileExistsAtPath:fullPath]) {
+            data = [NSData dataWithContentsOfFile:fullPath];
+        }
+    });
+    
+    OCSLog(@"GetClassProtocolExtend:fileName(%s)", [executableName UTF8String]);
+    
+    _OCSExtendClassProtocolSegment(data, dict, dict2);
+}
 
 void
 _setUpExecutableManagerEnvironment() {

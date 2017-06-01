@@ -192,7 +192,7 @@ _OCSGetCurrentThreadVirtualMachine();
 #define OCSLog(format, ...) \
 NSLog((@"%s (%@:Line %d) " format), \
 __PRETTY_FUNCTION__, [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__,\
-## __VA_ARGS__); \
+## __VA_ARGS__);
 #else
 #define OCSLog(format, ...)
 #endif ///< DEBUG

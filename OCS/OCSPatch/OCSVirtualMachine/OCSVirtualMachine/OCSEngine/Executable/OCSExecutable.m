@@ -7,11 +7,14 @@
 //
 
 #import "OCSVM_code.h"
+#import "OCSModules.h"
 
 // sub_2a137d4
 OCS_Executable*
 _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
     if (data) {
+        
+        OCSLog(@"OCSExecutableCreate start:fileName(%s)", [fileName UTF8String]);
         
         // XTest: 记得释放
         OCS_Executable *exe = malloc(sizeof(OCS_Executable));
@@ -37,11 +40,16 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
             //loc_2a13878:
             if (OCS2BYTE_FROM(8) == 0x20) {
                 // loc_2a13886
+                OCSLog(@"OCSExecutableCreate:fileName(%s),classNameOffset(%d)", [fileName UTF8String], 0xc);
+                
                 exe->clsName = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[0xc], kCFStringEncodingUTF8);
+                
                 
                 int16_t clsLen = OCS2BYTE_FROM(0xa);
                 
                 //                    NSLog(@"0x%x", clsLen);
+                
+//                int32_t startOffset = 0xc + clsLen;
                 
                 int32_t methodNamesOffset = OCS4BYTE_FROM(clsLen+0x11);
                 
@@ -65,6 +73,13 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                 int32_t constPoolOffset /*r10*/ = OCS4BYTE_FROM(clsLen+0xd);
                 
                 //                    NSLog(@"r10 0x%x", constPoolOffset); // 0x32
+                
+//                if (clsLen+0x11 = constPoolOffset - 0x4) {
+//                    r0 = 0;
+//                }
+//                else {
+//                    r0 = _readAndMove8ByteUint(sp + 0x8c);
+//                }
                 
                 int32_t constPoolCount = OCS4BYTE_FROM(constPoolOffset);
                 
@@ -355,11 +370,6 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                 NSCAssert(NO, @"(kArchMagicNum == kOCSExecutableArchMagicNum) && \"OCSExecutable architecture not match,update OCScript File \"");
             }
         }
-        
-#undef OCSBYTE_FROM
-#undef OCS2BYTE_FROM
-#undef OCS4BYTE_FROM
-#undef OCS8BYTE_FROM
     }
     else {
         // loc_2a13df4
@@ -734,6 +744,87 @@ loc_2a13df4:
     return r0;
 }
  */
+
+OCSClassInfo *
+_parseClassExtendSegment(int arg0, NSUInteger count) {
+    OCSClassInfo *r10 = nil;
+    if (count > 0) {
+        r10 = [OCSClassInfo new];
+    }
+    
+    NSUInteger r6 = 0;
+    
+    // loc_35ca96:
+    if (r6 < count) {
+        // loc_35ceaa
+    }
+    
+    return r10;
+}
+
+uint64_t
+_readAndMove8ByteUint(const char *bytes) {
+    return OCS8BYTE_FROM(0);
+}
+
+void
+_parseProtocolExtendSegment() {
+    
+}
+
+void
+_OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dict1, NSMutableDictionary *dict2) {
+    NSCAssert(data, @"data && \"Create OCSExecutable from nil NSData\"");
+    
+    const char *bytes = [data bytes];
+    
+    int16_t clsLenOffset = OCS2BYTE_FROM(0xa); //
+    int32_t r1 = OCS4BYTE_FROM(0xd + clsLenOffset) - 0x4;
+    
+    int32_t extendOffset = clsLenOffset + 0x15;
+    
+    if (extendOffset == r1) {
+        OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(%d)", extendOffset);
+        // There is no protocol segment.
+    }
+    else {
+        OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(%d)", extendOffset);
+//        _readAndMove8ByteUint(sp + 0x30)
+//        if (_readAndMove8ByteUint(sp + 0x30) | r1 != 0x0) {
+//            
+//        }
+        // ??
+        
+        NSUInteger count = 0;
+        
+        while(count > 0) {
+            
+            switch (r1) {
+                case 0x1:
+                {
+                    OCSLog(@"OCSExtendClassSegment:nodeInfoCount(%d),nodeInfoSize(%d)", );
+                    _parseClassExtendSegment();
+                }
+                    break;
+                case 0x2:
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+            count --;
+        }
+        
+        
+        
+    }
+    
+#undef OCSBYTE_FROM
+#undef OCS2BYTE_FROM
+#undef OCS4BYTE_FROM
+#undef OCS8BYTE_FROM
+}
 
 // sub_2a13e60
 void

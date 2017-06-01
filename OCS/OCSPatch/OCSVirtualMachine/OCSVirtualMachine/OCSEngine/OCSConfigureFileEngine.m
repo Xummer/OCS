@@ -48,8 +48,21 @@
     }
 }
 
-- (void)runWithConfigure:(id)configure configurefileNames:(NSArray *)fileNames errorCode:(NSUInteger *)errorCode {
+- (void)runWithConfigure:(NSString *)configure configurefileNames:(NSArray *)fileNames errorCode:(NSUInteger *)errorCode {
     dispatch_sync(self->_OCSConfigureFileQueue, ^{
+        
+#if __LP64__
+        NSMutableDictionary *x20 = [NSMutableDictionary new];
+        NSMutableDictionary *x19 = [NSMutableDictionary new];
+        
+        for (NSString *fileName in fileNames) {
+            _OCSGetClassProtocolExtend(configure, fileName, x20, x19);
+            
+            [x22 enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                
+            }];
+        }
+#endif
         
     });
 }
