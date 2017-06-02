@@ -122,6 +122,13 @@ typedef struct OCS_VirtualMachine_t {
     CFStringRef exptionCallStackInfo; // +0x1c     |64
 } OCS_VirtualMachine; // 0x20
 
+typedef struct OCS_PropertyAttributes_t {
+    SEL getter; // +0xc
+    SEL setter; // +0x10
+    Class cls;  // +0x18
+    char *_0x1c;
+} OCS_PropertyAttributes;
+
 
 static void *_OCSExecutableManagerLoadDataCallback_fun; // *0x35d3dc0 | *0x760634
 static void *_vmRunBlock;

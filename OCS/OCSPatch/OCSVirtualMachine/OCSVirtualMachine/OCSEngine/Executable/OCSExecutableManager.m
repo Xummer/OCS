@@ -134,7 +134,7 @@ int sub_2a0b75c(int arg0, int arg1) {
  */
 
 void
-_OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableArray *dict, NSMutableDictionary *dict2) {
+_OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableArray *dictCls, NSMutableDictionary *dictProtocol) {
     NSCAssert(executableName, @"executableName && \"executableName is NULL\"");
     
     NSString *path = [relativePath stringByAppendingPathComponent:executableName];
@@ -158,7 +158,7 @@ _OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSM
     
     OCSLog(@"GetClassProtocolExtend:fileName(%s)", [executableName UTF8String]);
     
-    _OCSExtendClassProtocolSegment(data, dict, dict2);
+    _OCSExtendClassProtocolSegment(data, dictCls, dictProtocol);
 }
 
 void

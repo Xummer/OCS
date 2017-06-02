@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+@class OCSProtocolInfo;
 @interface OCSDynamicProtocolTool : NSObject
+
++ (BOOL)setUpDynamicProtocol:(OCSProtocolInfo *)protocolInfo;
 
 @end

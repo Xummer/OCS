@@ -21,3 +21,5 @@ IMPLE(OCSProperty)
 IMPLE(OCSIvar)
 
 IMPLE(OCSProtocolProperty)
+
+IMPLE(OCSProtocolMethod)

@@ -68,7 +68,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                 
                 memcpy(exe->methodNames, &bytes[tableOffset], size);
                 
-                NSLog(@"%s", &exe->methodNames[5]);
+                OCSLog(@"%s", &exe->methodNames[5]);
                 
                 int32_t constPoolOffset /*r10*/ = OCS4BYTE_FROM(clsLen+0xd);
                 
@@ -120,7 +120,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                         
                         int8_t constPoolItemTag = OCSBYTE_FROM(nextOffset);
                         
-                        NSLog(@"-0x%x", constPoolItemTag);
+                        OCSLog(@"-0x%x", constPoolItemTag);
                         
                         int32_t itemLen = 0x4;
                         
@@ -194,7 +194,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                                     
                                     CFStringRef strRef = CFStringCreateWithCString(kCFAllocatorDefault, &exe->methodNames[startOffset], kCFStringEncodingUTF8);
                                     
-                                    NSLog(@"5 str: %@", strRef);
+                                    OCSLog(@"5 str: %@", strRef);
                                     
                                     // loc_2a13c1c
                                     c_s.value = strRef;
@@ -217,7 +217,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                                     
                                     Class cls = objc_getClass(&exe->methodNames[startOffset]);
                                     
-                                    NSLog(@"6 cls: %@", cls);
+                                    OCSLog(@"6 cls: %@", cls);
                                     
                                     // loc_2a13c1c
                                     c_c.value = cls;
@@ -239,7 +239,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                                     
                                     SEL sel = sel_registerName(&exe->methodNames[startOffset]);
                                     
-                                    NSLog(@"7 SEL: %@", NSStringFromSelector(sel));
+                                    OCSLog(@"7 SEL: %@", NSStringFromSelector(sel));
                                     
                                     // loc_2a13bb4
                                     c_s.value = sel;
@@ -261,7 +261,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                                     
                                     Protocol* protocol = objc_getProtocol(&exe->methodNames[startOffset]);
                                     
-                                    NSLog(@"8 Ptc: %@", protocol);
+                                    OCSLog(@"8 Ptc: %@", protocol);
                                     
                                     // loc_2a13bb4
                                     c_p.value = protocol;
@@ -280,7 +280,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                                     OCS_Char c_cs;
                                     c_cs.offset = startOffset;
                                     
-                                    NSLog(@"9 ??: %s", &exe->methodNames[startOffset]);
+                                    OCSLog(@"9 ??: %s", &exe->methodNames[startOffset]);
                                     
                                     
                                     // loc_2a13bb4
@@ -325,7 +325,7 @@ _OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                         CFStringRef keyStr =
                         CFStringCreateWithCString(kCFAllocatorDefault, &exe->methodNames[delta], kCFStringEncodingUTF8);
                         
-                        NSLog(@"%@", keyStr);
+                        OCSLog(@"%@", keyStr);
                         OCS_CodeBlock* codeBlock = malloc(sizeof(OCS_CodeBlock));
                         codeBlock->method = keyStr;
                         
@@ -745,35 +745,315 @@ loc_2a13df4:
 }
  */
 
-OCSClassInfo *
-_parseClassExtendSegment(int arg0, NSUInteger count) {
-    OCSClassInfo *r10 = nil;
-    if (count > 0) {
-        r10 = [OCSClassInfo new];
-    }
-    
-    NSUInteger r6 = 0;
-    
-    // loc_35ca96:
-    if (r6 < count) {
-        // loc_35ceaa
-    }
-    
-    return r10;
-}
-
 uint64_t
-_readAndMove8ByteUint(const char *bytes) {
-    return OCS8BYTE_FROM(0);
+_readAndMove8ByteUint(const char **b) {
+    const char *bytes = *b;
+    uint64_t t = OCS8BYTE_FROM(0);
+    *b += 8;
+    return t;
 }
 
-void
-_parseProtocolExtendSegment() {
+OCSClassInfo *
+_parseClassExtendSegment(const char *bytes, NSUInteger count) {
+    OCSClassInfo *clsInfo = nil;
+    if (count > 0) {
+        clsInfo = [OCSClassInfo new];
+    }
     
+    NSUInteger offset = 0;
+    
+    for (NSUInteger i = 0; i < count; i++) {
+        // loc_35ceaa
+        NSUInteger nextOffset = offset + 1;
+        int8_t type = OCSBYTE_FROM(offset) - 0x1;
+        
+        switch (type) {
+            case 0:
+            {
+                // 0x35cabc
+                CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[nextOffset], kCFStringEncodingUTF8);
+                clsInfo.currentClass = (__bridge NSString *)(str);
+                offset = clsInfo.currentClass.length + 1 + nextOffset;
+                if (str) {
+                    CFRelease(str);
+                }
+                
+                // loc_35cb28
+            }
+                break;
+            case 1:
+            {
+                // 0x35caf6
+                CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[nextOffset], kCFStringEncodingUTF8);
+                clsInfo.supperClass = (__bridge NSString *)(str);
+                offset = clsInfo.supperClass.length + 1 + nextOffset;
+                if (str) {
+                    CFRelease(str);
+                }
+            }
+                break;
+            case 2:
+            {
+                // 0x35cb2c
+                clsInfo.isARCClass = OCSBYTE_FROM(nextOffset) == 1;
+                offset += 2;
+            }
+                break;
+            case 3:
+            {
+                // 0x35cb44
+                NSUInteger c = OCSBYTE_FROM(nextOffset);
+                NSMutableArray *arr = [NSMutableArray array];
+                
+                offset += 2;
+                
+                for (NSUInteger j = 0; j < c; j ++) {
+                    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[offset], kCFStringEncodingUTF8);
+                    NSString *nsstr = (__bridge NSString *)str;
+                    offset += [nsstr length] + 1;
+                    if (str == NULL) {
+                        continue;
+                    }
+                    [arr addObject:nsstr];
+                    CFRelease(str);
+                }
+                
+                if (c != [arr count]) {
+                    // loc_35ceb4
+                    NSString *reason =
+                    [NSString stringWithFormat:@"class(%@) parseClassExtendSegment failed, refProtocolNodeCount donot match protocolArray = %@", [clsInfo currentClass], [arr description]];
+                    @throw [NSException exceptionWithName:@"OCSDynamicClassToolException" reason:reason userInfo:nil];
+                }
+                else {
+                    clsInfo.OCSRefProtocolList = [NSArray arrayWithArray:arr];
+                }
+                
+            }
+                break;
+            case 4:
+            {
+                // 0x35cba2
+                NSUInteger c = OCSBYTE_FROM(nextOffset);
+                NSMutableArray *arr = [NSMutableArray array];
+                
+                offset += 2;
+                
+                for (NSUInteger j = 0; j < c; j ++) {
+                    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[offset], kCFStringEncodingUTF8);
+                    NSString *nsstr = (__bridge NSString *)str;
+                    offset += [nsstr length] + 1;
+                    
+                    NSArray *components = [nsstr componentsSeparatedByString:@"==="];
+                    if ([components count] == 3) {
+                        OCSIvar *ivar = [OCSIvar new];
+                        ivar.ivarName = components[0];
+                        ivar.typeEncode = components[1];
+                        ivar.lifeTime = [components[2] integerValue];
+                        [arr addObject:ivar];
+                    }
+                    
+                    if (str) {
+                        CFRelease(str);
+                    }
+                }
+                
+                if (c != [arr count]) {
+                    NSString *reason =
+                    [NSString stringWithFormat:@"class(%@) parseClassExtendSegment failed, ivarNodeCount donot match protocolArray = %@", [clsInfo currentClass], [arr description]];
+                    @throw [NSException exceptionWithName:@"OCSDynamicClassToolException" reason:reason userInfo:nil];
+                }
+                else {
+                    // loc_35ce5e
+                    clsInfo.OCSIvarList = [NSArray arrayWithArray:arr];
+                }
+            }
+                break;
+            case 5:
+            {
+                // 0x35ccb8
+                NSUInteger c = OCSBYTE_FROM(nextOffset);
+                NSMutableArray *arr = [NSMutableArray array];
+                
+                offset += 2;
+                
+                for (NSUInteger j = 0; j < c; j ++) {
+                    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[offset], kCFStringEncodingUTF8);
+                    NSString *nsstr = (__bridge NSString *)str;
+                    offset += [nsstr length] + 1;
+                    
+                    NSArray *components = [nsstr componentsSeparatedByString:@"==="];
+                    if ([components count] == 3) {
+                        OCSProperty *p = [OCSProperty new];
+                        p.propertyName = components[0];
+                        p.typeEncode = components[1];
+                        p.geterSeterEncode = components[2];
+                        [arr addObject:p];
+                    }
+                    
+                    if (str == NULL) {
+                        continue;
+                    }
+                    
+                    CFRelease(str);
+                }
+                
+                if (c != [arr count]) {
+                    // loc_35cf34
+                    NSString *reason =
+                    [NSString stringWithFormat:@"class(%@) parseClassExtendSegment failed, propertyNodeCount donot match propertyArray = %@", [clsInfo currentClass], [arr description]];
+                    @throw [NSException exceptionWithName:@"OCSDynamicClassToolException" reason:reason userInfo:nil];
+                }
+                else {
+                    // loc_35ce88
+                    clsInfo.OCSPropertyList = [NSArray arrayWithArray:arr];
+                }
+                
+            }
+                break;
+            default:
+            {
+                // loc_35caf2
+                offset = nextOffset;
+            }
+                break;
+        }
+    }
+    
+    return clsInfo;
+}
+
+OCSProtocolInfo *
+_parseProtocolExtendSegment(const char *bytes, NSUInteger count) {
+    OCSProtocolInfo *pInfo = nil;
+    if (count > 0) {
+        pInfo = [OCSProtocolInfo new];
+    }
+    
+    NSUInteger offset = 0;
+    
+    for (NSUInteger i = 0; i < count; i++) {
+        // loc_35d0be:
+        NSUInteger nextOffset = offset + 1;
+        
+        int8_t type = OCSBYTE_FROM(offset) - 0x1;
+        
+        switch (type) {
+            case 0:
+            {
+                // 0x35d0d6
+                CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[nextOffset], kCFStringEncodingUTF8);
+                
+                pInfo.protocolName = (__bridge NSString *)str;
+                
+                offset += 1 + pInfo.protocolName.length + nextOffset;
+                
+                if (str) {
+                    CFRelease(str);
+                }
+            }
+                break;
+            case 1:
+            {
+                // 0x35d114
+                NSUInteger c = OCSBYTE_FROM(nextOffset);
+                NSMutableArray *arr = [NSMutableArray array];
+                
+                offset += 2;
+                
+                for (NSUInteger j = 0; j < c; j ++) {
+                    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[offset], kCFStringEncodingUTF8);
+                    NSString *nsstr = (__bridge NSString *)str;
+                    offset += [nsstr length] + 1;
+                    if (str == NULL) {
+                        continue;
+                    }
+                    [arr addObject:nsstr];
+                    CFRelease(str);
+                }
+                
+                pInfo.OCSRefProtocolList = [NSArray arrayWithArray:arr];
+                
+            }
+                break;
+            case 2:
+            {
+                // 0x35d16c
+                NSUInteger c = OCSBYTE_FROM(nextOffset);
+                NSMutableArray *arr = [NSMutableArray array];
+                
+                offset += 2;
+                
+                for (NSUInteger j = 0; j < c; j ++) {
+                    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[offset], kCFStringEncodingUTF8);
+                    NSString *nsstr = (__bridge NSString *)str;
+                    offset += [nsstr length] + 1;
+                    
+                    NSArray *components = [nsstr componentsSeparatedByString:@"==="];
+                    if ([components count] == 3) {
+                        OCSProtocolProperty *p = [OCSProtocolProperty new];
+                        p.propertyName = components[0];
+                        p.typeEncode = components[1];
+                        NSInteger d = [components[2] integerValue];
+                        p.isRequiredProperty = d & 0x1;
+                        p.isInstanceProperty = d & 0x10;
+                        [arr addObject:p];
+                    }
+                    
+                    if (str) {
+                        CFRelease(str);
+                    }
+                }
+                
+                pInfo.OCSPropertyList = [NSArray arrayWithArray:arr];
+            }
+                break;
+            case 3:
+            {
+                // 0x35d2a0
+                NSUInteger c = OCSBYTE_FROM(nextOffset);
+                NSMutableArray *arr = [NSMutableArray array];
+                
+                offset += 2;
+                
+                for (NSUInteger j = 0; j < c; j ++) {
+                    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, &bytes[offset], kCFStringEncodingUTF8);
+                    NSString *nsstr = (__bridge NSString *)str;
+                    offset += [nsstr length] + 1;
+                    
+                    NSArray *components = [nsstr componentsSeparatedByString:@"==="];
+                    if ([components count] == 3) {
+                        OCSProtocolMethod *m = [OCSProtocolMethod new];
+                        m.methodName = components[0];
+                        m.typeEncode = components[1];
+                        NSInteger d = [components[2] integerValue];
+                        m.isRequiredMethod = d & 0x1;
+                        m.isInstanceMethod = d & 0x10;
+                        [arr addObject:m];
+                    }
+                    
+                    if (str == NULL) {
+                        continue;
+                    }
+                    CFRelease(str);
+                }
+                
+                pInfo.OCSMethodList = [NSArray arrayWithArray:arr];
+            }
+                break;
+            default:
+            {
+                // loc_35d110
+                offset = nextOffset;
+            }
+                break;
+        }
+    }
+    
+    return pInfo;
 }
 
 void
-_OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dict1, NSMutableDictionary *dict2) {
+_OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dictCls, NSMutableDictionary *dictProtocol) {
     NSCAssert(data, @"data && \"Create OCSExecutable from nil NSData\"");
     
     const char *bytes = [data bytes];
@@ -781,43 +1061,58 @@ _OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dict1, NSMutab
     int16_t clsLenOffset = OCS2BYTE_FROM(0xa); //
     int32_t r1 = OCS4BYTE_FROM(0xd + clsLenOffset) - 0x4;
     
-    int32_t extendOffset = clsLenOffset + 0x15;
+    int32_t offset = clsLenOffset + 0x15;
     
-    if (extendOffset == r1) {
-        OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(%d)", extendOffset);
+    if (offset == r1) {
+        OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(%d)", 0);
         // There is no protocol segment.
     }
     else {
-        OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(%d)", extendOffset);
-//        _readAndMove8ByteUint(sp + 0x30)
-//        if (_readAndMove8ByteUint(sp + 0x30) | r1 != 0x0) {
-//            
-//        }
-        // ??
+        const char *buf = &bytes[offset + 0x4];
+        uint64_t extendOffset = _readAndMove8ByteUint(&buf);
+        OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(0x%llx)", extendOffset);
         
-        NSUInteger count = 0;
-        
-        while(count > 0) {
-            
-            switch (r1) {
-                case 0x1:
-                {
-                    OCSLog(@"OCSExtendClassSegment:nodeInfoCount(%d),nodeInfoSize(%d)", );
-                    _parseClassExtendSegment();
+        if (extendOffset) {
+            NSUInteger count = OCSBYTE_FROM(extendOffset);
+            uint64_t dOffset = extendOffset + 1;
+            for (NSUInteger i = 0; i < count; i++) {
+                int8_t type = OCSBYTE_FROM(dOffset);
+                switch (type) {
+                    case 0x1:
+                    {
+                        int8_t nodeInfoCount = OCSBYTE_FROM(dOffset+1);
+                        const char *data = &bytes[dOffset + 2];
+                        uint64_t nodeInfoSize = _readAndMove8ByteUint(&data);
+                        OCSLog(@"OCSExtendProtocolSegment:nodeInfoCount(%d),nodeInfoSize(%lld)", nodeInfoCount, nodeInfoSize);
+                        OCSClassInfo *cInfo = _parseClassExtendSegment(data, nodeInfoCount);
+                        if (cInfo.currentClass.length) {
+                            if ([dictCls isKindOfClass:[NSDictionary class]]) {
+                                dictCls[ cInfo.currentClass ] = cInfo;
+                            }
+                        }
+                    }
+                        break;
+                    case 0x2: //
+                    {
+                        int8_t nodeInfoCount = OCSBYTE_FROM(dOffset+1);
+                        const char *data = &bytes[dOffset + 2];
+                        uint64_t nodeInfoSize = _readAndMove8ByteUint(&data);
+                        OCSLog(@"OCSExtendProtocolSegment:nodeInfoCount(%d),nodeInfoSize(%lld)", nodeInfoCount, nodeInfoSize);
+                        OCSProtocolInfo *pInfo = _parseProtocolExtendSegment(data, nodeInfoCount);
+                        if (pInfo.protocolName.length) {
+                            if ([dictProtocol isKindOfClass:[NSDictionary class]]) {
+                                dictProtocol[ pInfo.protocolName ] = pInfo;
+                            }
+                        }
+                    }
+                        break;
+                        
+                    default:
+                        break;
                 }
-                    break;
-                case 0x2:
-                    break;
-                    
-                default:
-                    break;
+                dOffset += 1;
             }
-            
-            count --;
         }
-        
-        
-        
     }
     
 #undef OCSBYTE_FROM

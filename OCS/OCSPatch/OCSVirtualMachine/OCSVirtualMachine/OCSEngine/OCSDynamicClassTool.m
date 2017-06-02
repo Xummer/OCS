@@ -13,18 +13,100 @@
 void
 _OCSCopyPropertyAttributes(const char *name, const char *encode) {
     if (encode) {
+        // loc_356c5a
         if (encode[0] != 'T') {
+            // loc_356d2e
             fprintf(stderr, "ERROR: Expected attribute string \"%s\" for property %s to start with 'T'\n", encode, name);
             return;
         }
         
         NSUInteger uiSize = 0;
         NSUInteger uiAlignment = 0;
+        NSInteger offset = 0;
         
-        NSGetSizeAndAlignment(encode[1], &uiSize, &uiAlignment);
+        // loc_356c62
+        const char * s = &encode[offset];
+        const char * r = NSGetSizeAndAlignment(s, &uiSize, &uiAlignment);
+        if (r == 0) {
+            // loc_356d3a
+            fprintf(stderr, "ERROR: Could not read past type in attribute string \"%s\" for property %s\n", encode, name);
+            return;
+        }
         
+        if (r == s) {
+            // loc_356d46
+            fprintf(stderr, "ERROR: Invalid type in attribute string \"%s\" for property %s\n", encode, name);
+            return;
+        }
         
+        NSInteger len = r - s;
+        OCS_PropertyAttributes *propertyAttr = calloc(1, len + 0x1d); // ??
+        if (propertyAttr == NULL) {
+            // loc_356d7a
+            fprintf(stderr, "ERROR: Could not allocate OCSPropertyAttributes structure for attribute string \"%s\" for property %s\n", encode, name);
+            return;
+        }
         
+        strncpy(propertyAttr->_0x1c, s, len);
+        propertyAttr->_0x1c[len] = '\0';
+        
+        if (s[0] == '@' && s[1] == '"') {
+            // loc_356cca
+            r = strchr(&s[2], '"');
+            if (NULL == r) {
+                // loc_356f8c
+                fprintf(stderr, "ERROR: Could not read class name in attribute string \"%s\" for property %s\n", encode, name);
+                return;
+            }
+            else {
+                // loc_356cde:
+                if (r != &s[2]) {
+                    size_t clsLen = &s[2] - r;
+                    char clsName[0xFF] = "";
+                    strncpy(clsName, &s[2], clsLen);
+                    clsName[clsLen] = '\0';
+                    propertyAttr->cls = objc_getClass(clsName);
+                }
+                else {
+                    r = &s[2];
+                }
+            }
+        }
+        
+        // loc_356d8e
+        if (r[0] != 0x0) {
+            r = strchr(r, ',');
+        }
+        
+        // loc_356df8
+        if (r == NULL) {
+            // loc_356f2c
+            if (propertyAttr->getter == NULL) {
+                propertyAttr->getter = sel_registerName(name);
+            }
+            
+            if (propertyAttr->setter == NULL) {
+                size_t nameLen = strlen(name);
+                char setterName[0xFF] = "";
+                strncpy(setterName, "set", 0x3);
+                strncpy(setterName+3, name, nameLen);
+                setterName[3] = _toupper(setterName[3]);
+                setterName[3+nameLen] = '\0';
+                propertyAttr->setter = sel_registerName(setterName);
+            }
+        }
+        else if (r[0] != ',') {
+            // loc_356f12
+            if (r[0] != 0x0) {
+                fprintf(stderr, "Warning: Unparsed data \"%s\" in attribute string \"%s\" for property %s\n", encode, r[0], name);
+            }
+            // loc_356f2c
+        }
+        else {
+            if (r[1] > '%') {
+                // loc_356e16
+            }
+        }
     }
 }
 

@@ -8,22 +8,24 @@
 
 #import <Foundation/Foundation.h>
 
+@class OCSProperty, OCSIvar;
 @interface OCSClassInfo : NSObject
 @property(strong, nonatomic) OCSClassInfo* supperClassInfo;
 @property(strong, nonatomic) NSString* supperClass;
 @property(strong, nonatomic) NSString* currentClass;
-@property(strong, nonatomic) NSArray* OCSPropertyList;
-@property(strong, nonatomic) NSArray* OCSIvarList;
-@property(strong, nonatomic) NSArray* OCSRefProtocolList;
+@property(strong, nonatomic) NSArray<OCSProperty *>* OCSPropertyList;
+@property(strong, nonatomic) NSArray<OCSIvar *>* OCSIvarList;
+@property(strong, nonatomic) NSArray<NSString * /* Protocol Name*/>* OCSRefProtocolList;
 @property(assign, nonatomic) BOOL isARCClass;
 @end
 
 
+@class OCSProtocolMethod, OCSProtocolProperty;
 @interface OCSProtocolInfo : NSObject
 @property(strong, nonatomic) NSString* protocolName;
-@property(strong, nonatomic) NSArray* OCSRefProtocolList;
-@property(strong, nonatomic) NSArray* OCSMethodList;
-@property(strong, nonatomic) NSArray* OCSPropertyList;
+@property(strong, nonatomic) NSArray<NSString *>* OCSRefProtocolList;
+@property(strong, nonatomic) NSArray<OCSProtocolMethod *>* OCSMethodList;
+@property(strong, nonatomic) NSArray<OCSProtocolProperty *>* OCSPropertyList;
 @end
 
 
@@ -51,7 +53,7 @@
 @interface OCSIvar : NSObject
 @property(strong, nonatomic) NSString* ivarName;
 @property(strong, nonatomic) NSString* typeEncode;
-@property(assign, nonatomic) int lifeTime;
+@property(assign, nonatomic) NSInteger lifeTime;
 @end
 
 

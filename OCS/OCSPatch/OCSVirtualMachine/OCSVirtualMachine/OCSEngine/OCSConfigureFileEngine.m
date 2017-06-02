@@ -8,6 +8,7 @@
 
 #import "OCSConfigureFileEngine.h"
 #import "OCSDynamicClassTool.h"
+#import "OCSDynamicProtocolTool.h"
 #import "OCSModules.h"
 
 @interface OCSConfigureFileEngine () {
@@ -52,14 +53,22 @@
     dispatch_sync(self->_OCSConfigureFileQueue, ^{
         
 #if __LP64__
-        NSMutableDictionary *x20 = [NSMutableDictionary new];
-        NSMutableDictionary *x19 = [NSMutableDictionary new];
+        NSMutableDictionary *dictCls = [NSMutableDictionary new];
+        NSMutableDictionary *dictPro = [NSMutableDictionary new];
         
         for (NSString *fileName in fileNames) {
-            _OCSGetClassProtocolExtend(configure, fileName, x20, x19);
+            _OCSGetClassProtocolExtend(configure, fileName, dictCls, dictPro);
             
-            [x22 enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                
+            [dictPro enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, OCSProtocolInfo *  _Nonnull obj, BOOL * _Nonnull stop) {
+                [OCSDynamicProtocolTool setUpDynamicProtocol:obj];
+            }];
+            
+            [[dictCls allValues] enumerateObjectsUsingBlock:^(OCSClassInfo *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                OCSClassInfo *clsInfo = dictCls[ obj.supperClass ];
+                if (clsInfo) {
+                    obj.supperClassInfo = clsInfo;
+                    [ removeObject:obj]; // ??
+                }
             }];
         }
 #endif
