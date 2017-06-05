@@ -15,6 +15,7 @@
 #import <objc/message.h>
 #import <objc/objc.h>
 #import "OCSNativeCStruct.h"
+#import "OCSTypeStruct.h"
 
 typedef enum {
     OCS_CONSTANT_0 = 1,
@@ -55,9 +56,15 @@ typedef struct OCS_Char_t {
 
 typedef struct OCS_Struct_t {
     int32_t _0x0; 
-    int8_t _0x4; // +0x4
+    OCSTypeStruct *_0x4; // +0x4
     void* _0x8; // +0x8
 } OCS_Struct;
+
+typedef struct OCS_RValueStruct_t {
+    OCS_Struct * _0x0;
+    int _0x4; // +0x4
+    void * _0x8; // +0x8
+} OCS_RValueStruct; // +0xc
 
 typedef struct {
     OCS_ConstantPoolTag tag;
@@ -123,10 +130,16 @@ typedef struct OCS_VirtualMachine_t {
 } OCS_VirtualMachine; // 0x20
 
 typedef struct OCS_PropertyAttributes_t {
+    BOOL readOnly;
+    BOOL nonAtomic; // +0x1
+    BOOL weak; // +0x2;
+    BOOL dynamic; // +0x3;
     SEL getter; // +0xc
+    int memoryPolicy; // +0x8
     SEL setter; // +0x10
+    char * ivar; // +0x14
     Class cls;  // +0x18
-    char *_0x1c;
+    char *type;
 } OCS_PropertyAttributes;
 
 
@@ -145,8 +158,8 @@ static dispatch_queue_t classMethodBlockQueue; // | *0x720680
 static CFMutableDictionaryRef dictCFunction; // *0x367d208
 static CFMutableDictionaryRef dict_367d20c; // *0x367d20c
 static CFMutableDictionaryRef dict_367d210; // *0x367d210
-static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c
-static CFMutableDictionaryRef dictStructType; // *0x367d220
+static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c | *0x7206a0
+static CFMutableDictionaryRef dictStructType; // *0x367d220 | *0x7206a4
 static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214
 
 static NSMutableDictionary *OCSOverrideClsMethodNameDic; // *0x367d22c <NSString * className, <NSMutableDictionary <NSString * methodName (-|init|@:), ??> *> overrideMethods> | *0x7206c4

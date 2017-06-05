@@ -10,14 +10,14 @@
 #import "OCSVM_code.h"
 #import "OCSModules.h"
 
-void
+OCS_PropertyAttributes *
 _OCSCopyPropertyAttributes(const char *name, const char *encode) {
     if (encode) {
         // loc_356c5a
         if (encode[0] != 'T') {
             // loc_356d2e
             fprintf(stderr, "ERROR: Expected attribute string \"%s\" for property %s to start with 'T'\n", encode, name);
-            return;
+            return NULL;
         }
         
         NSUInteger uiSize = 0;
@@ -30,13 +30,13 @@ _OCSCopyPropertyAttributes(const char *name, const char *encode) {
         if (r == 0) {
             // loc_356d3a
             fprintf(stderr, "ERROR: Could not read past type in attribute string \"%s\" for property %s\n", encode, name);
-            return;
+            return NULL;
         }
         
         if (r == s) {
             // loc_356d46
             fprintf(stderr, "ERROR: Invalid type in attribute string \"%s\" for property %s\n", encode, name);
-            return;
+            return NULL;
         }
         
         NSInteger len = r - s;
@@ -44,11 +44,11 @@ _OCSCopyPropertyAttributes(const char *name, const char *encode) {
         if (propertyAttr == NULL) {
             // loc_356d7a
             fprintf(stderr, "ERROR: Could not allocate OCSPropertyAttributes structure for attribute string \"%s\" for property %s\n", encode, name);
-            return;
+            return NULL;
         }
         
-        strncpy(propertyAttr->_0x1c, s, len);
-        propertyAttr->_0x1c[len] = '\0';
+        strncpy(propertyAttr->type, s, len);
+        propertyAttr->type[len] = '\0';
         
         if (s[0] == '@' && s[1] == '"') {
             // loc_356cca
@@ -56,7 +56,7 @@ _OCSCopyPropertyAttributes(const char *name, const char *encode) {
             if (NULL == r) {
                 // loc_356f8c
                 fprintf(stderr, "ERROR: Could not read class name in attribute string \"%s\" for property %s\n", encode, name);
-                return;
+                return NULL;
             }
             else {
                 // loc_356cde:
@@ -98,13 +98,107 @@ _OCSCopyPropertyAttributes(const char *name, const char *encode) {
         else if (r[0] != ',') {
             // loc_356f12
             if (r[0] != 0x0) {
-                fprintf(stderr, "Warning: Unparsed data \"%s\" in attribute string \"%s\" for property %s\n", encode, r[0], name);
+                fprintf(stderr, "Warning: Unparsed data \"%s\" in attribute string \"%s\" for property %s\n", r, encode, name);
             }
             // loc_356f2c
         }
         else {
-            if (r[1] > '%') {
+            char r5 = r[1];
+            r = r + 0x2;
+            if (r5 > '%') {
                 // loc_356e16
+            }
+            else {
+                // loc_356e10
+                if (r5 != 0x0) {
+                    fprintf(stderr, "ERROR: Unrecognized attribute string flag '%c' in attribute string \"%s\" for property %s\n", r5, encode, name);
+                    // loc_356df8
+                }
+                else {
+                    // loc_356e16
+                    if (r5 > 'W') {
+                        // loc_356e82
+                        if (r5 == '&') {
+                            propertyAttr->memoryPolicy = 1;
+                        }
+                        else {
+                            if (r5 == 't') {
+                                fprintf(stderr, "ERROR: Old-style type encoding is unsupported in attribute string \"%s\" for property %s\n",encode, name);
+                                while (r[0] != 0x0 && r[0] != ',') {
+                                    r = r + 0x1;
+                                }
+                            }
+                            else {
+                                fprintf(stderr, "ERROR: Unrecognized attribute string flag '%c' in attribute string \"%s\" for property %s\n", r5, encode, name);
+                            }
+                        }
+                        // loc_356df8
+                    }
+                    else {
+                        // loc_356e1e
+                        switch (r5) {
+                            case 0:
+                            {
+                                // 0x356e38
+                                char * r11 = strchr(r, ',');
+                                if (r11 == 0) {
+                                    // loc_356f06
+                                }
+                                else if (r11 == r) {
+                                    // loc_356fa2
+                                }
+                                else {
+                                    // loc_356e52
+                                }
+                                
+                            }
+                                break;
+                            case 1:
+                            {
+                                // 0x356eae
+                            }
+                                break;
+                            case 2:
+                            {
+                                // 0x356ec8
+                            }
+                                break;
+                            case 3:
+                            {
+                                // 0x356ece
+                            }
+                                break;
+                            case 4:
+                            {
+                                // 0x356ed4
+                            }
+                                break;
+                            case 5:
+                            {
+                                // 0x356eda
+                            }
+                                break;
+                            case 6:
+                            {
+                                // 0x356ee0
+                            }
+                                break;
+                            case 7:
+                            {
+                                // 0x356ee6
+                            }
+                                break;
+                            case 8:
+                            {
+                                // 0x356efa
+                            }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                
             }
         }
     }

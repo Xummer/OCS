@@ -8,10 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+@class OCSTypeStruct, OCSStructTypeI;
 @interface OCSStructTypeParser : NSObject
 
-+ (id)componentsOfMembersEncode:(NSString *)mEcode;
++ (NSArray *)componentsOfMembersEncode:(NSString *)mEcode;
 
-+ (id)parseStructEncode:(NSString *)structEncode;
++ (OCSTypeStruct *)parseStructEncode:(NSString *)structEncode;
+
++ (OCSStructTypeI *)getStructType:(NSString *)structS;
 
 @end

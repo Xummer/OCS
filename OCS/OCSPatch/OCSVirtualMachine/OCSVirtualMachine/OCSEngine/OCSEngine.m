@@ -8,11 +8,13 @@
 
 #import "OCSEngine.h"
 #import "OCSVM_code.h"
+#import "OCSDynamicTool.h"
 #import "OCSConfigureFileEngine.h"
 #import <pthread.h>
 
 // sub_2a14b60
-static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation) {
+static void
+JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation) {
     NSMethodSignature *methodSignature = [invocation methodSignature];
     NSInteger numberOfArguments = [methodSignature numberOfArguments];
     
@@ -21,6 +23,28 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
     SEL JPSelector = NSSelectorFromString(JPSelectorName);
     
     if (!class_respondsToSelector(object_getClass(assignSlf), JPSelector)) {
+        
+        // loc_35f4a8
+        SEL dpSelector = NSSelectorFromString([NSString stringWithFormat:@"_OCSDynamicProperty_%@", selectorName]);
+        if (class_respondsToSelector(object_getClass(assignSlf), dpSelector)) {
+            // loc_35f4d0
+            _OCSDynamicClassGetSetInvocation(assignSlf, invocation);
+            return;
+        }
+        else {
+            // loc_35f6d8
+            if ([selectorName hasPrefix:@"=OCS_SUPER="]) {
+                NSArray <NSString *> *components =
+                [[selectorName stringByReplacingOccurrencesOfString:@"=OCS_SUPER=" withString:@""] componentsSeparatedByString:@"="];
+                if ([components count] == 2) {
+                    if (components[0].length > 0 && components[1].length > 0) {
+                        _getOCSMethodName(components[0], components[1]);
+                    }
+                }
+            }
+            
+            // loc_35f776
+        }
         
         // loc_2a14edc
         SEL origForwardSelector = @selector(ORIGforwardInvocation:);
@@ -80,7 +104,8 @@ static void JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, 
 }
 
 // sub_2a15228
-void close_thread (void* thread) {
+void
+close_thread (void* thread) {
     /* <0x2a15229> 清理函数 */
     _OCSVirtualMachineDestroy(thread);
 }
@@ -148,6 +173,34 @@ int sub_2a1514a() {
     return r0;
 }
  */
+
+void
+_getOCSMethodName(NSString *clsName, NSString *methodName) {
+    if (clsName.length > 0 && methodName.length > 0) {
+        dispatch_sync(classMethodNameReadWriteQueue, ^{
+            Class cls = NSClassFromString(clsName);
+            if (cls) {
+                // loc_35f862
+                // loc_35f87c
+                if (![cls isEqual:[NSObject class]]) {
+                    // loc_35f894
+                    NSString *key = NSStringFromClass(cls);
+                    cls = class_getSuperclass(key);
+                    NSMutableDictionary *dict =
+                    CFDictionaryGetValue(OCSOverrideClsMethodNameDic, (__bridge CFStringRef)key);
+                    if (!dict) {
+                        // loc_35f8d2
+                        
+                    }
+                    else {
+                        // loc_35f8b0
+                        CFDictionaryGetValue(dict, <#const void *key#>)
+                    }
+                }
+            }
+        });
+    }
+}
 
 @implementation OCSEngine
 
@@ -227,8 +280,8 @@ void sub_2a13ed0(void * _block) {
         
         for (uint32_t i = 0; i < count; i ++) {
             //            CFStringRef key = keys[i];
-            CFStringRef *value = (CFStringRef *)keys[i]);
-            [marr addObject:(__bridge id _Nonnull)(value)];
+            CFStringRef value = ((CFStringRef)keys[i]);
+            [marr addObject:(__bridge NSString *)(value)];
         }
         
         if (keys) {
@@ -254,7 +307,7 @@ void sub_2a13ed0(void * _block) {
 }
 
 // <NSString* /*methodName*/, OCS_CodeBlock* /*codeBlock*/>
-+ (NSDictionary *)overrideWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
++ (void)overrideWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
     NSString *clsName = [[self class] getClassNameWithFileName:fileName errorCode:errorCode];
     NSDictionary *orClsMethodDic = [OCSOverrideClsMethodNameDic objectForKey:clsName];
     
@@ -350,7 +403,7 @@ void sub_2a13ed0(void * _block) {
         return [methodName componentsSeparatedByString:@"|"];
     }
     else {
-        @throw [NSException exceptionWithName:@"componentsForMethodName" reason:nil userInfo:nil];
+        @throw [NSException exceptionWithName:@"OCSEngine" reason:@"OCS方法名为空！！！" userInfo:nil];
     }
 }
 
@@ -359,7 +412,7 @@ void sub_2a13ed0(void * _block) {
         return [components[0] isEqualToString:@"-"];
     }
     else {
-        @throw [NSException exceptionWithName:@"isInstanceInMethodNameComponents" reason:nil userInfo:nil];
+        @throw [NSException exceptionWithName:@"OCSEngine" reason:@"OCS方法名解析结果为空！！！" userInfo:nil];
     }
 }
 
@@ -368,7 +421,7 @@ void sub_2a13ed0(void * _block) {
         return components[1];
     }
     else {
-        @throw [NSException exceptionWithName:@"selectorNameInMethodNameComponents" reason:nil userInfo:nil];
+        @throw [NSException exceptionWithName:@"OCSEngine" reason:@"OCS方法名解析结果为空！！！" userInfo:nil];
     }
 }
 
@@ -377,31 +430,8 @@ void sub_2a13ed0(void * _block) {
         return components[2];
     }
     else {
-        @throw [NSException exceptionWithName:@"methodTypeEncdoeInMethodNameComponents" reason:nil userInfo:nil];
+        @throw [NSException exceptionWithName:@"OCSEngine" reason:@"OCS方法名解析结果为空！！！" userInfo:nil];
     }
-}
-
-+ (void)runWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
-    dispatch_barrier_sync(classMethodNameReadWriteQueue, ^{
-       // sub_2a145a0
-        NSString *clsName =
-        [[self class] getClassNameWithFileName:fileName errorCode:errorCode];
-        NSDictionary *overrideMethods =
-        [[self class] overrideWithFileName:fileName errorCode:errorCode];
-        if (*errorCode) {
-            
-        }
-        else {
-            NSMutableDictionary *dict = [OCSOverrideClsMethodNameDic objectForKey:clsName];
-            if (dict) {
-                [dict addEntriesFromDictionary:overrideMethods];
-            }
-            else {
-                dict = [NSMutableDictionary dictionaryWithDictionary:overrideMethods];
-            }
-            [OCSOverrideClsMethodNameDic setObject:dict forKey:clsName];
-        }
-    });
 }
 
 + (NSDictionary *)getRelationForMethodNameAndSelectorWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
@@ -428,6 +458,9 @@ void sub_2a13ed0(void * _block) {
 }
 
 + (void)overrideMethodWithClass:(Class)cls selectorName:(NSString *)selName isClassMethod:(BOOL)isClsMthd typeDescription:(const char *)typeDes {
+    
+    OCSLog(@"overrideMethod:class(%s),selectorName(%s),type(%s),typeDescription(%s)", [NSStringFromClass(cls) UTF8String], [selName UTF8String], isClsMthd, typeDes);
+    
     SEL sel = NSSelectorFromString(selName);
     
     NSMethodSignature *methodSign;
@@ -480,6 +513,40 @@ void sub_2a13ed0(void * _block) {
     NSString *JPSelName = [NSString stringWithFormat:@"_JP%@", selName];
     class_addMethod(cls, NSSelectorFromString(JPSelName), msgForwardIMP, typeDes);
     
+    OCSLog(@"OCS Add class:(%s) selector:(%s) isSucess = %s", [NSStringFromClass(cls) UTF8String], [JPSelName UTF8String], class_respondsToSelector(cls, NSSelectorFromString(JPSelName)) ? "YES" : "NO");
+}
+
++ (void)OCSMessageSendReceiver:(id)receiver returnResult:(void*)result selector:(SEL)selector {
+    if (receiver) {
+        [OCSDynamicTool sendMessageWithReceiver:receiver result:result selector:selector argptr:nil];
+    }
+}
+
++ (void)OCSMessageTry:(void (^)(void))tryBlock
+           catchBlock:(void (^)(NSException *exception))catchBlock
+         finallyBlock:(void (^)(void))finallyBlock {
+    @try {
+        if (tryBlock) {
+            tryBlock();
+        }
+    } @catch (NSException *exception) {
+        if (catchBlock) {
+            catchBlock(exception);
+        }
+    } @finally {
+        if (finallyBlock) {
+            finallyBlock();
+        }
+    }
+}
+
++ (void)OCSMessageSynchronized:(id)synchronized synchronizedBlock:(void (^)(void))block {
+    
+    @synchronized (synchronized) {
+        if (block) {
+            block();
+        }
+    }
 }
 
 @end

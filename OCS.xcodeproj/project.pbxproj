@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C12D56F91ECAA34200CC313A /* OCSInnerException.m in Sources */ = {isa = PBXBuildFile; fileRef = C12D56F81ECAA34100CC313A /* OCSInnerException.m */; };
+		C13791531EE5355600B821C4 /* OCSDynamicTool.m in Sources */ = {isa = PBXBuildFile; fileRef = C13791521EE5355600B821C4 /* OCSDynamicTool.m */; };
 		C162DF3D1ED90D3900222862 /* OCSStructTypeI.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF3A1ED90D3900222862 /* OCSStructTypeI.m */; };
 		C162DF3E1ED90D3900222862 /* OCSStructTypeParser.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF3C1ED90D3900222862 /* OCSStructTypeParser.m */; };
 		C162DF411ED90F8300222862 /* OCSTypyCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C162DF401ED90F8300222862 /* OCSTypyCommon.m */; };
@@ -56,6 +57,8 @@
 		C12D56F71ECAA34100CC313A /* OCSInnerException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSInnerException.h; sourceTree = "<group>"; };
 		C12D56F81ECAA34100CC313A /* OCSInnerException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSInnerException.m; sourceTree = "<group>"; };
 		C135A0FC1EC6EB68009844EF /* OCSVM_code.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSVM_code.h; sourceTree = "<group>"; };
+		C13791511EE5355600B821C4 /* OCSDynamicTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSDynamicTool.h; sourceTree = "<group>"; };
+		C13791521EE5355600B821C4 /* OCSDynamicTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSDynamicTool.m; sourceTree = "<group>"; };
 		C162DF391ED90D3900222862 /* OCSStructTypeI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSStructTypeI.h; sourceTree = "<group>"; };
 		C162DF3A1ED90D3900222862 /* OCSStructTypeI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OCSStructTypeI.m; sourceTree = "<group>"; };
 		C162DF3B1ED90D3900222862 /* OCSStructTypeParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCSStructTypeParser.h; sourceTree = "<group>"; };
@@ -235,6 +238,8 @@
 				C162DF881EDEB70F00222862 /* OCSModules.m */,
 				C162DF731EDEB38C00222862 /* OCSIvarLayout.h */,
 				C162DF741EDEB38C00222862 /* OCSIvarLayout.m */,
+				C13791511EE5355600B821C4 /* OCSDynamicTool.h */,
+				C13791521EE5355600B821C4 /* OCSDynamicTool.m */,
 				C162DF6D1EDE9D0000222862 /* OCSDynamicClassTool.h */,
 				C162DF6E1EDE9D0000222862 /* OCSDynamicClassTool.m */,
 				C162DF841EDEB65300222862 /* OCSDynamicProtocolTool.h */,
@@ -445,6 +450,7 @@
 				C16366D21E67A5190010A9D6 /* main.m in Sources */,
 				C1DB9EA61EC099220017C4E1 /* OCSVirtualMachine.m in Sources */,
 				C162DF861EDEB65300222862 /* OCSDynamicProtocolTool.m in Sources */,
+				C13791531EE5355600B821C4 /* OCSDynamicTool.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

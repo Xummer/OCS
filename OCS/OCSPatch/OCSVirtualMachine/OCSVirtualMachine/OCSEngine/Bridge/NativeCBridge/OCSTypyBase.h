@@ -10,7 +10,7 @@
 
 @interface OCSTypyBase : OCSTypyCommon
 
-- (void)makeFfi_type;
 - (void)countValue;
+- (void)makeFfi_type;
 
 @end

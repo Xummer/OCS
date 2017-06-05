@@ -10,10 +10,14 @@
 
 @interface OCSTypeStruct : OCSTypyCommon
 
-@property(strong, nonatomic) NSArray *memberStructSizeValues;
+@property(strong, nonatomic) NSArray <OCSTypyCommon *> *memberStructSizeValues;
 @property(strong, nonatomic) NSString *name;
 
-- (void)makeFfi_type;
 - (void)countValue;
+- (void)makeFfi_type;
+- (BOOL)isHomogeneousFloatingPoint;
+- (BOOL)isHomogeneousType:(char)type;
+- (NSUInteger)getHomogeneousCount;
+- (BOOL)isOnlyOneFundamentalType;
 
 @end

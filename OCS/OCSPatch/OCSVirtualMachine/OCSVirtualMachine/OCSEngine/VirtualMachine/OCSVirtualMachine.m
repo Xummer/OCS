@@ -1602,7 +1602,7 @@ void sub_2a137c4() {
  */
 
 void
-_OCSRunBlockWithLayout {}
+_OCSRunBlockWithLayout() {}
 
 /*
 void _OCSRunBlockWithLayout(int arg0, int arg1, int arg2) {

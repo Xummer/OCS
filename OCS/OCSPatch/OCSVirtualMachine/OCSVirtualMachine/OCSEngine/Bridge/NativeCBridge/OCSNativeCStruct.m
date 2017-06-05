@@ -151,7 +151,7 @@ _OCSGetStructType(NSString *typeString) {
                     [NSException raise:@"OCSException" format:@"OCSGetStructType structTypeEncode == NULL"];
                 }
                 
-                s = malloc(sizeof(OCS_Struct *));
+                s = malloc(sizeof(OCS_Struct));
                 s->_0x0 = 0;
                 s->_0x4 = [OCSStructTypeParser parseStructEncode:typeString];
                 
@@ -264,6 +264,29 @@ int sub_2a12ca2(int arg0) {
     return r0;
 }
  */
+
+OCS_RValueStruct *
+_OCSCreateRValueStruct(const char *type) {
+    OCS_RValueStruct* r = malloc(sizeof(OCS_RValueStruct));
+    OCS_Struct *s = _OCSGetStructType(type);
+    r->_0x0 = s;
+    r->_0x4 = 0;
+    r->_0x8 = malloc([s->_0x4 totalSize]);
+    return r;
+}
+
+OCS_RValueStruct *
+_OCSCreateRValueStructWithData(const char *type, const void *data) {
+    OCS_RValueStruct* r = malloc(sizeof(OCS_RValueStruct));
+    OCS_Struct *s = _OCSGetStructType(type);
+    
+    void *buf = malloc([s->_0x4 totalSize]);
+    memcpy(buf, data, [s->_0x4 totalSize]);
+    r->_0x0 = s;
+    r->_0x4 = 0;
+    r->_0x8 = buf;
+    return r;
+}
 
 // sub_2a12e24
 void OCSCreateCopyStruct() {}

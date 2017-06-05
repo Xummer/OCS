@@ -55,8 +55,29 @@
             }];
             
             [propertyList enumerateObjectsUsingBlock:^(OCSProtocolProperty *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                _OCSCopyPropertyAttributes([obj.propertyName UTF8String], [obj.typeEncode UTF8String]);
-                // TODO
+                OCS_PropertyAttributes *ppAttr = _OCSCopyPropertyAttributes([obj.propertyName UTF8String], [obj.typeEncode UTF8String]);
+                if (ppAttr) {
+                    OCSPropertyInfo *info = [OCSPropertyInfo new];
+                    NSString *ivarStr = nil;
+                    if (ppAttr->ivar) {
+                        ivarStr = [NSString stringWithUTF8String:ppAttr->ivar];
+                    }
+                    
+                    info.ivar = ivarStr;
+                    info.name = obj.propertyName ? : @"";
+                    info.type = [NSString stringWithUTF8String:ppAttr->type];
+                    info.readonly = ppAttr->readOnly;
+                    info.dynamic = ppAttr->dynamic;
+                    info.weak = ppAttr->weak;
+                    info.getter = ppAttr->getter;
+                    info.setter = ppAttr->setter;
+                    info.nonAtomic = ppAttr->nonAtomic;
+                    info.memoryPolicy = ppAttr->memoryPolicy;
+                    
+                    [[self class] addProperty:protocol property:info isRequiredProperty:obj.isRequiredProperty isInstanceProperty:obj.isInstanceProperty];
+                    
+                    free(ppAttr);
+                }
             }];
             
             objc_registerProtocol(protocol);
@@ -76,9 +97,29 @@
     }
 }
 
-+ (BOOL)addProperty:(id)property property:(id)property2 isRequiredProperty:(BOOL)property3 isInstanceProperty:(BOOL)property4
++ (BOOL)addProperty:(Protocol *)protocol property:(OCSPropertyInfo *)propertyInfo isRequiredProperty:(BOOL)isRequiredProperty isInstanceProperty:(BOOL)isInstanceProperty
 {
+    if (!protocol) {
+        @throw [NSException exceptionWithName:@"OCSDynamicProtocolTool" reason:@"protocol cannot be nil" userInfo:nil];
+        return NO;
+    }
     
+    if (!propertyInfo) {
+        @throw [NSException exceptionWithName:@"OCSDynamicProtocolTool" reason:@"property cannot be nil" userInfo:nil];
+        return NO;
+    }
+    
+    if (propertyInfo.name.length == 0) {
+        @throw [NSException exceptionWithName:@"OCSDynamicProtocolTool" reason:@"property name must be of non-zero length" userInfo:nil];
+        return NO;
+    }
+    
+    if (!propertyInfo.type) {
+        @throw [NSException exceptionWithName:@"OCSDynamicProtocolTool" reason:@"property typeEncoding must be of non-zero length" userInfo:nil];
+        return NO;
+    }
+    
+    // TODO
 }
 
 

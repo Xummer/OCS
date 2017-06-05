@@ -134,7 +134,7 @@ int sub_2a0b75c(int arg0, int arg1) {
  */
 
 void
-_OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableArray *dictCls, NSMutableDictionary *dictProtocol) {
+_OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableDictionary *dictCls, NSMutableDictionary *dictProtocol) {
     NSCAssert(executableName, @"executableName && \"executableName is NULL\"");
     
     NSString *path = [relativePath stringByAppendingPathComponent:executableName];

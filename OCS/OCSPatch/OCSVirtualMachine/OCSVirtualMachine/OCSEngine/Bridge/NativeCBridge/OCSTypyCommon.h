@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ffi.h"
 
 @interface OCSTypyCommon : NSObject
 
