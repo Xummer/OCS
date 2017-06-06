@@ -1551,8 +1551,8 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
 
 // sub_2a13770
 void
-_OCSRunWithParaList(NSString *className, NSString *arg1, int arg2, CFMutableArrayRef argList) {
-    OCS_CodeBlock *codeBlock = _OCSGetCodeBlock(className, arg1);
+_OCSRunWithParaList(NSString *className, NSString *methodName, int arg2, CFMutableArrayRef argList) {
+    OCS_CodeBlock *codeBlock = _OCSGetCodeBlock(className, methodName);
     OCS_VirtualMachine *vm = _OCSGetCurrentThreadVirtualMachine();
     _OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList);
 }

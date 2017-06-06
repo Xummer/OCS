@@ -19,6 +19,7 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
     NSInteger numberOfArguments = [methodSignature numberOfArguments];
     
     NSString *selectorName = NSStringFromSelector(invocation.selector);
+    NSString *className = NSStringFromClass([assignSlf class]);
     NSString *JPSelectorName = [NSString stringWithFormat:@"_JP%@", selectorName];
     SEL JPSelector = NSSelectorFromString(JPSelectorName);
     
@@ -31,76 +32,121 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
             _OCSDynamicClassGetSetInvocation(assignSlf, invocation);
             return;
         }
-        else {
-            // loc_35f6d8
-            if ([selectorName hasPrefix:@"=OCS_SUPER="]) {
-                NSArray <NSString *> *components =
-                [[selectorName stringByReplacingOccurrencesOfString:@"=OCS_SUPER=" withString:@""] componentsSeparatedByString:@"="];
-                if ([components count] == 2) {
-                    if (components[0].length > 0 && components[1].length > 0) {
-                        _getOCSMethodName(components[0], components[1]);
-                    }
-                }
-            }
-            
-            // loc_35f776
-        }
         
-        // loc_2a14edc
-        SEL origForwardSelector = @selector(ORIGforwardInvocation:);
-        NSMethodSignature *methodSignature = [assignSlf methodSignatureForSelector:origForwardSelector];
-        NSInvocation *forwardInv= [NSInvocation invocationWithMethodSignature:methodSignature];
-        [forwardInv setTarget:assignSlf];
-        [forwardInv setSelector:origForwardSelector];
-        [forwardInv setArgument:&invocation atIndex:2];
-        [forwardInv invoke];
-        // loc_2a14f6c;
-        
-        return;
-    }
-    
-    // loc_2a14bf2:
-    size_t size /*r8*/ = numberOfArguments /* r11 */ - 2;
-    void *buf /*r4*/ = malloc(size);
-    memset(buf, 0, size);
-    CFMutableArrayRef argList = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
-    if (numberOfArguments < 3) {
-        // loc_2a14dc8
-        [methodSignature /*stack[2022]*/ methodReturnType];
-        NSString *clsStr = NSStringFromClass([assignSlf class]);
-        OCS_CodeBlock *codeBlock;
-        
-        dispatch_sync(classMethodNameReadWriteQueue, ^{
-            // sub_2a14f74
-            Class cls = NSClassFromString(clsStr);
-            if (cls) {
-                while (![cls isEqual:[NSObject class]]) {
-                    NSString *clsName = NSStringFromClass(cls);
-                    cls = class_getSuperclass(cls);
-                    NSDictionary *dictOverrideMethod = OCSOverrideClsMethodNameDic[clsName];
-                    if (dictOverrideMethod) {
-                        codeBlock = dictOverrideMethod[ selectorName ];
+        // loc_35f6d8
+        if ([selectorName hasPrefix:@"=OCS_SUPER="]) {
+            NSArray <NSString *> *components =
+            [[selectorName stringByReplacingOccurrencesOfString:@"=OCS_SUPER=" withString:@""] componentsSeparatedByString:@"="];
+            if ([components count] == 2) {
+                // loc_35f724
+                NSString *clsName = components[0];
+                NSString *selName = components[1];
+                if (clsName.length > 0 && selName.length > 0) {
+                    // loc_35f75c
+                    NSString *methodName = _getOCSMethodName(clsName, selName);
+                    if (methodName) {
+                        OCS_CodeBlock *codeBlock = _OCSGetCodeBlock(clsName, methodName);
                         if (codeBlock) {
-                            break;
+                            // loc_35f486
                         }
                     }
-                    if (!cls) {
-                        break;
-                    }
+                    
                 }
             }
-        });
+        }
         
-        _OCSRunWithParaList(clsStr, selectorName, /*<sp + 0x30>*/, argList);
+        // loc_35f776
         
+//        // loc_2a14edc
+//        SEL origForwardSelector = @selector(ORIGforwardInvocation:);
+//        NSMethodSignature *methodSignature = [assignSlf methodSignatureForSelector:origForwardSelector];
+//        NSInvocation *forwardInv= [NSInvocation invocationWithMethodSignature:methodSignature];
+//        [forwardInv setTarget:assignSlf];
+//        [forwardInv setSelector:origForwardSelector];
+//        [forwardInv setArgument:&invocation atIndex:2];
+//        [forwardInv invoke];
+//        // loc_2a14f6c;
+//        
+//        return;
     }
     else {
-        // loc_2a14c28
-        r5 = 0;
-        // loc_2a14c70
-        r11 = r5 + 2;
-        [invocation getArgument:&arg atIndex:i]
+        // loc_35f480
+        // loc_35f486
+        
+        NSUInteger r1 = numberOfArguments - 2;
+        void *r5 = NULL;
+        if (numberOfArguments > 3) {
+            size_t size = r1 + r1 * (2 << 2);
+            r5 = malloc(size);
+            memset(r5, 0, size);
+        }
+        
+//        r5[4];
+        
+        // loc_35f51c
+        for (NSUInteger i = 2; i < numberOfArguments; i++) {
+            const char *argumentType = [methodSignature getArgumentTypeAtIndex:i];
+            switch(argumentType[0] == 'r' ? argumentType[1] : argumentType[0]) {
+                    
+#define JP_FWD_ARG_CASE(_typeChar, _type) \
+case _typeChar: {   \
+_type arg;  \
+[invocation getArgument:&arg atIndex:i];    \
+[argList addObject:@(arg)]; \
+break;  \
+}
+                    
+            }
+        }
+        
+        // loc_35f61c:
+        const char *returnType = [methodSignature methodReturnType];
+        NSString *methodName = _getOCSMethodName(className, selectorName);
+        _OCSRunWithParaList(className, methodName, ,)
     }
+    
+//    // loc_2a14bf2:
+//    size_t size /*r8*/ = numberOfArguments /* r11 */ - 2;
+//    void *buf /*r4*/ = malloc(size);
+//    memset(buf, 0, size);
+//    CFMutableArrayRef argList = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+//    if (numberOfArguments < 3) {
+//        // loc_2a14dc8
+//        [methodSignature /*stack[2022]*/ methodReturnType];
+//        NSString *clsStr = NSStringFromClass([assignSlf class]);
+//        OCS_CodeBlock *codeBlock;
+//        
+//        dispatch_sync(classMethodNameReadWriteQueue, ^{
+//            // sub_2a14f74
+//            Class cls = NSClassFromString(clsStr);
+//            if (cls) {
+//                while (![cls isEqual:[NSObject class]]) {
+//                    NSString *clsName = NSStringFromClass(cls);
+//                    cls = class_getSuperclass(cls);
+//                    NSDictionary *dictOverrideMethod = OCSOverrideClsMethodNameDic[clsName];
+//                    if (dictOverrideMethod) {
+//                        codeBlock = dictOverrideMethod[ selectorName ];
+//                        if (codeBlock) {
+//                            break;
+//                        }
+//                    }
+//                    if (!cls) {
+//                        break;
+//                    }
+//                }
+//            }
+//        });
+//        
+//        _OCSRunWithParaList(clsStr, selectorName, /*<sp + 0x30>*/, argList);
+//        
+//    }
+//    else {
+//        // loc_2a14c28
+//        r5 = 0;
+//        // loc_2a14c70
+//        r11 = r5 + 2;
+//        [invocation getArgument:&arg atIndex:i]
+//    }
 }
 
 // sub_2a15228
@@ -175,30 +221,33 @@ int sub_2a1514a() {
  */
 
 void
-_getOCSMethodName(NSString *clsName, NSString *methodName) {
-    if (clsName.length > 0 && methodName.length > 0) {
+_getOCSMethodName(NSString *clsName, NSString *selectorName) {
+    if (clsName.length > 0 && selectorName.length > 0) {
+        __block NSString *methodName = nil;
         dispatch_sync(classMethodNameReadWriteQueue, ^{
             Class cls = NSClassFromString(clsName);
             if (cls) {
                 // loc_35f862
                 // loc_35f87c
-                if (![cls isEqual:[NSObject class]]) {
+                while (![cls isEqual:[NSObject class]]) {
                     // loc_35f894
-                    NSString *key = NSStringFromClass(cls);
-                    cls = class_getSuperclass(key);
+                    NSString *className = NSStringFromClass(cls);
+                    cls = class_getSuperclass(className);
                     NSMutableDictionary *dict =
-                    CFDictionaryGetValue(OCSOverrideClsMethodNameDic, (__bridge CFStringRef)key);
-                    if (!dict) {
-                        // loc_35f8d2
-                        
-                    }
-                    else {
+                    CFDictionaryGetValue(OCSOverrideClsMethodNameDic, (__bridge CFStringRef)className);
+                    if (dict) {
                         // loc_35f8b0
-                        CFDictionaryGetValue(dict, <#const void *key#>)
+                        methodName = CFDictionaryGetValue(dict, selectorName);
+                        break;
                     }
                 }
             }
         });
+        
+        return methodName;
+    }
+    else {
+        return nil;
     }
 }
 
