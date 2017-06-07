@@ -7,6 +7,7 @@
 //
 
 #import "OCSTypyCommon.h"
+@import CoreGraphics;
 
 @implementation OCSTypyCommon
 
@@ -38,41 +39,39 @@
     [self makeFfi_type];
 }
 
-- (unsigned char)getBitForType:(char)type {
-    
+- (size_t)getBitForType:(char)type {
+    // ??
+    size_t size = 0;
     switch (type) {
-        case 'I':
-            // 0x360444,0x360454,0x36047a
-            return 1;
-            break;
+#define JP_STRUCT_SIZE_CASE(_typeChar, _type)   \
+case _typeChar: \
+    size = sizeof(_type);  \
+    break;
+        
+        JP_STRUCT_SIZE_CASE('c', char)
+        JP_STRUCT_SIZE_CASE('C', unsigned char)
+        JP_STRUCT_SIZE_CASE('s', short)
+        JP_STRUCT_SIZE_CASE('S', unsigned short)
+        JP_STRUCT_SIZE_CASE('I', unsigned int)
+        JP_STRUCT_SIZE_CASE('l', long)
+        JP_STRUCT_SIZE_CASE('L', unsigned long)
+        JP_STRUCT_SIZE_CASE('q', long long)
+        JP_STRUCT_SIZE_CASE('Q', unsigned long long)
+        JP_STRUCT_SIZE_CASE('f', float)
+        JP_STRUCT_SIZE_CASE('F', CGFloat)
+        JP_STRUCT_SIZE_CASE('N', NSInteger)
+        JP_STRUCT_SIZE_CASE('U', NSUInteger)
+        JP_STRUCT_SIZE_CASE('d', double)
+        JP_STRUCT_SIZE_CASE('B', BOOL)
+        JP_STRUCT_SIZE_CASE('*', void *)
+        JP_STRUCT_SIZE_CASE('^', void *)
             
         default:
             [NSException raise:@"OCSCommonException" format:@"getBitForType 不支持的数据类型:%c", type];
             break;
     }
     
-    //    if (type <= 'P') { //0x50
-    //        // loc_2a153dc
-    //        if (type >= 'D') { //0x44
-    //            if (type != 'I') { //0x49
-    //
-    //            }
-    //            else if (type != 'L') {
-    //
-    //            }
-    //        }
-    //        else {
-    //
-    //        }
-    //    }
-    //    else if (type > 's') { //0x73
-    //        // loc_2a153f0
-    //    }
-    //    else {
-    //        // loc_2a153c6
-    //    }
-    
-    return NULL;
+    return size;
 }
 
 @end

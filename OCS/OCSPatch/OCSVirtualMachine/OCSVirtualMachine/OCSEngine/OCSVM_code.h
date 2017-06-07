@@ -54,17 +54,25 @@ typedef struct OCS_Char_t {
     int32_t     offset;
 } OCS_Char;
 
-typedef struct OCS_Struct_t {
+typedef struct OCS_StructType_t {
     int32_t _0x0; 
-    OCSTypeStruct *_0x4; // +0x4
-    void* _0x8; // +0x8
-} OCS_Struct;
+    __unsafe_unretained OCSTypeStruct *typeStruct; // +0x4
+} OCS_StructType;
 
-typedef struct OCS_RValueStruct_t {
-    OCS_Struct * _0x0;
-    int _0x4; // +0x4
-    void * _0x8; // +0x8
-} OCS_RValueStruct; // +0xc
+typedef NS_ENUM(NSUInteger, OCSStrucValueType) {
+    OCSStrucValueTypeR = 0, // Deep Copy
+    OCSStrucValueTypeL,     // Reffence
+};
+
+typedef struct OCS_Struct_t {
+    OCS_StructType      *structType; // +0x0
+    OCSStrucValueType   type; // +0x4
+    void *              value; // +0x8
+} OCS_Struct; // +0xc
+
+typedef struct OCS_ParaList_t {
+    OCS_Struct* arg; // +0x4
+} OCS_ParaList;
 
 typedef struct {
     OCS_ConstantPoolTag tag;

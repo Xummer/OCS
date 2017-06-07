@@ -11,42 +11,6 @@
 #import <mach-o/dyld.h>
 #import "OCSStructTypeParser.h"
 
-// sub_2a11118
-void
-OCSDestroyStruct(OCS_Struct *s) {
-    NSCAssert(s, @"s && \"Destroy NULL OCSStruct\"");
-    if (s->_0x4 == 0) {
-        free(s->_0x8);
-    }
-    
-    free(s);
-}
-
-/*
-int sub_2a11118(int arg0) {
-    r0 = arg0;
-    stack[2045] = r4;
-    stack[2046] = r7;
-    stack[2047] = lr;
-    r7 = (sp - 0xc) + 0x4;
-    r4 = r0;
-    if (r4 != 0x0) {
-        if (*(int8_t *)(r4 + 0x4) == 0x0) {
-            r0 = free(*(r4 + 0x8));
-        }
-        r0 = loc_2dee7e8(r4);
-    }
-    else {
-        r2 = 0x9a;
-        r0 = "OCSDestroyStruct";
-        r1 = "/Users/liujizhou/workspace/OCSPatch/OCSVirtualMachine/OCSVirtualMachine/OCSEngine/Bridge/NativeCBridge/OCSNativeCStruct.m";
-        r3 = "s && \"Destroy NULL OCSStruct\"";
-        r0 = __assert_rtn();
-    }
-    return r0;
-}
- */
-
 // sub_2a123ba
 void
 _OCSSetUpCFunctionEnvironment() {
@@ -132,35 +96,35 @@ _OCSSetUpCStructEnvironment() {
 }
 
 // sub_2a12b8e
-OCS_Struct *
+OCS_StructType *
 _OCSGetStructType(NSString *typeString) {
     NSCAssert(typeString, @"structTypeEncode && \"Get StructType With typeName NULL\"");
     
-    __block OCS_Struct *s = NULL;
+    __block OCS_StructType *st = NULL;
     dispatch_sync(structTypeDictReadWriteQueue, ^{
         // sub_2a12c70
-        s = (OCS_Struct *)CFDictionaryGetValue(dictStructType, (__bridge CFStringRef)typeString);
+        st = (OCS_StructType *)CFDictionaryGetValue(dictStructType, (__bridge CFStringRef)typeString);
     });
     
-    if (!s) {
+    if (!st) {
         dispatch_barrier_sync(structTypeDictReadWriteQueue, ^{
             // sub_2a12ca2
-            s = (OCS_Struct *)CFDictionaryGetValue(dictStructType, (__bridge CFStringRef)typeString);
-            if (!s) {
+            st = (OCS_StructType *)CFDictionaryGetValue(dictStructType, (__bridge CFStringRef)typeString);
+            if (!st) {
                 if (!typeString) {
                     [NSException raise:@"OCSException" format:@"OCSGetStructType structTypeEncode == NULL"];
                 }
                 
-                s = malloc(sizeof(OCS_Struct));
-                s->_0x0 = 0;
-                s->_0x4 = [OCSStructTypeParser parseStructEncode:typeString];
+                st = malloc(sizeof(OCS_StructType));
+                st->_0x0 = 0;
+                st->typeStruct = [OCSStructTypeParser parseStructEncode:typeString];
                 
-                CFDictionarySetValue(dictStructType, (__bridge CFStringRef)typeString, s);
+                CFDictionarySetValue(dictStructType, (__bridge CFStringRef)typeString, st);
             }
         });
     }
     
-    return s;
+    return st;
 }
 
 /*
@@ -265,31 +229,66 @@ int sub_2a12ca2(int arg0) {
 }
  */
 
-OCS_RValueStruct *
-_OCSCreateRValueStruct(const char *type) {
-    OCS_RValueStruct* r = malloc(sizeof(OCS_RValueStruct));
-    OCS_Struct *s = _OCSGetStructType(type);
-    r->_0x0 = s;
-    r->_0x4 = 0;
-    r->_0x8 = malloc([s->_0x4 totalSize]);
+OCS_Struct *
+_OCSCreateRValueStruct(NSString *type) {
+    OCS_Struct* r = malloc(sizeof(OCS_Struct));
+    OCS_StructType *st = _OCSGetStructType(type);
+    r->structType = st;
+    r->type = OCSStrucValueTypeR;
+    r->value = malloc([st->typeStruct totalSize]);
     return r;
 }
 
-OCS_RValueStruct *
-_OCSCreateRValueStructWithData(const char *type, const void *data) {
-    OCS_RValueStruct* r = malloc(sizeof(OCS_RValueStruct));
-    OCS_Struct *s = _OCSGetStructType(type);
+OCS_Struct *
+_OCSCreateRValueStructWithData(NSString *type, const void *data) {
+    OCS_Struct* r = malloc(sizeof(OCS_Struct));
+    OCS_StructType *st = _OCSGetStructType(type);
     
-    void *buf = malloc([s->_0x4 totalSize]);
-    memcpy(buf, data, [s->_0x4 totalSize]);
-    r->_0x0 = s;
-    r->_0x4 = 0;
-    r->_0x8 = buf;
+    void *buf = malloc([st->typeStruct totalSize]);
+    memcpy(buf, data, [st->typeStruct totalSize]);
+    r->structType = st;
+    r->type = OCSStrucValueTypeR;
+    r->value = buf;
+    return r;
+}
+
+OCS_Struct *
+_OCSCreateLValueStruct(NSString *type, void *data) {
+    OCS_Struct* r = malloc(sizeof(OCS_Struct));
+    OCS_StructType *st = _OCSGetStructType(type);
+    r->structType = st;
+    r->type = OCSStrucValueTypeL;
+    r->value = data;
     return r;
 }
 
 // sub_2a12e24
-void OCSCreateCopyStruct() {}
+OCS_Struct *
+OCSCreateCopyStruct(OCS_Struct *s, OCSStrucValueType valueType) {
+    NSCAssert(s, @"s && \"Copy NULL OCSStruct\"");
+    if (s) {
+        OCS_Struct* cp = malloc(sizeof(OCS_Struct));
+        if (valueType == OCSStrucValueTypeL) {
+            cp->structType = s->structType;
+            cp->value = s->value;
+        }
+        else {
+            OCS_StructType *st = s->structType;
+            void *buf = malloc([st->typeStruct totalSize]);
+            memcpy(buf, s->value, [st->typeStruct totalSize]);
+            cp->structType = st;
+            cp->type = OCSStrucValueTypeR;
+            cp->value = buf;
+        }
+        
+        cp->type = valueType;
+        
+        return cp;
+    }
+    
+    return NULL;
+}
+
 
 /*
 int sub_2a12e24(int arg0, int arg1) {
@@ -331,6 +330,47 @@ int sub_2a12e24(int arg0, int arg1) {
     return r0;
 }
 */
+
+// sub_2a11118
+void
+_OCSDestroyStruct(OCS_Struct *s) {
+    NSCAssert(s, @"s && \"Destroy NULL OCSStruct\"");
+    if (s->type == OCSStrucValueTypeR) {
+        free(s->value);
+    }
+    
+    free(s);
+}
+
+void
+_OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Struct *s, OCSStrucValueType valueType) {
+    OCSTypeStruct *ts = d->structType->typeStruct;
+    OCSTypyCommon *typeC = [ts memberStructSizeValues][idx];
+    void *r8 = &(d->value[typeC.startIndex]);
+    switch (typeC.charType) {
+        case '^':
+        {
+            r8 = r10->_0x4;
+        }
+            break;
+        case '|':
+        {
+            [typeC totalSize];
+            memcpy(r8, <#const void *__src#>, typeC.totalSize)
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+
+
+void
+_OCSGetFieldValue(OCS_Struct *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {}
+
+
 
 // sub_2a1264e
 //CGRect

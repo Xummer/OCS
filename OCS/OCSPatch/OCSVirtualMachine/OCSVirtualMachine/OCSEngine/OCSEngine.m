@@ -73,12 +73,12 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
         // loc_35f480
         // loc_35f486
         
-        NSUInteger r1 = numberOfArguments - 2;
-        void *r5 = NULL;
+        NSUInteger uiArgCount = numberOfArguments - 2;
+        OCS_ParaList *paraList = NULL;
         if (numberOfArguments > 3) {
-            size_t size = r1 + r1 * (2 << 2);
-            r5 = malloc(size);
-            memset(r5, 0, size);
+            size_t size = offsetof(OCS_ParaList, arg) + uiArgCount * sizeof(OCS_Struct); //r1 + r1 * (2 << 2);
+            paraList = malloc(size);
+            memset(paraList, 0, size);
         }
         
 //        r5[4];
@@ -94,15 +94,47 @@ _type arg;  \
 [invocation getArgument:&arg atIndex:i];    \
 [argList addObject:@(arg)]; \
 break;  \
-}
+}                   
                     
+                    
+                    
+                    0x3f
+                    
+                    0x67 'g', 'a', 'b'
+                    
+                    ; 0x35f55c,0x35f582,0x35f59e,0x35f5d0,0x35f5e4,0x35f5e8,0x35f5ec, case 14
+                    ; 0x35f582,0x35f5d0,0x35f5f0,0x35f5f4,0x35f5f8,0x35f5fc,0x35f600,0x35f604, case 17
+                    
+                    // 0x23 '#' loc_35f608   0xd
+                    // 0x2a '*' loc_35f59e   0x10
+                    // 0x3a ':' loc_35f592   0xf
+                    // 0x51 'Q' loc_35f5a6   0xa
+                    // 0x53 'S' loc_35f60c   0x4
+                    // 0x5e '^' loc_35f59e   0x10
+                    // loc_35f5d0
+                    default:
+                    {
+                        [NSException raise:@"OCSCommonException" format: @"JPForwardInvocation argumentType not define:%s", argumentType];
+                    }
+                        break;
             }
         }
         
         // loc_35f61c:
         const char *returnType = [methodSignature methodReturnType];
         NSString *methodName = _getOCSMethodName(className, selectorName);
-        _OCSRunWithParaList(className, methodName, ,)
+        _OCSRunWithParaList(className, methodName, ??, paraList);
+        
+        switch (returnType[0] == 'r' ? returnType[1] : returnType[0]) {}
+        
+        [invocation setReturnValue:<#(nonnull void *)#>];
+        
+        if (paraList) {
+            for (NSUInteger i = 0; i < uiArgCount; i ++) {
+                _OCSDestroyStruct();
+            }
+            free(paraList);
+        }
     }
     
 //    // loc_2a14bf2:
@@ -220,7 +252,7 @@ int sub_2a1514a() {
 }
  */
 
-void
+NSString *
 _getOCSMethodName(NSString *clsName, NSString *selectorName) {
     if (clsName.length > 0 && selectorName.length > 0) {
         __block NSString *methodName = nil;
@@ -232,7 +264,7 @@ _getOCSMethodName(NSString *clsName, NSString *selectorName) {
                 while (![cls isEqual:[NSObject class]]) {
                     // loc_35f894
                     NSString *className = NSStringFromClass(cls);
-                    cls = class_getSuperclass(className);
+                    cls = class_getSuperclass(cls);
                     NSMutableDictionary *dict =
                     CFDictionaryGetValue(OCSOverrideClsMethodNameDic, (__bridge CFStringRef)className);
                     if (dict) {
