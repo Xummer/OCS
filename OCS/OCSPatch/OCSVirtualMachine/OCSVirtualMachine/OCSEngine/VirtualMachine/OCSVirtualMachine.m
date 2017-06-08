@@ -379,70 +379,134 @@ _OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBloc
         vm->stackPointer +=  codeBlock->localVarCount * STACK_CELL_SIZE;
         vm->currentFrame = &f;
         __virtualMachineEval(vm);
-//        vm->stackPointer;
+        void* stackP = vm->stackPointer;
         
-        int32_t r_r6 = stack[2022];
-        if (r_r6 > ']') { // 0x5d
-            // loc_2a0c1b0
-            if (r_r6 > 'v') { // 0x76
-                // loc_2a0c1f0
-                if (r_r6 != '^') { // 0x5e
-                    if (r_r6 == '{') { // 0x7b
-//                        malloc(<#size_t __size#>)
-                    }
-                    else {
-                        [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
-                    }
-                }
-                else {
-                    malloc(0x4);
-                }
-                // loc_2a0c2ce
-            }
-            else {
-                // loc_2a0c1b8
-                goto *0x2a0c1bc[r0];
-            }
-        }
-        else if (r_r6 > 'H') { // 0x48
-            // loc_2a0c1e2
-            if (r_r6 <= 'P') {
+        // 0x5e '^' malloc(0x4)
+        // 0x7b '{'
+        // 0x51 Q
+        // 0x53 S
+        // 0x49 I
+        // 0x4C L
+        
+        
+        
+        
+        OCS_ReturnValue *rv;
+        
+        switch (rv->typeEncode) {
+
+#define OCS_RET_CASE_RET(_typeChar, _type)  \
+    case _typeChar : {  \
+        void *v = malloc(sizeof(_type));    \
+        rv->value = v;  \
+        *v = *(stackP - 0x8);   \
+        break;  \
+    }
                 
+            OCS_RET_CASE_RET('@', id)
+            OCS_RET_CASE_RET('^', void*)
+            OCS_RET_CASE_RET('*', void*)
+            OCS_RET_CASE_RET('#', Class)
+            OCS_RET_CASE_RET(':', SEL)
+                
+            OCS_RET_CASE_RET('c', char)
+            OCS_RET_CASE_RET('C', unsigned char)
+            OCS_RET_CASE_RET('s', short)
+            OCS_RET_CASE_RET('S', unsigned short)
+            OCS_RET_CASE_RET('i', int)
+            OCS_RET_CASE_RET('I', unsigned int)
+            OCS_RET_CASE_RET('l', long)
+            OCS_RET_CASE_RET('L', unsigned long)
+            OCS_RET_CASE_RET('q', long long)
+            OCS_RET_CASE_RET('Q', unsigned long long)
+            OCS_RET_CASE_RET('f', float)
+            OCS_RET_CASE_RET('d', double)
+            OCS_RET_CASE_RET('B', BOOL)
+                
+            case 'v':
+                break;
+            case '{':
+            {
+                OCS_Struct* st = stackP - 0x8;
+                size_t size = [st->structType->typeStruct totalSize];
+                void *buf = malloc(size);
+                memcpy(buf, st->value, size);
+                rv->value = buf;
             }
-            else {
-                if (r_r6 != 'Q') {
-                    if (r_r6 == 'S') {
-                        malloc(0x2);
-                    }
-                    else {
-                        [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
-                    }
-                }
-                else {
-                    malloc(0x8);
-                }
-            }
-            
-            // loc_2a0c2ce
+                break;
+            default:
+                break;
         }
-        else if (r_r6 - 0x3a > 0x9) {
-            // loc_2a0c244
-            if (r_r6 != '$') { // 0x24
-                if (r_r6 == '*') {
-                    malloc(0x4);
-                }
-                else {
-                    [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
-                }
-            }
-            
-            // loc_2a0c2ce
-        }
-        else {
-            // loc_2a0c1a2
-            goto *0x2a0c1a6[r0];
-            
-        }
+        
+        
+//        int32_t r_r6 = stack[2022];
+//        if (r_r6 > ']') { // 0x5d
+//            // loc_3516e0
+//            if (r_r6 > 'v') { // 0x76 r0 = r6 - 0x63
+//                // loc_351720
+//                if (r_r6 != '^') { // 0x5e
+//                    if (r_r6 == '{') { // 0x7b
+//                        OCS_Struct* st = stackP - 0x8;
+//                        size_t size = [st->structType->typeStruct totalSize];
+//                        void *buf = malloc(size);
+//                        memcpy(buf, st->value, size);
+//                        rv->value = buf;
+//                    }
+//                    else {
+//                        [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
+//                    }
+//                }
+//                else {
+//                    void *v = malloc(0x4);
+//                    rv->value = v;
+//                    *v = *(stackP - 0x8);
+//                }
+//                // loc_2a0c2ce
+//            }
+//            else {
+//                // loc_3516e8 ; ; 0x351700,0x351776,0x351790,0x3517a2,0x3517ba,0x3517d
+//                goto *0x2a0c1bc[r0];
+//            }
+//        }
+//        else if (r_r6 > 'H') { // 0x48
+//            // loc_351712
+//            if (r_r6 <= 'P') {
+//                
+//            }
+//            else {
+//                if (r_r6 != 'Q') {
+//                    if (r_r6 == 'S') {
+//                        malloc(sizeof(unsigned short));
+//                    }
+//                    else {
+//                        [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
+//                    }
+//                }
+//                else {
+//                    malloc(sizeof(unsigned long long));
+//                }
+//            }
+//            
+//            // loc_2a0c2ce
+//        }
+//        else if (r_r6 - 0x3a > 0x9) {
+//            // loc_35176e
+//            if (r_r6 != '$') { // 0x24
+//                if (r_r6 == '*') {
+//                    malloc(0x4);
+//                }
+//                else {
+//                    [NSException raise:@"OCSCommonException" format:@"vm returnValue type not define:%c", r_r6];
+//                }
+//            }
+//            
+//            // loc_2a0c2ce
+//        }
+//        else {
+//            // loc_3516d2 ; 0x351700,0x351776,0x3517ba, case 10
+//            goto *0x2a0c1a6[r0];
+//            
+//        }
         
         // loc_2a0c2ce
         CFArrayApplyFunction(arrCStructs, CFRangeMake(0, CFArrayGetCount(arrCStructs)), OCSDestroyStruct, NULL);

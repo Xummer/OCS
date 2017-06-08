@@ -70,9 +70,36 @@ typedef struct OCS_Struct_t {
     void *              value; // +0x8
 } OCS_Struct; // +0xc
 
+typedef NS_ENUM(NSUInteger, OCSValueTag) {
+    OCSVTagVoid = 0,    // 0x0 'v'
+    OCSVTagChar,        // 0x1 'c'
+    OCSVTagUChar,       // 0x2 'C' 'B'
+    OCSVTagShort,       // 0x3 's'
+    OCSVTagUShort,      // 0x4 'S'
+    OCSVTagInt,         // 0x5 'i'
+    OCSVTagUInt,        // 0x6 'I'
+    OCSVTagLong,        // 0x7 'l'
+    OCSVTagULong,       // 0x8 'L'
+    OCSVTagLongLong,    // 0x9 'q'
+    OCSVTagULongLong,   // 0xa 'Q'
+    OCSVTagFloat,       // 0xb 'f'
+    OCSVTagDouble,      // 0xc 'd'
+    OCSVTagClass,       // 0xd '#'
+    OCSVTagID,          // 0xe '@'
+    OCSVTagSel,         // 0xf ':'
+    OCSVTagPointer,     // 0x10 '*' '^'
+    OCSVTagStruct,       // 0x11 '{'
+};
+
 typedef struct OCS_ParaList_t {
+    OCSValueTag vTag; //
     OCS_Struct* arg; // +0x4
 } OCS_ParaList;
+
+typedef struct OCS_ReturnValue_t {
+    char typeEncode; // +0x0
+    void *value;
+} OCS_ReturnValue;
 
 typedef struct {
     OCS_ConstantPoolTag tag;

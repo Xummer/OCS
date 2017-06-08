@@ -76,34 +76,55 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
         NSUInteger uiArgCount = numberOfArguments - 2;
         OCS_ParaList *paraList = NULL;
         if (numberOfArguments > 3) {
-            size_t size = offsetof(OCS_ParaList, arg) + uiArgCount * sizeof(OCS_Struct); //r1 + r1 * (2 << 2);
+            size_t size = (offsetof(OCS_ParaList, arg) + sizeof(OCS_Struct)) * uiArgCount; //r1 + r1 * (2 << 2);
             paraList = malloc(size);
             memset(paraList, 0, size);
         }
         
-//        r5[4];
+//      r11 = r5 + 4;
         
         // loc_35f51c
         for (NSUInteger i = 2; i < numberOfArguments; i++) {
+            NSUInteger uiArgIdx = i - 2;
             const char *argumentType = [methodSignature getArgumentTypeAtIndex:i];
             switch(argumentType[0] == 'r' ? argumentType[1] : argumentType[0]) {
                     
-#define JP_FWD_ARG_CASE(_typeChar, _type) \
-case _typeChar: {   \
-_type arg;  \
-[invocation getArgument:&arg atIndex:i];    \
-[argList addObject:@(arg)]; \
-break;  \
-}                   
+#define JP_FWD_ARG_CASE(_typeChar, _type, _tag) \
+                case _typeChar: {   \
+                    _type arg;  \
+                    [invocation getArgument:&arg atIndex:i];    \
+                    paraList[uiArgIdx].vTag = _tag;   \
+                    paraList[uiArgIdx].arg = arg;\
+                    break;  \
+                }
+                
+                JP_FWD_ARG_CASE('c', char, OCSVTagChar)
+                JP_FWD_ARG_CASE('C', unsigned char, OCSVTagUChar)
+                JP_FWD_ARG_CASE('s', short, OCSVTagShort)
+                JP_FWD_ARG_CASE('S', unsigned short, OCSVTagUShort)
+                JP_FWD_ARG_CASE('i', int, OCSVTagInt)
+                JP_FWD_ARG_CASE('I', unsigned int, OCSVTagUInt)
+                JP_FWD_ARG_CASE('l', long, OCSVTagLong)
+                JP_FWD_ARG_CASE('L', unsigned long, OCSVTagULong)
+                JP_FWD_ARG_CASE('q', long long, OCSVTagLongLong)
+                JP_FWD_ARG_CASE('Q', unsigned long long, OCSVTagULongLong)
+                JP_FWD_ARG_CASE('f', float, OCSVTagFloat)
+                JP_FWD_ARG_CASE('d', double, OCSVTagDouble)
+                JP_FWD_ARG_CASE('B', BOOL, OCSVTagUChar)
+                JP_FWD_ARG_CASE('#', Class, OCSVTagClass)
+                JP_FWD_ARG_CASE('@', id, OCSVTagID)
+                JP_FWD_ARG_CASE(':', SEL, OCSVTagSel)
+                JP_FWD_ARG_CASE('*', void *, OCSVTagPointer)
+                JP_FWD_ARG_CASE('^', void *, OCSVTagPointer)
                     
+#undef JP_FWD_ARG_CASE
                     
-                    
-                    0x3f
-                    
-                    0x67 'g', 'a', 'b'
-                    
-                    ; 0x35f55c,0x35f582,0x35f59e,0x35f5d0,0x35f5e4,0x35f5e8,0x35f5ec, case 14
-                    ; 0x35f582,0x35f5d0,0x35f5f0,0x35f5f4,0x35f5f8,0x35f5fc,0x35f600,0x35f604, case 17
+//                    0x3f
+//                    
+//                    0x67 'g', 'a', 'b'
+//                    
+//                    ; 0x35f55c,0x35f582,0x35f59e,0x35f5d0,0x35f5e4,0x35f5e8,0x35f5ec, case 14
+//                    ; 0x35f582,0x35f5d0,0x35f5f0,0x35f5f4,0x35f5f8,0x35f5fc,0x35f600,0x35f604, case 17
                     
                     // 0x23 '#' loc_35f608   0xd
                     // 0x2a '*' loc_35f59e   0x10
@@ -111,27 +132,46 @@ break;  \
                     // 0x51 'Q' loc_35f5a6   0xa
                     // 0x53 'S' loc_35f60c   0x4
                     // 0x5e '^' loc_35f59e   0x10
+                    // 0x7b '{'  0x11
                     // loc_35f5d0
-                    default:
-                    {
-                        [NSException raise:@"OCSCommonException" format: @"JPForwardInvocation argumentType not define:%s", argumentType];
-                    }
-                        break;
+                    
+                case '{':
+                {
+                    // loc_35f5ae
+                    OCS_Struct *st = _OCSCreateRValueStruct([NSString stringWithUTF8String:argumentType]);
+                    paraList[uiArgIdx].arg = st;
+                    paraList[uiArgIdx].vTag = OCSVTagStruct;
+                    [invocation getArgument:&st->value atIndex:i];
+                }
+                    break;
+                default:
+                {
+                    [NSException raise:@"OCSCommonException" format: @"JPForwardInvocation argumentType not define:%s", argumentType];
+                }
+                    break;
             }
         }
         
         // loc_35f61c:
         const char *returnType = [methodSignature methodReturnType];
+        char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
+        
         NSString *methodName = _getOCSMethodName(className, selectorName);
         _OCSRunWithParaList(className, methodName, ??, paraList);
         
-        switch (returnType[0] == 'r' ? returnType[1] : returnType[0]) {}
+        void *ret = NULL;
+        if (rType != 'v') {
+            // TODO
+        }
         
-        [invocation setReturnValue:<#(nonnull void *)#>];
+        [invocation setReturnValue:ret];
         
         if (paraList) {
+            // Relase Struct
             for (NSUInteger i = 0; i < uiArgCount; i ++) {
-                _OCSDestroyStruct();
+                if (paraList[i]->vTag == OCSVTagStruct) {
+                    _OCSDestroyStruct(paraList[i]->arg);
+                }
             }
             free(paraList);
         }
