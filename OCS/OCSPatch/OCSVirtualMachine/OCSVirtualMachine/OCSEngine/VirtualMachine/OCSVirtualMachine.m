@@ -312,7 +312,7 @@ int sub_2a0bf7e(int arg0) {
 
 // sub_2a0c01c
 void
-_OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, int arg2, CFMutableArrayRef argList) {
+_OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_ParaList* argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
     // loc_2a0c080
@@ -388,12 +388,7 @@ _OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBloc
         // 0x49 I
         // 0x4C L
         
-        
-        
-        
-        OCS_ReturnValue *rv;
-        
-        switch (rv->typeEncode) {
+        switch (returnVal->typeEncode) {
 
 #define OCS_RET_CASE_RET(_typeChar, _type)  \
     case _typeChar : {  \
@@ -431,7 +426,7 @@ _OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBloc
                 size_t size = [st->structType->typeStruct totalSize];
                 void *buf = malloc(size);
                 memcpy(buf, st->value, size);
-                rv->value = buf;
+                returnVal->value = buf;
             }
                 break;
             default:
@@ -1615,10 +1610,10 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
 
 // sub_2a13770
 void
-_OCSRunWithParaList(NSString *className, NSString *methodName, int arg2, CFMutableArrayRef argList) {
+_OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_ParaList* argList) {
     OCS_CodeBlock *codeBlock = _OCSGetCodeBlock(className, methodName);
     OCS_VirtualMachine *vm = _OCSGetCurrentThreadVirtualMachine();
-    _OCSVirtualMachineExecuteWithArr(vm, codeBlock, arg2, argList);
+    _OCSVirtualMachineExecuteWithArr(vm, codeBlock, returnVal, argList);
 }
 
 /*

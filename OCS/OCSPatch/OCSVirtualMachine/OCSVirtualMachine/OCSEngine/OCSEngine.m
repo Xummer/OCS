@@ -156,21 +156,28 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
         const char *returnType = [methodSignature methodReturnType];
         char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
         
-        NSString *methodName = _getOCSMethodName(className, selectorName);
-        _OCSRunWithParaList(className, methodName, ??, paraList);
+        OCS_ReturnValue *rv;
+        rv->typeEncode = rType;
+        rv->value = NULL;
         
-        void *ret = NULL;
+        NSString *methodName = _getOCSMethodName(className, selectorName);
+        _OCSRunWithParaList(className, methodName, rv, paraList);
+        
         if (rType != 'v') {
-            // TODO
+            void *ret = rv->value;
+            [invocation setReturnValue:ret];
+            if (ret) {
+                free(ret);
+                ret = NULL;
+            }
         }
         
-        [invocation setReturnValue:ret];
         
         if (paraList) {
             // Relase Struct
             for (NSUInteger i = 0; i < uiArgCount; i ++) {
-                if (paraList[i]->vTag == OCSVTagStruct) {
-                    _OCSDestroyStruct(paraList[i]->arg);
+                if (paraList[i].vTag == OCSVTagStruct) {
+                    _OCSDestroyStruct(paraList[i].arg);
                 }
             }
             free(paraList);

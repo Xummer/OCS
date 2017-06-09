@@ -88,7 +88,7 @@ typedef NS_ENUM(NSUInteger, OCSValueTag) {
     OCSVTagID,          // 0xe '@'
     OCSVTagSel,         // 0xf ':'
     OCSVTagPointer,     // 0x10 '*' '^'
-    OCSVTagStruct,       // 0x11 '{'
+    OCSVTagStruct,      // 0x11 '{'
 };
 
 typedef struct OCS_ParaList_t {
@@ -149,7 +149,7 @@ typedef struct OCS_Frame_t {
     int32_t pc; // class +0x8   |64 +0x10
     OCS_CodeBlock *codeBlock; // +0xc   |64 +0x18
     OCS_Class *cls; // +0x10    |64 +0x20
-    CFArrayRef _0x14; // +0x14;
+    OCS_ParaList *_0x14; // +0x14;
     CFArrayRef arrCStruct; // +0x18 CStruct
 } OCS_Frame; // 0x39c
 
