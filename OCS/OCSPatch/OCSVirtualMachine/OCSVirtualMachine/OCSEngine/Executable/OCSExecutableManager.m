@@ -9,15 +9,15 @@
 #import "OCSVM_code.h"
 
 void
-_setUpExecutableManagerEnvironment();
+setUpExecutableManagerEnvironment();
 
 
 
 // sub_2a0b75c
 OCS_Executable*
-_OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
+OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
     NSCAssert(executableName, @"executableName && \"executableName is NULL\"");
-    _setUpExecutableManagerEnvironment();
+    setUpExecutableManagerEnvironment();
     
     __block OCS_Executable* exec;
     dispatch_sync(OCSExecutableManagerReadWriteQueue, ^{
@@ -35,7 +35,7 @@ _OCSGetExecutable(NSString *executableName, NSUInteger *errorCode) {
                 // loc_2a0b99e
                 
                 exec =
-                _OCSExecutableCreate(executableName, ((NSData *(*)())_OCSExecutableManagerLoadDataCallback_fun)(executableName), errorCode);
+                OCSExecutableCreate(executableName, ((NSData *(*)())_OCSExecutableManagerLoadDataCallback_fun)(executableName), errorCode);
                 
                 if (*errorCode) {
                     
@@ -134,7 +134,7 @@ int sub_2a0b75c(int arg0, int arg1) {
  */
 
 void
-_OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableDictionary *dictCls, NSMutableDictionary *dictProtocol) {
+OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSMutableDictionary *dictCls, NSMutableDictionary *dictProtocol) {
     NSCAssert(executableName, @"executableName && \"executableName is NULL\"");
     
     NSString *path = [relativePath stringByAppendingPathComponent:executableName];
@@ -145,7 +145,7 @@ _OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSM
     NSString *fullPath = [path stringByAppendingPathExtension:@"32.ocs"];
 #endif
     
-    _setUpExecutableManagerEnvironment();
+    setUpExecutableManagerEnvironment();
     
     __block NSData *data = nil;
     
@@ -158,11 +158,11 @@ _OCSGetClassProtocolExtend(NSString *relativePath, NSString *executableName, NSM
     
     OCSLog(@"GetClassProtocolExtend:fileName(%s)", [executableName UTF8String]);
     
-    _OCSExtendClassProtocolSegment(data, dictCls, dictProtocol);
+    OCSExtendClassProtocolSegment(data, dictCls, dictProtocol);
 }
 
 void
-_setUpExecutableManagerEnvironment() {
+setUpExecutableManagerEnvironment() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // sub_2a0b874
@@ -179,7 +179,7 @@ _setUpExecutableManagerEnvironment() {
 // ??
 // sub_2a0bac0
 OCS_CodeBlock *
-_OCSGetCodeBlock(NSString *clsName, NSString *codeBlockName) {
+OCSGetCodeBlock(NSString *clsName, NSString *codeBlockName) {
     NSString *keyStr = [NSString stringWithFormat:@"%@_%@", clsName, codeBlockName];
     NSCAssert(clsName.length > 0 && codeBlockName.length > 0 && keyStr.length > 0, @"keyStr.length > 0 && \"OCSGetCodeBlock className codeBlockName is nil\"");
     

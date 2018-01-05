@@ -10,6 +10,6 @@
 #define OCSNativeCStruct_h
 
 void
-_OCSSetUpEnvironment();
+OCSSetUpEnvironment();
 
 #endif /* OCSNativeCStruct_h */

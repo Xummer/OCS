@@ -57,7 +57,7 @@
         NSMutableDictionary *dictPro = [NSMutableDictionary new];
         
         for (NSString *fileName in fileNames) {
-            _OCSGetClassProtocolExtend(configure, fileName, dictCls, dictPro);
+            OCSGetClassProtocolExtend(configure, fileName, dictCls, dictPro);
             
             [dictPro enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, OCSProtocolInfo *  _Nonnull obj, BOOL * _Nonnull stop) {
                 [OCSDynamicProtocolTool setUpDynamicProtocol:obj];

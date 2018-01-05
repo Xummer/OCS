@@ -204,23 +204,23 @@ static dispatch_queue_t classExecutableRootReadWriteQueue; // *0x367d230 | *0x72
 
 // sub_2a0bac0
 OCS_CodeBlock *
-_OCSGetCodeBlock(NSString *clsName, NSString *arg1);
+OCSGetCodeBlock(NSString *clsName, NSString *arg1);
 
 // sub_2a0bdee
 OCS_VirtualMachine*
-_OCSVirtualMachineCreate();
+OCSVirtualMachineCreate();
 
 // sub_2a0be22
 void
-_OCSVirtualMachineDestroy(OCS_VirtualMachine* vm);
+OCSVirtualMachineDestroy(OCS_VirtualMachine* vm);
 
 // sub_2a0be9c
 void
-_OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread);
+OCSVirtualMachineAttachThread(OCS_VirtualMachine *vm, pthread_t thread);
 
 // sub_2a0b75c
 OCS_Executable*
-_OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
+OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
 
 // sub_2a11118
 void
@@ -228,19 +228,19 @@ OCSDestroyStruct(OCS_Struct *s, void *context);
 
 // sub_2a137d4
 OCS_Executable*
-_OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode);
+OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode);
 
 // sub_2a13790
 id
-_CurrentThreadOCSVMExptionCallStackInfo();
+CurrentThreadOCSVMExptionCallStackInfo();
 
 // sub_2a13fb4
 NSData *
-_loadData(NSString *fileName);
+loadData(NSString *fileName);
 
 // sub_2a1514a
 OCS_VirtualMachine*
-_OCSGetCurrentThreadVirtualMachine();
+OCSGetCurrentThreadVirtualMachine();
 
 
 #ifdef DEBUG

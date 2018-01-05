@@ -11,7 +11,7 @@
 
 // sub_2a137d4
 OCS_Executable*
-_OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
+OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
     if (data) {
         
         OCSLog(@"OCSExecutableCreate start:fileName(%s)", [fileName UTF8String]);
@@ -746,7 +746,7 @@ loc_2a13df4:
  */
 
 uint64_t
-_readAndMove8ByteUint(const char **b) {
+readAndMove8ByteUint(const char **b) {
     const char *bytes = *b;
     uint64_t t = OCS8BYTE_FROM(0);
     *b += 8;
@@ -754,7 +754,7 @@ _readAndMove8ByteUint(const char **b) {
 }
 
 OCSClassInfo *
-_parseClassExtendSegment(const char *bytes, NSUInteger count) {
+parseClassExtendSegment(const char *bytes, NSUInteger count) {
     OCSClassInfo *clsInfo = nil;
     if (count > 0) {
         clsInfo = [OCSClassInfo new];
@@ -923,7 +923,7 @@ _parseClassExtendSegment(const char *bytes, NSUInteger count) {
 }
 
 OCSProtocolInfo *
-_parseProtocolExtendSegment(const char *bytes, NSUInteger count) {
+parseProtocolExtendSegment(const char *bytes, NSUInteger count) {
     OCSProtocolInfo *pInfo = nil;
     if (count > 0) {
         pInfo = [OCSProtocolInfo new];
@@ -1053,7 +1053,7 @@ _parseProtocolExtendSegment(const char *bytes, NSUInteger count) {
 }
 
 void
-_OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dictCls, NSMutableDictionary *dictProtocol) {
+OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dictCls, NSMutableDictionary *dictProtocol) {
     NSCAssert(data, @"data && \"Create OCSExecutable from nil NSData\"");
     
     const char *bytes = [data bytes];
@@ -1069,7 +1069,7 @@ _OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dictCls, NSMut
     }
     else {
         const char *buf = &bytes[offset + 0x4];
-        uint64_t extendOffset = _readAndMove8ByteUint(&buf);
+        uint64_t extendOffset = readAndMove8ByteUint(&buf);
         OCSLog(@"OCSExtendClassProtocolSegment:extendOffset(0x%llx)", extendOffset);
         
         if (extendOffset) {
@@ -1082,9 +1082,9 @@ _OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dictCls, NSMut
                     {
                         int8_t nodeInfoCount = OCSBYTE_FROM(dOffset+1);
                         const char *data = &bytes[dOffset + 2];
-                        uint64_t nodeInfoSize = _readAndMove8ByteUint(&data);
+                        uint64_t nodeInfoSize = readAndMove8ByteUint(&data);
                         OCSLog(@"OCSExtendProtocolSegment:nodeInfoCount(%d),nodeInfoSize(%lld)", nodeInfoCount, nodeInfoSize);
-                        OCSClassInfo *cInfo = _parseClassExtendSegment(data, nodeInfoCount);
+                        OCSClassInfo *cInfo = parseClassExtendSegment(data, nodeInfoCount);
                         if (cInfo.currentClass.length) {
                             if ([dictCls isKindOfClass:[NSDictionary class]]) {
                                 dictCls[ cInfo.currentClass ] = cInfo;
@@ -1096,9 +1096,9 @@ _OCSExtendClassProtocolSegment(NSData *data, NSMutableDictionary *dictCls, NSMut
                     {
                         int8_t nodeInfoCount = OCSBYTE_FROM(dOffset+1);
                         const char *data = &bytes[dOffset + 2];
-                        uint64_t nodeInfoSize = _readAndMove8ByteUint(&data);
+                        uint64_t nodeInfoSize = readAndMove8ByteUint(&data);
                         OCSLog(@"OCSExtendProtocolSegment:nodeInfoCount(%d),nodeInfoSize(%lld)", nodeInfoCount, nodeInfoSize);
-                        OCSProtocolInfo *pInfo = _parseProtocolExtendSegment(data, nodeInfoCount);
+                        OCSProtocolInfo *pInfo = parseProtocolExtendSegment(data, nodeInfoCount);
                         if (pInfo.protocolName.length) {
                             if ([dictProtocol isKindOfClass:[NSDictionary class]]) {
                                 dictProtocol[ pInfo.protocolName ] = pInfo;
@@ -1150,7 +1150,7 @@ int sub_2a13e60() {
 
 // sub_2a13fb4
 NSData *
-_loadData(NSString *fileName) {
+loadData(NSString *fileName) {
     __block NSString *rootPath;
     dispatch_sync(classExecutableRootReadWriteQueue, ^{
         // sub_2a14b20

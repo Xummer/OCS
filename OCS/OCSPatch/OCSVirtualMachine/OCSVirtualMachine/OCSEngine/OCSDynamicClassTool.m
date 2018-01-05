@@ -11,7 +11,7 @@
 #import "OCSModules.h"
 
 OCS_PropertyAttributes *
-_OCSCopyPropertyAttributes(const char *name, const char *encode) {
+OCSCopyPropertyAttributes(const char *name, const char *encode) {
     if (encode) {
         // loc_356c5a
         if (encode[0] != 'T') {
@@ -507,7 +507,7 @@ int +[OCSDynamicClassTool generateDynamicClass:isARCClass:superClass:IvarList:pr
 + (id)dynamicClassPropertyInfos:(NSArray *)propertyInfos {
     NSMutableOrderedSet *set = [NSMutableOrderedSet orderedSet];
     [propertyInfos enumerateObjectsUsingBlock:^(OCSProperty * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        _OCSCopyPropertyAttributes([obj.propertyName UTF8String], [obj.typeEncode UTF8String]);
+        OCSCopyPropertyAttributes([obj.propertyName UTF8String], [obj.typeEncode UTF8String]);
     }];
 }
 

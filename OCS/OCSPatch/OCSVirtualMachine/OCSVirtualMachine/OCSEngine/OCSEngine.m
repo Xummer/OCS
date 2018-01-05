@@ -29,7 +29,7 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
         SEL dpSelector = NSSelectorFromString([NSString stringWithFormat:@"_OCSDynamicProperty_%@", selectorName]);
         if (class_respondsToSelector(object_getClass(assignSlf), dpSelector)) {
             // loc_35f4d0
-            _OCSDynamicClassGetSetInvocation(assignSlf, invocation);
+            OCSDynamicClassGetSetInvocation(assignSlf, invocation);
             return;
         }
         
@@ -43,9 +43,9 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
                 NSString *selName = components[1];
                 if (clsName.length > 0 && selName.length > 0) {
                     // loc_35f75c
-                    NSString *methodName = _getOCSMethodName(clsName, selName);
+                    NSString *methodName = getOCSMethodName(clsName, selName);
                     if (methodName) {
-                        OCS_CodeBlock *codeBlock = _OCSGetCodeBlock(clsName, methodName);
+                        OCS_CodeBlock *codeBlock = OCSGetCodeBlock(clsName, methodName);
                         if (codeBlock) {
                             // loc_35f486
                         }
@@ -138,7 +138,7 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
                 case '{':
                 {
                     // loc_35f5ae
-                    OCS_Struct *st = _OCSCreateRValueStruct([NSString stringWithUTF8String:argumentType]);
+                    OCS_Struct *st = OCSCreateRValueStruct([NSString stringWithUTF8String:argumentType]);
                     paraList[uiArgIdx].arg = st;
                     paraList[uiArgIdx].vTag = OCSVTagStruct;
                     [invocation getArgument:&st->value atIndex:i];
@@ -160,8 +160,8 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
         rv->typeEncode = rType;
         rv->value = NULL;
         
-        NSString *methodName = _getOCSMethodName(className, selectorName);
-        _OCSRunWithParaList(className, methodName, rv, paraList);
+        NSString *methodName = getOCSMethodName(className, selectorName);
+        OCSRunWithParaList(className, methodName, rv, paraList);
         
         if (rType != 'v') {
             void *ret = rv->value;
@@ -177,7 +177,7 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
             // Relase Struct
             for (NSUInteger i = 0; i < uiArgCount; i ++) {
                 if (paraList[i].vTag == OCSVTagStruct) {
-                    _OCSDestroyStruct(paraList[i].arg);
+                    OCSDestroyStruct(paraList[i].arg);
                 }
             }
             free(paraList);
@@ -216,7 +216,7 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
 //            }
 //        });
 //        
-//        _OCSRunWithParaList(clsStr, selectorName, /*<sp + 0x30>*/, argList);
+//        OCSRunWithParaList(clsStr, selectorName, /*<sp + 0x30>*/, argList);
 //        
 //    }
 //    else {
@@ -232,23 +232,23 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
 void
 close_thread (void* thread) {
     /* <0x2a15229> 清理函数 */
-    _OCSVirtualMachineDestroy(thread);
+    OCSVirtualMachineDestroy(thread);
 }
 
 // sub_2a1514a
 OCS_VirtualMachine*
-_OCSGetCurrentThreadVirtualMachine() {
+OCSGetCurrentThreadVirtualMachine() {
     OCS_VirtualMachine* vm;
     if (pthread_main_np()) {
         // main thread
         static OCS_VirtualMachine* mainThreadVM /* <*0x367d244> */;
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            mainThreadVM = _OCSVirtualMachineCreate();
+            mainThreadVM = OCSVirtualMachineCreate();
         });
         
         vm = mainThreadVM;
-        _OCSVirtualMachineAttachThread(vm, pthread_self());
+        OCSVirtualMachineAttachThread(vm, pthread_self());
     }
     else {
         static pthread_key_t pkey; /* <*0x367d250> */;
@@ -259,8 +259,8 @@ _OCSGetCurrentThreadVirtualMachine() {
         
         vm = pthread_getspecific(pkey);
         if (!vm) {
-            vm = _OCSVirtualMachineCreate();
-            _OCSVirtualMachineAttachThread(vm, pthread_self());
+            vm = OCSVirtualMachineCreate();
+            OCSVirtualMachineAttachThread(vm, pthread_self());
             pthread_setspecific(pkey, vm);
         }
     }
@@ -300,7 +300,7 @@ int sub_2a1514a() {
  */
 
 NSString *
-_getOCSMethodName(NSString *clsName, NSString *selectorName) {
+getOCSMethodName(NSString *clsName, NSString *selectorName) {
     if (clsName.length > 0 && selectorName.length > 0) {
         __block NSString *methodName = nil;
         dispatch_sync(classMethodNameReadWriteQueue, ^{
@@ -345,14 +345,14 @@ _getOCSMethodName(NSString *clsName, NSString *selectorName) {
             classExecutableRoot = [[NSMutableDictionary alloc] init];
         }
         if (!_OCSExecutableManagerLoadDataCallback_fun) {
-            _OCSExecutableManagerLoadDataCallback_fun = &_loadData; // | 0x35d885
+            _OCSExecutableManagerLoadDataCallback_fun = &loadData; // | 0x35d885
         }
         
         if (!_vmRunBlock) {
-            _vmRunBlock = &_OCSRunBlockWithLayout; // | 0x35b8b1
+            _vmRunBlock = &OCSRunBlockWithLayout; // | 0x35b8b1
         }
         
-        _OCSSetUpEnvironment();
+        OCSSetUpEnvironment();
     });
 }
 
@@ -381,7 +381,7 @@ void sub_2a13ed0(void * _block) {
  */
 
 + (NSString *)getClassNameWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
-    OCS_Executable* exec = _OCSGetExecutable(fileName, errorCode);
+    OCS_Executable* exec = OCSGetExecutable(fileName, errorCode);
     if (*errorCode) {
         return nil;
     }
@@ -393,7 +393,7 @@ void sub_2a13ed0(void * _block) {
 // <OCS_CodeBlock *>
 + (NSArray *)getMethodsNameWithFileName:(NSString *)fileName errorCode:(NSUInteger *)errorCode {
     NSArray *result;
-    OCS_Executable* exec = _OCSGetExecutable(fileName, errorCode);
+    OCS_Executable* exec = OCSGetExecutable(fileName, errorCode);
     if (*errorCode) {
         result = nil;
     }
@@ -427,11 +427,11 @@ void sub_2a13ed0(void * _block) {
 }
 
 + (id)CurrentThreadOCSVMExptionCallStackInfo {
-    return _CurrentThreadOCSVMExptionCallStackInfo();
+    return CurrentThreadOCSVMExptionCallStackInfo();
 }
 
 + (id)CurrentThreadOCSVMStackInfo {
-    return _CurrentThreadOCSVMStackInfo();
+    return CurrentThreadOCSVMStackInfo();
 }
 
 // <NSString* /*methodName*/, OCS_CodeBlock* /*codeBlock*/>

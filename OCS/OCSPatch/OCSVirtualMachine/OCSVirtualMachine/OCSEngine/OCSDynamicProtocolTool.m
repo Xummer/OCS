@@ -55,7 +55,7 @@
             }];
             
             [propertyList enumerateObjectsUsingBlock:^(OCSProtocolProperty *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                OCS_PropertyAttributes *ppAttr = _OCSCopyPropertyAttributes([obj.propertyName UTF8String], [obj.typeEncode UTF8String]);
+                OCS_PropertyAttributes *ppAttr = OCSCopyPropertyAttributes([obj.propertyName UTF8String], [obj.typeEncode UTF8String]);
                 if (ppAttr) {
                     OCSPropertyInfo *info = [OCSPropertyInfo new];
                     NSString *ivarStr = nil;

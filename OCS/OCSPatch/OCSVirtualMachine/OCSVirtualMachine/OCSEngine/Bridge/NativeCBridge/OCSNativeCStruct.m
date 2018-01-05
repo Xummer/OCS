@@ -13,11 +13,11 @@
 
 // sub_2a123ba
 void
-_OCSSetUpCFunctionEnvironment() {
+OCSSetUpCFunctionEnvironment() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // sub_2a123e6
-        _initAppImagebase();
+        initAppImagebase();
         CFMutableDictionaryRef dictRef =
         CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
         
@@ -86,7 +86,7 @@ void sub_2a123e6(void * _block) {
 
 // sub_2a12b08
 void
-_OCSSetUpCStructEnvironment() {
+OCSSetUpCStructEnvironment() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // sub_2a12b34
@@ -97,7 +97,7 @@ _OCSSetUpCStructEnvironment() {
 
 // sub_2a12b8e
 OCS_StructType *
-_OCSGetStructType(NSString *typeString) {
+OCSGetStructType(NSString *typeString) {
     NSCAssert(typeString, @"structTypeEncode && \"Get StructType With typeName NULL\"");
     
     __block OCS_StructType *st = NULL;
@@ -230,9 +230,9 @@ int sub_2a12ca2(int arg0) {
  */
 
 OCS_Struct *
-_OCSCreateRValueStruct(NSString *type) {
+OCSCreateRValueStruct(NSString *type) {
     OCS_Struct* r = malloc(sizeof(OCS_Struct));
-    OCS_StructType *st = _OCSGetStructType(type);
+    OCS_StructType *st = OCSGetStructType(type);
     r->structType = st;
     r->type = OCSStrucValueTypeR;
     r->value = malloc([st->typeStruct totalSize]);
@@ -240,9 +240,9 @@ _OCSCreateRValueStruct(NSString *type) {
 }
 
 OCS_Struct *
-_OCSCreateRValueStructWithData(NSString *type, const void *data) {
+OCSCreateRValueStructWithData(NSString *type, const void *data) {
     OCS_Struct* r = malloc(sizeof(OCS_Struct));
-    OCS_StructType *st = _OCSGetStructType(type);
+    OCS_StructType *st = OCSGetStructType(type);
     
     void *buf = malloc([st->typeStruct totalSize]);
     memcpy(buf, data, [st->typeStruct totalSize]);
@@ -253,9 +253,9 @@ _OCSCreateRValueStructWithData(NSString *type, const void *data) {
 }
 
 OCS_Struct *
-_OCSCreateLValueStruct(NSString *type, void *data) {
+OCSCreateLValueStruct(NSString *type, void *data) {
     OCS_Struct* r = malloc(sizeof(OCS_Struct));
-    OCS_StructType *st = _OCSGetStructType(type);
+    OCS_StructType *st = OCSGetStructType(type);
     r->structType = st;
     r->type = OCSStrucValueTypeL;
     r->value = data;
@@ -333,7 +333,7 @@ int sub_2a12e24(int arg0, int arg1) {
 
 // sub_2a11118
 void
-_OCSDestroyStruct(OCS_Struct *s) {
+OCSDestroyStruct(OCS_Struct *s) {
     NSCAssert(s, @"s && \"Destroy NULL OCSStruct\"");
     if (s->type == OCSStrucValueTypeR) {
         free(s->value);
@@ -343,7 +343,7 @@ _OCSDestroyStruct(OCS_Struct *s) {
 }
 
 void
-_OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Struct *s, OCSStrucValueType valueType) {
+OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Struct *s, OCSStrucValueType valueType) {
     OCSTypeStruct *ts = d->structType->typeStruct;
     OCSTypyCommon *typeC = [ts memberStructSizeValues][idx];
     void *r8 = &(d->value[typeC.startIndex]);
@@ -368,7 +368,7 @@ _OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Struct *s, OCSStrucValueType val
 
 
 void
-_OCSGetFieldValue(OCS_Struct *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {}
+OCSGetFieldValue(OCS_Struct *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {}
 
 
 
@@ -380,7 +380,7 @@ _OCSGetFieldValue(OCS_Struct *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueTyp
 
 // sub_2a1344e
 void
-_initAppImagebase() {
+initAppImagebase() {
     NSString *mainBundleName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     //Get count of all currently loaded DYLD
     uint32_t count = _dyld_image_count();
@@ -456,9 +456,9 @@ loc_2a13514:
 
 // sub_2a13760
 void
-_OCSSetUpEnvironment() {
-    _OCSSetUpCStructEnvironment();
-    _OCSSetUpCFunctionEnvironment();
+OCSSetUpEnvironment() {
+    OCSSetUpCStructEnvironment();
+    OCSSetUpCFunctionEnvironment();
 }
 
 /*

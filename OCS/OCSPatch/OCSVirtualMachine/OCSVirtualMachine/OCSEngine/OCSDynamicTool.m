@@ -9,14 +9,14 @@
 #import "OCSDynamicTool.h"
 #import "OCSVM_code.h"
 
-const static void *_OCSSpecialStructPropertyCached = &_OCSSpecialStructPropertyCached;
+const static void *OCSSpecialStructPropertyCached = &OCSSpecialStructPropertyCached;
 
 void
-_OCSDynamicClassGetSetInvocation(id target, NSInvocation* invocation) {
+OCSDynamicClassGetSetInvocation(id target, NSInvocation* invocation) {
     NSMethodSignature *signature = [invocation methodSignature];
     NSString *selStr = NSStringFromSelector([invocation selector]);
     Class cls = [target class];
-    NSDictionary *associated =  objc_getAssociatedObject(cls, _OCSSpecialStructPropertyCached);
+    NSDictionary *associated =  objc_getAssociatedObject(cls, OCSSpecialStructPropertyCached);
     
     const char *name = [associated[selStr] UTF8String];
     Ivar ivar = class_getInstanceVariable(cls, name);
@@ -48,7 +48,7 @@ _OCSDynamicClassGetSetInvocation(id target, NSInvocation* invocation) {
             return;
         }
         
-        _OCSCreateRValueStructWithData(rType, );        
+        OCSCreateRValueStructWithData(rType, );        
     }
     else {
 //        malloc(<#size_t __size#>)
