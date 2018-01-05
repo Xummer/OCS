@@ -910,9 +910,21 @@ int sub_2a0e360(int arg0) {
 }
 */
 
+void
+_cleanLocalStruct(OCS_Struct *s, void *context) {
+    OCSDestroyStruct(s, context);
+}
+
+int
+OCSVirtualMachineDirCallWithArr() {
+    // TODO
+}
+
+
+
 // sub_2a1111e
 void
-virtualMachineRegisterCStruct(OCS_VirtualMachine *vm) {
+_virtualMachineRegisterCStruct(OCS_VirtualMachine *vm) {
     NSCAssert(vm, @"vm && \"Register CStruct on NULL OCSVirtualMachine\"");
     NSCAssert(vm->currentFrame, @"vm->currentFrame && \"OCSVirtualMachine Frame is NULL\"");
     CFArrayAppendValue(vm->currentFrame->arrCStruct, <#const void *value#>)
@@ -949,7 +961,7 @@ int sub_2a1111e(int arg0) {
 */
 
 // sub_2a113de
-void getObjectStructIvar() {
+void _getObjectIvar() {
 
 }
 
@@ -999,9 +1011,63 @@ int sub_2a113de(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
 }
  */
 
-// sub_2a11474
 void
-sub_2a11474() {}
+_setObjectIvar() {}
+
+void
+_getObjectStructIvar() {}
+
+// sub_2a11474
+// in JSPatch
+// static id callSelector(NSString *className, NSString *selectorName, JSValue *arguments, JSValue *instance, BOOL isSuper)
+void
+_messageSendN(int arg0, int arg1, id target, SEL selector, BOOL isSuper, int arg5, int arg6) {
+    NSMethodSignature *signature = [target methodSignatureForSelector:selector];
+    if (signature) {
+        // loc_35574e
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+        invocation.target = target;
+        
+        SEL sel = selector;
+        if (isSuper) {
+            // ??
+            Class superCls = class_getSuperclass(NSClassFromString((arg1->0xc)->0x1c));
+            if (superCls) {
+                superCls = [target superclass];
+            }
+            
+            SEL superSelector =
+            NSSelectorFromString([NSString stringWithFormat:@"=OCS_SUPER=%@=%@",
+                                  NSStringFromClass(superCls),
+                                  NSStringFromSelector(selector)]);
+            Method superMethod = class_getInstanceMethod(superCls, selector);
+            IMP superIMP = method_getImplementation(superMethod);
+            
+            class_addMethod([target class], superSelector, superIMP, method_getTypeEncoding(superMethod));
+            
+            sel = superSelector;
+        }
+        
+        invocation.selector = sel;
+        
+        // loc_35585a
+        if (2 >= signature.numberOfArguments) {
+            // loc_355aaa
+            [invocation invoke];
+            
+        }
+        else {
+            // loc_355868
+        }
+    }
+    else {
+        // loc_355c5a
+        NSString *reason = [NSString stringWithFormat:@"[%@ %@]: unrecognized selector sent to instance %p", [target class], NSStringFromSelector(selector), &target];
+        @throw [NSException exceptionWithName:@"NSInvalidArgumentException" reason:reason userInfo:nil];
+    }
+    
+    
+}
 
 /*
 int sub_2a11474(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6) {
@@ -1484,7 +1550,7 @@ loc_2a11a44:
 
 // sub_2a11ad0
 void
-sub_2a11ad0() {}
+_messageSend_var() {}
 
 /*
 int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
@@ -1583,7 +1649,7 @@ int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int 
 
 // sub_2a11c56
 void
-sub_2a11c56() {}
+_messageSendStructToNilReceiver() {}
 
 /*
 int sub_2a11c56(int arg0, int arg1, int arg2) {
@@ -1607,6 +1673,35 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
     return 0x11;
 }
  */
+
+void
+_dynamicCastToBool() {}
+
+void
+_dynamicCastToChar() {}
+
+void
+_dynamicCastToShort() {}
+
+void
+_dynamicCastToInt() {}
+
+void
+_dynamicCastToLong() {}
+
+void
+_dynamicCastToFloat() {}
+
+void
+_dynamicCastToDouble() {}
+
+void
+_init_OCS_FFiBuff() {}
+
+void
+_clearFFiBuff() {}
+
+
 
 // sub_2a13770
 void
