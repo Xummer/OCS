@@ -371,6 +371,8 @@ void
 OCSGetFieldValue(OCS_Struct *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {}
 
 
+void
+getFfi_typeForCharType(const char type) {}
 
 // sub_2a1264e
 //CGRect

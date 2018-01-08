@@ -19,7 +19,7 @@ OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
         // XTest: 记得释放
         OCS_Executable *exe = malloc(sizeof(OCS_Executable));
         
-        // loc_2a137f2
+        // loc_2a137f2 | loc_35c106
         exe->fileName = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)fileName);
         
         const char *bytes = [data bytes];
@@ -37,7 +37,7 @@ OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
             //                (*(uint16_t *)(bytes + 4) == 0) &&
             //                (*(uint16_t *)(bytes + 6) == 0x2))
         {
-            //loc_2a13878:
+            //loc_2a13878: | loc_35c1b0
             if (OCS2BYTE_FROM(8) == 0x20) {
                 // loc_2a13886
                 OCSLog(@"OCSExecutableCreate:fileName(%s),classNameOffset(%d)", [fileName UTF8String], 0xc);
@@ -309,10 +309,11 @@ OCSExecutableCreate(NSString *fileName, NSData *data, NSUInteger* errorCode) {
                     
                 }
                 
-                // loc_2a13c42
+                // loc_2a13c42 | loc_35c68e
                 int32_t codeOffset /*r4*/ = OCS4BYTE_FROM(clsLen+0x15);
                 int32_t codeCount /*r5*/ = OCS4BYTE_FROM(codeOffset);
                 CFMutableDictionaryRef codesDict = CFDictionaryCreateMutable(CFAllocatorGetDefault(), codeCount, &kCFTypeDictionaryKeyCallBacks, 0);
+            OCSLog(@"OCSExecutableCreate:fileName(%s),codeBlockNameOffset(%d),codeBlockNameLength(%d)", [fileName UTF8String], codeOffset, codeCount);
                 
                 if (codeCount > 0) {
                     // loc_2a13c80

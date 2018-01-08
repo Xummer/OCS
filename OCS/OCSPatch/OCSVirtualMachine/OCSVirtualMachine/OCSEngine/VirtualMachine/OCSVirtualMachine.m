@@ -7,6 +7,8 @@
 //
 
 #import "OCSVM_code.h"
+#import "OCSStructTypeParser.h"
+#import "ffi.h"
 
 #define STACK_CELL_SIZE     12 // 64 bit 2^4 = 16
 
@@ -924,10 +926,10 @@ OCSVirtualMachineDirCallWithArr() {
 
 // sub_2a1111e
 void
-_virtualMachineRegisterCStruct(OCS_VirtualMachine *vm) {
+_virtualMachineRegisterCStruct(OCS_VirtualMachine *vm, OCS_Struct *st) {
     NSCAssert(vm, @"vm && \"Register CStruct on NULL OCSVirtualMachine\"");
     NSCAssert(vm->currentFrame, @"vm->currentFrame && \"OCSVirtualMachine Frame is NULL\"");
-    CFArrayAppendValue(vm->currentFrame->arrCStruct, <#const void *value#>)
+    CFArrayAppendValue(vm->currentFrame->arrCStruct, st);
 }
 
 /*
@@ -1021,7 +1023,7 @@ _getObjectStructIvar() {}
 // in JSPatch
 // static id callSelector(NSString *className, NSString *selectorName, JSValue *arguments, JSValue *instance, BOOL isSuper)
 void
-_messageSendN(int arg0, int arg1, id target, SEL selector, BOOL isSuper, int arg5, int arg6) {
+_messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, int arg5, NSString *arg6) {
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
     if (signature) {
         // loc_35574e
@@ -1031,8 +1033,8 @@ _messageSendN(int arg0, int arg1, id target, SEL selector, BOOL isSuper, int arg
         SEL sel = selector;
         if (isSuper) {
             // ??
-            Class superCls = class_getSuperclass(NSClassFromString((arg1->0xc)->0x1c));
-            if (superCls) {
+            Class superCls = class_getSuperclass(NSClassFromString((vm->currentFrame)->codeBlock->clsName));
+            if (!superCls) {
                 superCls = [target superclass];
             }
             
@@ -1054,7 +1056,53 @@ _messageSendN(int arg0, int arg1, id target, SEL selector, BOOL isSuper, int arg
         if (2 >= signature.numberOfArguments) {
             // loc_355aaa
             [invocation invoke];
+            const char *returnType = [methodSignature methodReturnType];
+            // r 0x72
+            char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
             
+            // [ 0x5d
+            if (rType > '[') {
+                // loc_355b06
+                // v 0x63
+                if (rType > 'c') {
+                    // loc_355b42
+                    
+                    // ^ 0x5e
+                    if (rType == '^') {
+                        // loc_355c2c
+                        // loc_355c32
+                        [invocation getReturnValue:]
+                    }
+                    // { 0x7b
+                    else if (rType == '{') {
+                        // loc_355b46
+                        OCS_Struct *st = OCSCreateRValueStruct(arg6);
+                        [invocation getReturnValue:st->value];
+                        _virtualMachineRegisterCStruct(vm, st);
+                    }
+                    else {
+                        [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
+                    }
+                }
+                else {
+                    // loc_355b0e
+                    
+                    goto *0x355b12[r1];
+                }
+            }
+            // H 0x48
+            else if (rType > 'H') {
+                // loc_355b2e
+            }
+            // C 0x43
+            else if (rType > 'C') {
+                // loc_355b70
+            }
+            else {
+                // loc_355af0
+                
+                goto *0x355af4[r1];
+            }
         }
         else {
             // loc_355868
@@ -1550,7 +1598,39 @@ loc_2a11a44:
 
 // sub_2a11ad0
 void
-_messageSend_var() {}
+_messageSend_var(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, int arg5) {
+    _init_OCS_FFiBuff(vm);
+    
+    if (isSuper) {
+        // ??
+        Class superCls = class_getSuperclass(NSClassFromString((vm->currentFrame)->codeBlock->clsName));
+        if (!superCls) {
+            superCls = [target superclass];
+        }
+        
+        SEL superSelector =
+        NSSelectorFromString([NSString stringWithFormat:@"=OCS_SUPER=%@=%@",
+                              NSStringFromClass(superCls),
+                              NSStringFromSelector(selector)]);
+        Method superMethod = class_getInstanceMethod(superCls, selector);
+        IMP superIMP = method_getImplementation(superMethod);
+        
+        class_addMethod([target class], superSelector, superIMP, method_getTypeEncoding(superMethod));
+    }
+    ffi_cif cif;
+    ffi_status ffiPrepStatus = ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, (unsigned int)0, (unsigned int)argCount, returnFfiType, ffiArgTypes);
+    if (ffiPrepStatus == FFI_OK) {
+        IMP msgForwardIMP = _objc_msgForward;
+#if !defined(__arm64__)
+        
+#endif
+        ffi_call(&cif, functionPtr, returnPtr, ffiArgs);
+
+    }
+    
+    _clearFFiBuff()
+    
+}
 
 /*
 int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8) {
@@ -1649,7 +1729,20 @@ int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int 
 
 // sub_2a11c56
 void
-_messageSendStructToNilReceiver() {}
+_messageSendStructToNilReceiver(int arg0, OCS_VirtualMachine *vm, NSString *arg2) {
+    OCS_Struct *s = OCSCreateRValueStruct(arg2);
+    OCS_StructType *st = s->structType;
+    memset(value, 0, [s->typeStruct totalSize]);
+    _virtualMachineRegisterCStruct(vm, s);
+    
+    
+    // TODO
+    /*
+     *arg0 = 0x11;
+     *(arg0 + 0x4) = r6;
+     *(arg0 + 0x8) = 0x0;
+     */
+}
 
 /*
 int sub_2a11c56(int arg0, int arg1, int arg2) {
@@ -1696,7 +1789,26 @@ void
 _dynamicCastToDouble() {}
 
 void
-_init_OCS_FFiBuff() {}
+_init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, int arg3, const char * memEncode, int arg5) {
+    
+    // TODO
+    
+    NSArray *arrComponents = [OCSStructTypeParser componentsOfMembersEncode:[NSString stringWithUTF8String:memEncode]];
+    
+    for (int i = 0; i < arg1->0x0 ; ++i) {
+        const char *cstr = [[arrComponents objectAtIndexedSubscript:i] UTF8String];
+        
+        if (cstr == '{') {
+            [?? my_ffi_type];
+        }
+        else {
+            getFfi_typeForCharType(cstr);
+        }
+    }
+    
+    
+    
+}
 
 void
 _clearFFiBuff() {}

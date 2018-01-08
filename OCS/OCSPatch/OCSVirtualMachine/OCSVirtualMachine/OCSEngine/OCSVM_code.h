@@ -114,27 +114,28 @@ typedef struct {
         OCS_Protocol*   c_protocol;
         OCS_Char*       c_cString;
     } u;
-} OCS_ConstantPool;
+} OCS_ConstantPool; // |64 0x18
 
 typedef struct OCS_Executable_t {
     int32_t constPoolCount; // +0x0
-    OCS_ConstantPool *constPool; // +0x4
-    size_t size; // +0x8
-    void *methodNames; // +0xc
+    OCS_ConstantPool *constPool; // +0x4    |65 +0x8
+    size_t size; // +0x8    |64 +0x10
+    void *methodNames; // +0xc  |65 +0x18
     CFMutableDictionaryRef dictCodes;// +0x10 // <CFString, OCS_CodeBlock*>
-    CFStringRef fileName; // +0x14
+    CFStringRef fileName; // +0x14  |64 + 0x26
     CFStringRef clsName; // +0x18
 } OCS_Executable ; // 0x1c
 
 typedef struct {
     size_t codeSize; // +0x0
-    const char *buf; // +0x4
+    const char *buf; // +0x4    |64 +0x8
     int32_t constPoolCount; // +0x8
     OCS_ConstantPool *constPool; // +0xc
     int32_t localVarCount;  // +0x10     |64 +0x20
-    int32_t stackSize; // +0x14     |64 +0x30
-    CFStringRef method; // +0x18  -|initWithModel:param:|@@:@@
-} OCS_CodeBlock; // 0x1c
+    int32_t stackSize; // +0x14     |64 +0x28
+    CFStringRef method; // +0x18  -|initWithModel:param:|@@:@@  |64 +0x30
+    CFStringRef clsName; // | +0x1c
+} OCS_CodeBlock; // 0x1c |64 +0x40
 
 typedef struct OCS_StackBlock_t {
     struct OCS_StackBlock_t *prev; // +0x0
@@ -190,12 +191,12 @@ static dispatch_queue_t exeClassNameTablesQueue; // *0x367d1fc | *0x720678
 static NSMutableDictionary *codeBlockCache; // *0x367d200 <className, OCS_CodeBlock*> | *0x720684
 static dispatch_queue_t classMethodBlockQueue; // | *0x720680
 
-static CFMutableDictionaryRef dictCFunction; // *0x367d208
-static CFMutableDictionaryRef dict_367d20c; // *0x367d20c
-static CFMutableDictionaryRef dict_367d210; // *0x367d210
+static CFMutableDictionaryRef dictCFunction; // *0x367d208 | *0x72068c
+static CFMutableDictionaryRef dict_367d20c; // *0x367d20c | *0x720690
+static CFMutableDictionaryRef dict_367d210; // *0x367d210 | *0x720694
 static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c | *0x7206a0
 static CFMutableDictionaryRef dictStructType; // *0x367d220 | *0x7206a4
-static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214
+static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214 | *0x720698
 
 static NSMutableDictionary *OCSOverrideClsMethodNameDic; // *0x367d22c <NSString * className, <NSMutableDictionary <NSString * methodName (-|init|@:), ??> *> overrideMethods> | *0x7206c4
 static dispatch_queue_t classMethodNameReadWriteQueue; // *00x367d228 | *0x7206c0
