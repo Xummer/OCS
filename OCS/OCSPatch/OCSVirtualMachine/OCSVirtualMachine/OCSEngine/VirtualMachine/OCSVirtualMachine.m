@@ -1059,12 +1059,223 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
             const char *returnType = [methodSignature methodReturnType];
             // r 0x72
             char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
-            
+
+            int eType = 0;
+
+            switch(rType) {
+                case '#': // Class
+                {
+                    // loc_355c24
+                    eType = 0xd;
+                    // loc_355c32
+
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+
+                }
+                    break;
+                case '*': // char *
+                {
+                    // loc_355b78
+                    // r4: (sp+0x20)OR 0x4
+                    // loc_355bd2
+                    eType = 0x10;
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case ':': // SEL
+                {
+                    // loc_355afe
+                    eType = 0xf;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case '@': // id
+                {
+                    // loc_355baa
+                    eType = 0xe;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'B': // bool
+                {
+                    // loc_355b26
+                    eType = 0x1;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'C': // usigned char
+                {
+                    // loc_355bb2
+                    eType = 0x2;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'I': // unsigned int
+                {
+                    // loc_355c14
+                    eType = 0x6;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'L': // unsigned long
+                {
+                    // loc_355b3a
+                    eType = 0x8;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'Q': // unsigned long long
+                {
+                    // loc_355c1c
+                    eType = 0xa;
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                }
+                    break;
+                case 'S': // unsigned short
+                {
+                    // loc_355b88
+                    eType = 0x4;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+
+                case '^': // pointer
+                {
+                    // loc_355c2c
+                    eType = 0x10;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'c': // char
+                {
+                    // loc_355b26
+                    eType = 0x1;
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+
+                }
+                    break;
+                case 'd': // double
+                {
+                    // loc_355bba
+                    eType = 0xc;
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                }
+                    break;
+                case 'f': // float
+                {
+                    // loc_355be6
+                    eType = 0xb;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'i': // int
+                {
+                    // loc_355bee
+                    eType = 0x5;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'l': // long
+                {
+                    // loc_355bf6
+                    eType = 0x7;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'q': // long long
+                {
+                    // loc_355bfe
+                    eType = 0x9;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 's': // short
+                {
+                    // loc_355c06
+                    eType = 0x3;
+                    // loc_355c32
+                    // r2: (sp+0x20)OR 0x4
+                    [invocation getReturnValue:];
+                    // loc_355c42
+                }
+                    break;
+                case 'v': // void
+                {
+                    // loc_355c0e
+                    eType = 0;
+                    // loc_355c42
+                }
+                    break;
+                case '{': // struct
+                {
+                    // loc_355b46
+                    eType = 0x11;
+                    OCS_Struct *st = OCSCreateRValueStruct(arg6);
+                    [invocation getReturnValue:st->value];
+                    _virtualMachineRegisterCStruct(vm, st);
+                }
+                    break;
+                default:
+                {
+                    // loc_355b90
+                    [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
+                }
+                    break;
+
+            }
+
+
+        /*
             // [ 0x5d
             if (rType > '[') {
                 // loc_355b06
-                // v 0x63
-                if (rType > 'c') {
+                // rType - 0x63
+                // v 0x63 + 0x13
+                if (rType > 'v') {
                     // loc_355b42
                     
                     // ^ 0x5e
@@ -1081,31 +1292,504 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                         _virtualMachineRegisterCStruct(vm, st);
                     }
                     else {
+                        // loc_355b90
                         [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
                     }
                 }
                 else {
                     // loc_355b0e
-                    
-                    goto *0x355b12[r1];
+                    // rType - 0x63
+                    switch (rType) {
+                        // tb 0x0a
+                        case 'c': // 0x63 0
+                        {
+                            // loc_355b26
+                        }
+                            break;
+                        // tb 0x54
+                        case 'd': // 0x64 1
+                        {
+                            // loc_355bba
+                        }
+                            break;
+                       // // tb 0x3f
+                       // // tb 2 dup (0x3f)
+                       // // 4  5
+                       // // 67 68
+                       // // g  h
+                       // // tb 2 dup (0x3f)
+                       // // 7  8
+                       // // 6a 6b
+                       // // j  k
+                       // case 'e': // 0x65 2
+                       // case 'g':
+                       // case 'h':
+                       // {
+                       //     // loc_355b90
+                       // }
+                       //     break;
+                        // tb 0x6a
+                        case 'f': // 0x66 3
+                        {
+                            // loc_355be6
+                        }
+                            break;
+                        // tb 0x6e
+                        case 'i': // 0x69 6
+                        {
+                            // loc_355bee
+                        }
+                            break;
+                        // tb 0x72
+                        case 'l': // 0x6c 9
+                        {
+                            // loc_355bf6
+                        }
+                            break;
+                        // tb 0x76
+                        case 'q': // 0x71 14
+                        {
+                            // loc_355bfe
+                        }
+                            break;
+                        // tb 0x7a
+                        case 's': // 0x73 16
+                        {
+                            // loc_355c06
+                        }
+                            break;
+                        // tb 0x7e
+                        case 'v': // 0x76 19
+                        {
+                            // loc_355c0e
+                        }
+                            break;
+                        default:
+                        {
+                            // loc_355b90
+                        }
+                            break;
+                    }
                 }
             }
             // H 0x48
             else if (rType > 'H') {
                 // loc_355b2e
+                // 0x50
+                if (rType > 0x50) {
+                    // loc_355b80
+                    // 0x51 Q
+                    if (rType == 'Q') {
+                        // loc_355c1c
+                    }
+                    // 0x53 S
+                    else if (rType == 'S') {
+                        // loc_355b88
+                    }
+                    else {
+                        // loc_355b90
+                    }
+                }
+                else {
+                    // loc_355b32
+                    // 0x49 I
+                    if (rType == 'I') {
+                        // loc_355c14
+                    }
+                    // 0x4c L
+                    else if (rType == 'L') {
+                        // loc_355b3a
+                    }
+                    else {
+                        // loc_355b90
+                    }
+                    
+                }
             }
             // C 0x43
             else if (rType > 'C') {
                 // loc_355b70
+                if (rType == '#') {
+                    // loc_355c24
+                }
+                else if (rType == '*') {
+                    // loc_355b78
+                }
+                else {
+                    // loc_355b90
+                }
             }
             else {
                 // loc_355af0
-                
-                goto *0x355af4[r1];
+                // rType - 0x3a
+                switch (rType) {
+                    // tb 0x05
+                    case ':': // 0x3a 0
+                    {
+                        // loc_355afe
+                    }
+                        break;
+                   // // tb 5 dup (0x4e)
+                   // // 1  2  3  4  5
+                   // // 3b 3c 3d 3e 3f
+                   // // ;  <  =  >  ?
+                   // case ';':
+                   // case '<':
+                   // case '=':
+                   // case '>':
+                   // case '?': // 0x3f
+                   // case 'A': // 0x41
+                   // {
+                   //     // loc_355b90
+                   // }
+                   //     break
+                    // tb 0x5b
+                    case '@': // 0x40
+                    {
+                        // loc_355baa
+                    }
+                        break;
+                    // tb 0x19
+                    case 'B': // 0x42
+                    {
+                        // loc_355b26
+                    }
+                        break;
+                    // tb 0x5f
+                    case 'C': // 0x43
+                    {
+                        // loc_355bb2
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_355b90
+                    }
+                        break;
+                }
             }
+        */
         }
         else {
             // loc_355868
+            const char *argType = [signature getArgumentTypeAtIndex:2];
+
+            char aType = argType[0] == 'r' ? argType[1] : argType[0];
+
+
+            switch(aType) {
+                case '#': // Class
+                {
+                    // loc_355956
+                }
+                    break;
+                case '*': // char *
+                {
+                    // loc_355956
+                }
+                    break;
+                case ':': // SEL
+                {
+                    // loc_355956
+                }
+                    break;
+                case '@': // id
+                {
+                    // loc_355956
+                }
+                    break;
+                case 'B': // bool
+                {
+                    // loc_35589a
+                }
+                    break;
+                case 'C': // usigned char
+                {
+                    // loc_3558d4
+                }
+                    break;
+                case 'I': // unsigned int
+                {
+                    // loc_355948
+                }
+                    break;
+                case 'L': // unsigned long
+                {
+                    // loc_3558f6
+                }
+                    break;
+                case 'Q': // unsigned long long
+                {
+                    // loc_35595e
+                }
+                    break;
+                case 'S': // unsigned short
+                {
+                    // loc_355932
+                }
+                    break;
+
+                case '^': // pointer
+                {
+                    // loc_355956
+                }
+                    break;
+                case 'c': // char
+                {
+                    // loc_3558d4
+
+                }
+                    break;
+                case 'd': // double
+                {
+                    // loc_355998
+                }
+                    break;
+                case 'f': // float
+                {
+                    // loc_3559ac
+                }
+                    break;
+                case 'i': // int
+                {
+                    // loc_355948
+                }
+                    break;
+                case 'l': // long
+                {
+                    // loc_3558f6
+                }
+                    break;
+                case 'q': // long long
+                {
+                    // loc_35595e
+                }
+                    break;
+                case 's': // short
+                {
+                    // loc_35597a
+                }
+                    break;
+                case 'v': // void
+                {
+                    // loc_355932
+                }
+                    break;
+                case '{': // struct
+                {
+                    // loc_355914
+                }
+                    break;
+                default:
+                {
+                    // loc_35597a
+                }
+                    break;
+
+            }
+
+        /*
+            // [ 0x5d
+            if (aType > '[') {
+                // loc_3558b6
+                // aType - 0x63
+                // v 0x63 + 0x13
+                if (aType > 'v') {
+                    // loc_35590c
+                    
+                    // ^ 0x5e
+                    if (aType == '^') {
+                        // loc_355956
+                    }
+                    // { 0x7b
+                    else if (aType == '{') {
+                        // loc_355914
+                    }
+                    else {
+                        // loc_35597a
+                    }
+                }
+                else {
+                    // loc_3558be 
+                    // aType - 0x63
+                    switch (aType) {
+                        // tb 0x09
+                        case 'c': // 0x63 0
+                        {
+                            // loc_3558d4
+                        }
+                            break;
+                        // tb 0x6b
+                        case 'd': // 0x64 1
+                        {
+                            // loc_355998
+                        }
+                            break;
+                       // // tb 0x5c
+                       // // tb 2 dup (0x3f)
+                       // // 4  5
+                       // // 67 68
+                       // // g  h
+                       // // tb 2 dup (0x3f)
+                       // // 7  8
+                       // // 6a 6b
+                       // // j  k
+                       // case 'e': // 0x65 2
+                       // case 'g':
+                       // case 'h':
+                       // {
+                       //     // loc_355b90
+                       // }
+                       //     break;
+                        // tb 0x75
+                        case 'f': // 0x66 3
+                        {
+                            // loc_3559ac
+                        }
+                            break;
+                        // tb 0x43
+                        case 'i': // 0x69 6
+                        {
+                            // loc_355948
+                        }
+                            break;
+                        // tb 0x1a
+                        case 'l': // 0x6c 9
+                        {
+                            // loc_3558f6
+                        }
+                            break;
+                        // tb 0x4e
+                        case 'q': // 0x71 14
+                        {
+                            // loc_35595e
+                        }
+                            break;
+                        // tb 0x5c
+                        case 's': // 0x73 16
+                        {
+                            // loc_35597a
+                        }
+                            break;
+                        // tb 0x38
+                        case 'v': // 0x76 19
+                        {
+                            // loc_355932
+                        }
+                            break;
+                        default:
+                        {
+                            // loc_35597a
+                        }
+                            break;
+                    }
+                }
+            }
+            // H 0x48
+            else if (aType > 'H') {
+                // loc_3558ea
+                // 0x50
+                if (aType > 0x50) {
+                    // loc_35592a
+                    // 0x51 Q
+                    if (aType == 'Q') {
+                        // loc_35595e
+                    }
+                    // 0x53 S
+                    else if (aType == 'S') {
+                        // loc_355932
+                    }
+                    else {
+                        // loc_35597a
+                    }
+                }
+                else {
+                    // loc_3558ee
+                    // 0x49 I
+                    if (aType == 'I') {
+                        // loc_355948
+                    }
+                    // 0x4c L
+                    else if (aType == 'L') {
+                        // loc_3558f6
+                    }
+                    else {
+                        // loc_35597a
+                    }
+                    
+                }
+            }
+            // C 0x43
+            else if (aType > 'C') {
+                // loc_355920
+                if (aType == '#') {
+                    // loc_355956
+                }
+                else if (aType == '*') {
+                    // loc_355956
+                }
+                else {
+                    // loc_35597a
+                }
+            }
+            else {
+                // loc_35588c
+                // rType - 0x3a
+                switch (aType) {
+                    // tb 0x63
+                    case ':': // 0x3a 0
+                    {
+                        // loc_355956
+                    }
+                        break;
+                   // // tb 5 dup (0x4e)
+                   // // 1  2  3  4  5
+                   // // 3b 3c 3d 3e 3f
+                   // // ;  <  =  >  ?
+                   // case ';':
+                   // case '<':
+                   // case '=':
+                   // case '>':
+                   // case '?': // 0x3f
+                   // case 'A': // 0x41
+                   // {
+                   //     // loc_355b90
+                   // }
+                   //     break
+                    // tb 0x63
+                    case '@': // 0x40
+                    {
+                        // loc_355956
+                    }
+                        break;
+                    // tb 0x05
+                    case 'B': // 0x42
+                    {
+                        // loc_35589a
+                    }
+                        break;
+                    // tb 0x22
+                    case 'C': // 0x43
+                    {
+                        // loc_3558d4
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_35597a
+                    }
+                        break;
+                }
+            }
+        */
+
+            r0: argType
+            r1: argType
+            r2: 0x2
+            r3: 
+            r4: signature
+            r5: 0x2
+            fp: selector(getArgumentTypeAtIndex:)
         }
     }
     else {
