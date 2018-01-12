@@ -319,13 +319,10 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
 
     // loc_3515c2 
-    r0: vm
-
-    // loc_2a0c080
-    // if (*(stack[2021] + 0x14) != 0x1)
+    // r0: vm
     
     if (vm->state != 0x1 /* vm + 0x14 */) {
-        // loc_2a0c0a6
+        // loc_3515dc
         //        stack[2023] = *(stack[2021] + 0x8);
         //        stack[2024] = *(stack[2021] + 0x4);
         //        r2 = stack[2024];
@@ -333,6 +330,10 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         //        r0 = stack[2023];
         //        r1 = *(r4 + 0x10) + *(r4 + 0x14);
         //        if (r3 >= r1) goto loc_2a0c126;
+
+        r0: stackBlock
+        fp: ret_addr
+
         
         OCS_StackBlock *stackBlock = vm->stackBlock;/* vm + 0x8 */ // ??
         void *sp = vm->stackPointer; /* vm + 0x4 */
@@ -375,7 +376,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         f.codeBlock = codeBlock;
         f._0x14 = argList;
 
-//        OCS_Frame *f_2014 = vm->currentFrame;
+        // OCS_Frame *f_2014 = vm->currentFrame;
         CFMutableArrayRef arrCStructs = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
         
         f.arrCStruct = arrCStructs;
