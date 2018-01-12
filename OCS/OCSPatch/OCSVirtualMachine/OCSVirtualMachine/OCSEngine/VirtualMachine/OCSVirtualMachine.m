@@ -317,6 +317,10 @@ void
 OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_ParaList* argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
+
+    // loc_3515c2 
+    r0: vm
+
     // loc_2a0c080
     // if (*(stack[2021] + 0x14) != 0x1)
     
@@ -370,7 +374,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         f.pc = 0;
         f.codeBlock = codeBlock;
         f._0x14 = argList;
-        
+
 //        OCS_Frame *f_2014 = vm->currentFrame;
         CFMutableArrayRef arrCStructs = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
         
@@ -1023,7 +1027,7 @@ _getObjectStructIvar() {}
 // in JSPatch
 // static id callSelector(NSString *className, NSString *selectorName, JSValue *arguments, JSValue *instance, BOOL isSuper)
 void
-_messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, int arg5, NSString *arg6) {
+_messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_ParaList *paraList, NSString *arg6) {
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
     if (signature) {
         // loc_35574e
@@ -1052,541 +1056,279 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
         
         invocation.selector = sel;
         
-        // loc_35585a
-        if (2 >= signature.numberOfArguments) {
-            // loc_355aaa
-            [invocation invoke];
-            const char *returnType = [methodSignature methodReturnType];
-            // r 0x72
-            char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
+        NSUInteger numberOfArguments = signature.numberOfArguments;
 
-            int eType = 0;
-
-            switch(rType) {
-                case '#': // Class
-                {
-                    // loc_355c24
-                    eType = 0xd;
-                    // loc_355c32
-
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-
-                }
-                    break;
-                case '*': // char *
-                {
-                    // loc_355b78
-                    // r4: (sp+0x20)OR 0x4
-                    // loc_355bd2
-                    eType = 0x10;
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case ':': // SEL
-                {
-                    // loc_355afe
-                    eType = 0xf;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case '@': // id
-                {
-                    // loc_355baa
-                    eType = 0xe;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'B': // bool
-                {
-                    // loc_355b26
-                    eType = 0x1;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'C': // usigned char
-                {
-                    // loc_355bb2
-                    eType = 0x2;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'I': // unsigned int
-                {
-                    // loc_355c14
-                    eType = 0x6;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'L': // unsigned long
-                {
-                    // loc_355b3a
-                    eType = 0x8;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'Q': // unsigned long long
-                {
-                    // loc_355c1c
-                    eType = 0xa;
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                }
-                    break;
-                case 'S': // unsigned short
-                {
-                    // loc_355b88
-                    eType = 0x4;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-
-                case '^': // pointer
-                {
-                    // loc_355c2c
-                    eType = 0x10;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'c': // char
-                {
-                    // loc_355b26
-                    eType = 0x1;
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-
-                }
-                    break;
-                case 'd': // double
-                {
-                    // loc_355bba
-                    eType = 0xc;
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                }
-                    break;
-                case 'f': // float
-                {
-                    // loc_355be6
-                    eType = 0xb;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'i': // int
-                {
-                    // loc_355bee
-                    eType = 0x5;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'l': // long
-                {
-                    // loc_355bf6
-                    eType = 0x7;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'q': // long long
-                {
-                    // loc_355bfe
-                    eType = 0x9;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 's': // short
-                {
-                    // loc_355c06
-                    eType = 0x3;
-                    // loc_355c32
-                    // r2: (sp+0x20)OR 0x4
-                    [invocation getReturnValue:];
-                    // loc_355c42
-                }
-                    break;
-                case 'v': // void
-                {
-                    // loc_355c0e
-                    eType = 0;
-                    // loc_355c42
-                }
-                    break;
-                case '{': // struct
-                {
-                    // loc_355b46
-                    eType = 0x11;
-                    OCS_Struct *st = OCSCreateRValueStruct(arg6);
-                    [invocation getReturnValue:st->value];
-                    _virtualMachineRegisterCStruct(vm, st);
-                }
-                    break;
-                default:
-                {
-                    // loc_355b90
-                    [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
-                }
-                    break;
-
-            }
-
-
-        /*
-            // [ 0x5d
-            if (rType > '[') {
-                // loc_355b06
-                // rType - 0x63
-                // v 0x63 + 0x13
-                if (rType > 'v') {
-                    // loc_355b42
-                    
-                    // ^ 0x5e
-                    if (rType == '^') {
-                        // loc_355c2c
-                        // loc_355c32
-                        [invocation getReturnValue:]
-                    }
-                    // { 0x7b
-                    else if (rType == '{') {
-                        // loc_355b46
-                        OCS_Struct *st = OCSCreateRValueStruct(arg6);
-                        [invocation getReturnValue:st->value];
-                        _virtualMachineRegisterCStruct(vm, st);
-                    }
-                    else {
-                        // loc_355b90
-                        [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
-                    }
-                }
-                else {
-                    // loc_355b0e
-                    // rType - 0x63
-                    switch (rType) {
-                        // tb 0x0a
-                        case 'c': // 0x63 0
-                        {
-                            // loc_355b26
-                        }
-                            break;
-                        // tb 0x54
-                        case 'd': // 0x64 1
-                        {
-                            // loc_355bba
-                        }
-                            break;
-                       // // tb 0x3f
-                       // // tb 2 dup (0x3f)
-                       // // 4  5
-                       // // 67 68
-                       // // g  h
-                       // // tb 2 dup (0x3f)
-                       // // 7  8
-                       // // 6a 6b
-                       // // j  k
-                       // case 'e': // 0x65 2
-                       // case 'g':
-                       // case 'h':
-                       // {
-                       //     // loc_355b90
-                       // }
-                       //     break;
-                        // tb 0x6a
-                        case 'f': // 0x66 3
-                        {
-                            // loc_355be6
-                        }
-                            break;
-                        // tb 0x6e
-                        case 'i': // 0x69 6
-                        {
-                            // loc_355bee
-                        }
-                            break;
-                        // tb 0x72
-                        case 'l': // 0x6c 9
-                        {
-                            // loc_355bf6
-                        }
-                            break;
-                        // tb 0x76
-                        case 'q': // 0x71 14
-                        {
-                            // loc_355bfe
-                        }
-                            break;
-                        // tb 0x7a
-                        case 's': // 0x73 16
-                        {
-                            // loc_355c06
-                        }
-                            break;
-                        // tb 0x7e
-                        case 'v': // 0x76 19
-                        {
-                            // loc_355c0e
-                        }
-                            break;
-                        default:
-                        {
-                            // loc_355b90
-                        }
-                            break;
-                    }
-                }
-            }
-            // H 0x48
-            else if (rType > 'H') {
-                // loc_355b2e
-                // 0x50
-                if (rType > 0x50) {
-                    // loc_355b80
-                    // 0x51 Q
-                    if (rType == 'Q') {
-                        // loc_355c1c
-                    }
-                    // 0x53 S
-                    else if (rType == 'S') {
-                        // loc_355b88
-                    }
-                    else {
-                        // loc_355b90
-                    }
-                }
-                else {
-                    // loc_355b32
-                    // 0x49 I
-                    if (rType == 'I') {
-                        // loc_355c14
-                    }
-                    // 0x4c L
-                    else if (rType == 'L') {
-                        // loc_355b3a
-                    }
-                    else {
-                        // loc_355b90
-                    }
-                    
-                }
-            }
-            // C 0x43
-            else if (rType > 'C') {
-                // loc_355b70
-                if (rType == '#') {
-                    // loc_355c24
-                }
-                else if (rType == '*') {
-                    // loc_355b78
-                }
-                else {
-                    // loc_355b90
-                }
-            }
-            else {
-                // loc_355af0
-                // rType - 0x3a
-                switch (rType) {
-                    // tb 0x05
-                    case ':': // 0x3a 0
-                    {
-                        // loc_355afe
-                    }
-                        break;
-                   // // tb 5 dup (0x4e)
-                   // // 1  2  3  4  5
-                   // // 3b 3c 3d 3e 3f
-                   // // ;  <  =  >  ?
-                   // case ';':
-                   // case '<':
-                   // case '=':
-                   // case '>':
-                   // case '?': // 0x3f
-                   // case 'A': // 0x41
-                   // {
-                   //     // loc_355b90
-                   // }
-                   //     break
-                    // tb 0x5b
-                    case '@': // 0x40
-                    {
-                        // loc_355baa
-                    }
-                        break;
-                    // tb 0x19
-                    case 'B': // 0x42
-                    {
-                        // loc_355b26
-                    }
-                        break;
-                    // tb 0x5f
-                    case 'C': // 0x43
-                    {
-                        // loc_355bb2
-                    }
-                        break;
-                    default:
-                    {
-                        // loc_355b90
-                    }
-                        break;
-                }
-            }
-        */
-        }
-        else {
-            // loc_355868
-            const char *argType = [signature getArgumentTypeAtIndex:2];
-
+        // loc_355868
+        for (NSUInteger index = 2; index < numberOfArguments; index++) {
+            const char *argType = [signature getArgumentTypeAtIndex:index];
             char aType = argType[0] == 'r' ? argType[1] : argType[0];
+            int argIdx = index - 2;
 
+            OCSValueTag eValueTag = paraList[argIdx].vTag;
 
             switch(aType) {
                 case '#': // Class
-                {
-                    // loc_355956
-                }
-                    break;
                 case '*': // char *
-                {
-                    // loc_355956
-                }
-                    break;
                 case ':': // SEL
-                {
-                    // loc_355956
-                }
-                    break;
                 case '@': // id
+                case '^': // pointer
+
                 {
                     // loc_355956
+
+                    // r0: arg5->0x4
+
+                    // loc_35595a
+                    // var_28: arg5->0x4
+                    var_28 = paraList[argIdx].arg;
+
+                    // loc_355aa0
+
                 }
                     break;
                 case 'B': // bool
                 {
                     // loc_35589a
+                    // r0: 0x0
+                    // var_28: 0x0
+                    if (eValueTag == OCSVTagChar) {
+                        // r0: arg5[argIdx]->0x4
+                        // if (paraList[argIdx].arg) {
+                        //     r0: 1
+                        // }
+                        // else {
+                        //     r0: 0
+                        // }
+                        // loc_3559fe
+                        var_28 = paraList[argIdx].arg;
+                    }
+                    else {
+                        // loc_3559f8
+                        // loc_3559fe
+                        var_28 = _dynamicCastToBool(paraList[argIdx]);
+                    }
+                    // loc_355aa0
+
                 }
                     break;
                 case 'C': // usigned char
-                {
-                    // loc_3558d4
-                }
-                    break;
-                case 'I': // unsigned int
-                {
-                    // loc_355948
-                }
-                    break;
-                case 'L': // unsigned long
-                {
-                    // loc_3558f6
-                }
-                    break;
-                case 'Q': // unsigned long long
-                {
-                    // loc_35595e
-                }
-                    break;
-                case 'S': // unsigned short
-                {
-                    // loc_355932
-                }
-                    break;
-
-                case '^': // pointer
-                {
-                    // loc_355956
-                }
-                    break;
                 case 'c': // char
                 {
                     // loc_3558d4
+                    // r0: 0x0
+                    // var_28: 0x0
 
+                    if (eValueTag == OCSVTagUChar || eValueTag == eValueTag) {
+                        var_28 = paraList[argIdx].arg;
+                    }
+                    else {
+                        var_28 = _dynamicCastToChar(paraList[argIdx]);
+                    }
+                    // loc_3559fe
+                    // loc_355aa0
+                }
+                    break;
+                case 'I': // unsigned int
+                case 'i': // int
+                {
+                    // loc_355948
+                    if (eValueTag == OCSVTagUInt || eValueTag == OCSVTagInt) {
+                        var_28 = paraList[argIdx].arg;
+                    }
+                    else {
+                        var_28 = _dynamicCastToInt(paraList[argIdx].arg);
+                    }
+                }
+                    break;
+                case 'L': // unsigned long
+                case 'l': // long
+                {
+                    // loc_3558f6
+                    if (eValueTag == OCSVTagULong || eValueTag == OCSVTagLong) {
+                        var_28 = paraList[argIdx].arg;
+                    }
+                    else {
+                        var_28 = _dynamicCastToLong(paraList[argIdx].arg)
+                    }
+                }
+                    break;
+                case 'Q': // unsigned long long
+                case 'q': // long long
+                {
+                    // loc_35595e
+                    // r0: paraList[argIdx].vTag
+                    // var_28 = 0x0 0x0
+                    // r1: paraList[argIdx].vTag  - 0x9
+                    if (eValueTag == OCSVTagULongLong || eValueTag == OCSVTagLongLong) {
+                        // r0: paraList[argIdx].arg
+                        // r1: paraList[argIdx].arg
+                        // loc_355a9c
+                    }
+                    else {
+                        // loc_3559d2
+                        // r0: 0x0
+                        // r2: paraList[argIdx].vTag - 0x1
+                        // r3: (paraList[argIdx].vTag  - 0x1) * 0x5
+                        // r1: 0x0
+
+                        switch(paraList[argIdx].vTag) {
+                            // tb 2 dup (0x22)
+                            case OCSVTagChar: // 0x1
+                            case OCSVTagUChar: // 0x2
+                            {
+                                // loc_355a28
+                                r1 = paraList[argIdx].arg >> 0x1f
+                                // loc_355a9c
+                            }
+                                break;
+                            // tb 2 dup (0x26)
+                            case OCSVTagShort: // 0x3
+                            case OCSVTagUShort: // 0x4
+                            {
+                                // loc_355a30
+                                r1 = paraList[argIdx].arg >> 0x1f
+                                // loc_355a9c
+                            }
+                                break;
+                            // tb 4 dup (0x06)
+                            case OCSVTagInt: // 0x5
+                            case OCSVTagUInt: // 0x6
+                            case OCSVTagLong: // 0x7
+                            case OCSVTagULong: // 0x8
+                            {
+                                // loc_3559f0
+                                r1 = paraList[argIdx].arg >> 0x1f
+                                // loc_355a9c
+                            }
+                                break;
+                            // tb 2 dup (0x5c)
+                            case OCSVTagLongLong: // 0x9
+                            case OCSVTagULongLong: // 0xa
+                            {
+                                // loc_355a9c
+                            }
+                                break;
+                            // tb 0x2a
+                            case OCSVTagFloat: // 0xb
+                            {
+                                // loc_355a38
+                                _fixsfdi(paraList[argIdx].arg);
+                                // loc_355a9c
+                            }
+                                break;
+                            // tb 0x54
+                            case OCSVTagDouble: // 0xc
+                            {
+                                // loc_355a8c
+                                r0: paraList[argIdx].arg & 0xffff
+                                r1: paraList[argIdx].arg >> 0x10
+                                _fixdfdi(paraList[argIdx].arg & 0xffff);
+                                // loc_355a9c
+                            }
+                                break;
+                            default:
+                            {
+                                // loc_355a9a
+                                r1: 0x0
+                                // loc_355a9c
+                            }
+                                break;
+                            
+                        }
+
+                    }
+
+                    // strd       r0, r1, [sp, #0x48 + var_28]  
+                    var_28 = ??;
+                    // loc_355aa0
+                }
+                    break;
+                case 'S': // unsigned short
+                case 's': // short
+                {
+                    // loc_355932
+                    if (eValueTag == OCSVTagUShort || eValueTag == OCSVTagShort) {
+                        var_28 = paraList[argIdx].arg;
+                        // loc_3559be
+                        // loc_355aa0
+
+                    }
+                    else {
+                        // loc_3559c4
+                        var_28 = _dynamicCastToShort(paraList[argIdx].arg)
+                        // loc_3559c4
+                    }
                 }
                     break;
                 case 'd': // double
                 {
                     // loc_355998
+                    if (paraList[argIdx].vTag == OCSVTagDouble) {
+                        var_28 = paraList[argIdx].arg;
+                    }
+                    else {
+                        var_28 = _dynamicCastToDouble(paraList[argIdx].arg);
+                    }
                 }
                     break;
                 case 'f': // float
                 {
                     // loc_3559ac
+                    if (paraList[argIdx].vTag == OCSVTagFloat) {
+                        var_28 = paraList[argIdx].arg;
+                        // loc_355a1e
+                    }
+                    else {
+                        // loc_355a18
+                        var_28 = _dynamicCastToFloat(paraList[argIdx].arg);
+                        // loc_355a1e
+                    }
                 }
                     break;
-                case 'i': // int
-                {
-                    // loc_355948
-                }
-                    break;
-                case 'l': // long
-                {
-                    // loc_3558f6
-                }
-                    break;
-                case 'q': // long long
-                {
-                    // loc_35595e
-                }
-                    break;
-                case 's': // short
-                {
-                    // loc_35597a
-                }
-                    break;
-                case 'v': // void
-                {
-                    // loc_355932
-                }
-                    break;
+                // case 'v': // void
+                // {
+                // }
+                //     break;
                 case '{': // struct
                 {
                     // loc_355914
+                    // r0: invocation
+                    // r1: @selector(setArgument:atIndex:)
+                    // r2: st.value
+
+                    OCS_Struct* st = paraList[argIdx].arg;
+                    // st.value
+                    var_28 = st.value;
                 }
                     break;
                 default:
                 {
                     // loc_35597a
+                    [NSException raise:@"OCSCommonException" format:@"Unsupported argument type: %s", argType];
+                    // loc_355850
+
+                    // r0: @class(NSException)        
+                    // r1: @selector(raise:format:)
+                    // r2: @"OCSCommonException"
+                    // r3: @"Unsupported argument type: %s"
+                    // var_48: argType
+
                 }
                     break;
 
             }
+
+            // loc_355aa0
+            // r0: invocation
+            // r1: @selector(setArgument:atIndex:)
+            // r2: var_28
+
+            // loc_355aa6
+            // r3: index
+            // loc_355850
+            [invocation setArgument:var_28 atIndex:index];
+
+            // loc_35585a
 
         /*
             // [ 0x5d
@@ -1665,18 +1407,16 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                             // loc_35595e
                         }
                             break;
-                        // tb 0x5c
-                        case 's': // 0x73 16
-                        {
-                            // loc_35597a
-                        }
-                            break;
                         // tb 0x38
-                        case 'v': // 0x76 19
+                        case 's': // 0x73 16
                         {
                             // loc_355932
                         }
                             break;
+                        //case 'v': // 0x76 19
+                        //{
+                        //}
+                        //    break;
                         default:
                         {
                             // loc_35597a
@@ -1783,14 +1523,426 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
             }
         */
 
-            r0: argType
-            r1: argType
-            r2: 0x2
-            r3: 
-            r4: signature
-            r5: 0x2
-            fp: selector(getArgumentTypeAtIndex:)
         }
+
+        // loc_355aaa
+        [invocation invoke];
+        const char *returnType = [methodSignature methodReturnType];
+        // r 0x72
+        char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
+
+        int eType = 0;
+
+        switch(rType) {
+            case '#': // Class
+            {
+                // loc_355c24
+                eType = 0xd;
+                // loc_355c32
+
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+
+            }
+                break;
+            case '*': // char *
+            {
+                // loc_355b78
+                // r4: (sp+0x20)OR 0x4
+                // loc_355bd2
+                eType = 0x10;
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case ':': // SEL
+            {
+                // loc_355afe
+                eType = 0xf;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case '@': // id
+            {
+                // loc_355baa
+                eType = 0xe;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'B': // bool
+            {
+                // loc_355b26
+                eType = 0x1;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'C': // usigned char
+            {
+                // loc_355bb2
+                eType = 0x2;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'I': // unsigned int
+            {
+                // loc_355c14
+                eType = 0x6;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'L': // unsigned long
+            {
+                // loc_355b3a
+                eType = 0x8;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'Q': // unsigned long long
+            {
+                // loc_355c1c
+                eType = 0xa;
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+            }
+                break;
+            case 'S': // unsigned short
+            {
+                // loc_355b88
+                eType = 0x4;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+
+            case '^': // pointer
+            {
+                // loc_355c2c
+                eType = 0x10;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'c': // char
+            {
+                // loc_355b26
+                eType = 0x1;
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+
+            }
+                break;
+            case 'd': // double
+            {
+                // loc_355bba
+                eType = 0xc;
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+            }
+                break;
+            case 'f': // float
+            {
+                // loc_355be6
+                eType = 0xb;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'i': // int
+            {
+                // loc_355bee
+                eType = 0x5;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'l': // long
+            {
+                // loc_355bf6
+                eType = 0x7;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'q': // long long
+            {
+                // loc_355bfe
+                eType = 0x9;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 's': // short
+            {
+                // loc_355c06
+                eType = 0x3;
+                // loc_355c32
+                // r2: (sp+0x20)OR 0x4
+                [invocation getReturnValue:];
+                // loc_355c42
+            }
+                break;
+            case 'v': // void
+            {
+                // loc_355c0e
+                eType = 0;
+                // loc_355c42
+            }
+                break;
+            case '{': // struct
+            {
+                // loc_355b46
+                eType = 0x11;
+                OCS_Struct *st = OCSCreateRValueStruct(arg6);
+                [invocation getReturnValue:st->value];
+                _virtualMachineRegisterCStruct(vm, st);
+            }
+                break;
+            default:
+            {
+                // loc_355b90
+                [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
+            }
+                break;
+
+        }
+
+    /*
+        // [ 0x5d
+        if (rType > '[') {
+            // loc_355b06
+            // rType - 0x63
+            // v 0x63 + 0x13
+            if (rType > 'v') {
+                // loc_355b42
+                
+                // ^ 0x5e
+                if (rType == '^') {
+                    // loc_355c2c
+                    // loc_355c32
+                    [invocation getReturnValue:]
+                }
+                // { 0x7b
+                else if (rType == '{') {
+                    // loc_355b46
+                    OCS_Struct *st = OCSCreateRValueStruct(arg6);
+                    [invocation getReturnValue:st->value];
+                    _virtualMachineRegisterCStruct(vm, st);
+                }
+                else {
+                    // loc_355b90
+                    [NSException raise:@"OCSCommonException" format:@"Unsupported return type: %s", rType];
+                }
+            }
+            else {
+                // loc_355b0e
+                // rType - 0x63
+                switch (rType) {
+                    // tb 0x0a
+                    case 'c': // 0x63 0
+                    {
+                        // loc_355b26
+                    }
+                        break;
+                    // tb 0x54
+                    case 'd': // 0x64 1
+                    {
+                        // loc_355bba
+                    }
+                        break;
+                   // // tb 0x3f
+                   // // tb 2 dup (0x3f)
+                   // // 4  5
+                   // // 67 68
+                   // // g  h
+                   // // tb 2 dup (0x3f)
+                   // // 7  8
+                   // // 6a 6b
+                   // // j  k
+                   // case 'e': // 0x65 2
+                   // case 'g':
+                   // case 'h':
+                   // {
+                   //     // loc_355b90
+                   // }
+                   //     break;
+                    // tb 0x6a
+                    case 'f': // 0x66 3
+                    {
+                        // loc_355be6
+                    }
+                        break;
+                    // tb 0x6e
+                    case 'i': // 0x69 6
+                    {
+                        // loc_355bee
+                    }
+                        break;
+                    // tb 0x72
+                    case 'l': // 0x6c 9
+                    {
+                        // loc_355bf6
+                    }
+                        break;
+                    // tb 0x76
+                    case 'q': // 0x71 14
+                    {
+                        // loc_355bfe
+                    }
+                        break;
+                    // tb 0x7a
+                    case 's': // 0x73 16
+                    {
+                        // loc_355c06
+                    }
+                        break;
+                    // tb 0x7e
+                    case 'v': // 0x76 19
+                    {
+                        // loc_355c0e
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_355b90
+                    }
+                        break;
+                }
+            }
+        }
+        // H 0x48
+        else if (rType > 'H') {
+            // loc_355b2e
+            // 0x50
+            if (rType > 0x50) {
+                // loc_355b80
+                // 0x51 Q
+                if (rType == 'Q') {
+                    // loc_355c1c
+                }
+                // 0x53 S
+                else if (rType == 'S') {
+                    // loc_355b88
+                }
+                else {
+                    // loc_355b90
+                }
+            }
+            else {
+                // loc_355b32
+                // 0x49 I
+                if (rType == 'I') {
+                    // loc_355c14
+                }
+                // 0x4c L
+                else if (rType == 'L') {
+                    // loc_355b3a
+                }
+                else {
+                    // loc_355b90
+                }
+                
+            }
+        }
+        // C 0x43
+        else if (rType > 'C') {
+            // loc_355b70
+            if (rType == '#') {
+                // loc_355c24
+            }
+            else if (rType == '*') {
+                // loc_355b78
+            }
+            else {
+                // loc_355b90
+            }
+        }
+        else {
+            // loc_355af0
+            // rType - 0x3a
+            switch (rType) {
+                // tb 0x05
+                case ':': // 0x3a 0
+                {
+                    // loc_355afe
+                }
+                    break;
+               // // tb 5 dup (0x4e)
+               // // 1  2  3  4  5
+               // // 3b 3c 3d 3e 3f
+               // // ;  <  =  >  ?
+               // case ';':
+               // case '<':
+               // case '=':
+               // case '>':
+               // case '?': // 0x3f
+               // case 'A': // 0x41
+               // {
+               //     // loc_355b90
+               // }
+               //     break
+                // tb 0x5b
+                case '@': // 0x40
+                {
+                    // loc_355baa
+                }
+                    break;
+                // tb 0x19
+                case 'B': // 0x42
+                {
+                    // loc_355b26
+                }
+                    break;
+                // tb 0x5f
+                case 'C': // 0x43
+                {
+                    // loc_355bb2
+                }
+                    break;
+                default:
+                {
+                    // loc_355b90
+                }
+                    break;
+            }
+        }
+    */
+
+        // loc_355c42
+        return ??;
+
     }
     else {
         // loc_355c5a
