@@ -852,6 +852,18 @@ loc_2a0c33e:
 // sub_2a0e360
 void
 _virtualMachineEval(OCS_VirtualMachine *vm) {
+
+    00351a94         str        r0, [sp, #0x1c8 + var_17C]
+    
+    r0: @selector(numberWithFloat:)
+    r1: &@selector(UTF8String)
+    r2: &@selector(methodReturnType)
+    r3: &@selector(methodSignatureForSelector:)
+    r4: &@selector(autorelease)
+    r5: &@selector(release)
+    r6: &@selector(retain)
+    fp: vm
+
     NSCAssert(vm, @"vm && \"Eval on NULL OCSVirtualMachine\"");
     /* vm r5*/
     OCS_Frame *fp = vm->currentFrame;
