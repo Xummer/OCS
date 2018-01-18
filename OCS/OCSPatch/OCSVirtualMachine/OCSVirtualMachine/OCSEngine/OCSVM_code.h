@@ -56,7 +56,7 @@ typedef struct OCS_Char_t {
 
 typedef struct OCS_StructType_t {
     int32_t _0x0; 
-    __unsafe_unretained OCSTypeStruct *typeStruct; // +0x4
+    __unsafe_unretained OCSTypeStruct *typeStruct; // +0x4 | 64 +0x8
 } OCS_StructType;
 
 typedef NS_ENUM(NSUInteger, OCSStrucValueType) {
@@ -67,7 +67,7 @@ typedef NS_ENUM(NSUInteger, OCSStrucValueType) {
 typedef struct OCS_Struct_t {
     OCS_StructType      *structType; // +0x0
     OCSStrucValueType   type; // +0x4
-    void *              value; // +0x8
+    void *              value; // +0x8 | 64 +0x10
 } OCS_Struct; // +0xc
 
 typedef NS_ENUM(NSUInteger, OCSValueTag) {
@@ -130,7 +130,7 @@ typedef struct {
     size_t codeSize; // +0x0
     const char *buf; // +0x4    |64 +0x8
     int32_t constPoolCount; // +0x8
-    OCS_ConstantPool *constPool; // +0xc
+    OCS_ConstantPool *constPool; // +0xc |64 +0x18
     int32_t localVarCount;  // +0x10     |64 +0x20
     int32_t stackSize; // +0x14     |64 +0x28
     CFStringRef method; // +0x18  -|initWithModel:param:|@@:@@  |64 +0x30
@@ -146,7 +146,7 @@ typedef struct OCS_StackBlock_t {
 
 typedef struct OCS_Frame_t {
     struct OCS_Frame_t *back; // +0x0
-    // +0x4
+    void* localVarPointer; // +0x4 | 64 +0x8
     int32_t pc; // class +0x8   |64 +0x10
     OCS_CodeBlock *codeBlock; // +0xc   |64 +0x18
     OCS_Class *cls; // +0x10    |64 +0x20

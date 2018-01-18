@@ -551,7 +551,7 @@ OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock
         // r3: CFArrayApplyFunction
 
 
-        CFArrayApplyFunction(arrCStructs, CFRangeMake(0, CFArrayGetCount(arrCStructs)), OCSDestroyStruct, NULL);
+        CFArrayApplyFunction(arrCStructs, CFRangeMake(0, CFArrayGetCount(arrCStructs)), _cleanLocalStructs, NULL);
         CFRelease(arrCStructs);
         
         vm->state = state_2025;
@@ -853,31 +853,42 @@ loc_2a0c33e:
 void
 _virtualMachineEval(OCS_VirtualMachine *vm) {
 
-    00351a94         str        r0, [sp, #0x1c8 + var_17C]
-    
-    r0: @selector(numberWithFloat:)
-    r1: &@selector(UTF8String)
-    r2: &@selector(methodReturnType)
-    r3: &@selector(methodSignatureForSelector:)
-    r4: &@selector(autorelease)
-    r5: &@selector(release)
-    r6: &@selector(retain)
-    fp: vm
+    // r0: 0x0
+    // r1: codes->buf[pc]
+    // r2: &@selector(methodReturnType)
+    // r3: &@selector(methodSignatureForSelector:)
+    // r4: pc
+    // r5: &@selector(release)
+    // r6: codes->buf
+    // r8: codes
+    // sl: fp
+    // fp: vm
 
     NSCAssert(vm, @"vm && \"Eval on NULL OCSVirtualMachine\"");
     /* vm r5*/
     OCS_Frame *fp = vm->currentFrame;
     OCS_CodeBlock *codes = fp->codeBlock; /*sl*/
-    //  loc_2a0e50a
+    // loc_351b3e
     int32_t pc = fp->pc; /*r6*/
     /*r3 codes->buf*/
     int8_t opCode = ((int8_t)(codes->buf[pc]));
     if (opCode > 0xef) {
-        // loc_2a0ed28
+        // loc_352478
         [NSException raise:@"OCSCommonException" format:@"Invalid Opcode %d", opCode];
     }
     else {
         
+        r0: pc + 0x78 + codes->buf[fp->pc] * 4
+        r1: codes->buf[fp->pc]
+        r2: &@selector(methodReturnType)
+        r3: &@selector(methodSignatureForSelector:)
+        r4: pc
+        r5: &@selector(release)
+        r6: codes->buf
+        r8: codes
+        sl: fp
+        fp: vm
+
         // 1
         // sub_2a0e360+4038
         fp->pc = fp->pc + 1;
@@ -1020,8 +1031,340 @@ int sub_2a1111e(int arg0) {
 */
 
 // sub_2a113de
-void _getObjectIvar() {
+void
+_getObjectIvar(id obj, const char *name, void *stackPointer) {
+    
+    // r0: ivar
+    // r1: name
+    // r4: ivar
+    // r5: @selector(class)
+    // r6: obj
+    // r8: arg2
+    // sl: name
 
+    Ivar ivar = class_getInstanceVariable([obj class], name)
+    if (ivar) {
+        // 0035531e
+
+        // r0: ivar
+        // r5: offset
+
+        ptrdiff_t offset = ivar_getOffset(ivar);
+        const char *type = ivar_getTypeEncoding(ivar, offset);
+
+        switch(type) {
+            case '#': // Class
+            case '*': // char *
+            case ':': // SEL
+            case '@': // id
+            case '^': // pointer
+            {
+                // loc_3553aa
+                // r0: obj
+                // r1: ivar
+
+                id ivarObj = object_getIvar(obj, ivar);
+                *(stackPointer + 0x4) = ivarObj;
+
+                // loc_3553ea
+
+            }
+                break;
+            case 'B': // bool
+            case 'C': // usigned char
+            {
+                // loc_35536c
+                // r0: obj + offset
+                // int *ivarPtr1 = (int *)((uint8_t *)obj + ivar_getOffset(ivar1));
+                // void *pointer = (__bridge void *)object + offset;
+                *(stackPointer + 0x4) = (__bridge void *)obj + offset;
+                // loc_3553ea
+            }
+                break;
+            case 'I': // unsigned int
+            case 'L': // unsigned long
+            case 'f': // float
+            case 'i': // int
+            case 'l': // long
+            {
+                // loc_355390
+                *(stackPointer + 0x4) = (__bridge void *)obj + offset;
+                // loc_3553ea
+            }
+                break;
+            case 'Q': // unsigned long long
+            case 'q': // long long
+            {
+                // loc_355380
+                // r0: obj + offset
+                // r1: obj + offset + 0x4
+
+                *(stackPointer + 0x4) = (__bridge void *)obj + offset;
+                *(stackPointer + 0x8) = (__bridge void *)obj + offset + 0x4;
+
+                // loc_3553ea
+            }
+                break;
+            case 'S': // unsigned short
+            case 's': // short
+            {
+                // loc_3553b8
+                // r0: obj + offset
+
+                *(stackPointer + 0x4) = (__bridge void *)obj + offset;
+
+                // loc_3553ea
+
+            }
+                break;
+            case 'c': // char
+            {   
+                // loc_35536c
+
+                *(stackPointer + 0x4) = (__bridge void *)obj + offset;
+
+                // loc_3553ea
+
+            }
+                break;
+            case 'd': // double
+            {
+                // loc_3553e0
+
+                *(stackPointer + 0x4) = (__bridge void *)obj + offset;
+
+                // loc_3553ea
+            }
+                break;     
+            // case 'v': // void
+            // {
+                
+            // }
+            //     break;
+            // case '{': // struct
+            // {
+                
+            // }
+            //     break;
+            default:
+            {
+                // loc_3553c0
+                // r0: NSException
+                // r1: @selector(raise:format:)
+                // r2: @"OCSCommonException"
+                // r3: @"unsupported ivar type %s (ivar %s)"
+                // r6: NSException
+                // var_1C = ivar
+
+                [NSException raise:@"OCSCommonException" format:@"unsupported ivar type %s (ivar %s)", type, ivar]
+                
+            }
+                break;
+
+        }
+
+        /*
+            //  0x52
+            if (aType > '[') {
+                // loc_35534e
+                // aType - 0x63
+                // v 0x63 + 0x10
+                if (aType > 'v') {
+                    // loc_355398
+                    
+                    // S 0x53
+                    if (aType == 'S') {
+                        // loc_3553b8
+                    }
+                    // ^ 0x5e
+                    if (aType == '^') {
+                        // loc_3553aa
+                    }
+                    // { 0x7b
+                    //else if (aType == '{') {
+                    //    // loc_355914
+                    //}
+                    else {
+                        // loc_3553c0
+                    }
+                }
+                else {
+                    // loc_355356 
+                    // aType - 0x63
+                    switch (aType) {
+                        // tb 0x09
+                        case 'c': // 0x63 0
+                        {
+                            // loc_35536c
+                        }
+                            break;
+                        // tb 0x43
+                        case 'd': // 0x64 1
+                        {
+                            // loc_3553e0
+                        }
+                            break;
+                       // // tb 0x33
+                       // // tb 2 dup (0x3f)
+                       // // 4  5
+                       // // 67 68
+                       // // g  h
+                       // // tb 2 dup (0x3f)
+                       // // 7  8
+                       // // 6a 6b
+                       // // j  k
+                       // case 'e': // 0x65 2
+                       // case 'g':
+                       // case 'h':
+                       // {
+                       //     // loc_355b90
+                       // }
+                       //     break;
+                        // tb 0x1b
+                        case 'f': // 0x66 3
+                        {
+                            // loc_355390
+                        }
+                            break;
+                        // tb 0x1b
+                        case 'i': // 0x69 6
+                        {
+                            // loc_355390
+                        }
+                            break;
+                        // tb 0x1b
+                        case 'l': // 0x6c 9
+                        {
+                            // loc_355390
+                        }
+                            break;
+                        // tb 0x13
+                        case 'q': // 0x71 14
+                        {
+                            // loc_355380
+                        }
+                            break;
+                        // tb 0x2f
+                        case 's': // 0x73 16
+                        {
+                            // loc_3553b8
+                        }
+                            break;
+                        //case 'v': // 0x76 19
+                        //{
+                        //}
+                        //    break;
+                        default:
+                        {
+                            // loc_35597a
+                        }
+                            break;
+                    }
+                }
+            }
+            // H 0x48
+            else if (aType > 'H') {
+                // loc_355374
+                // 0x50
+                if (aType > 0x50) {
+                    // loc_35592a
+                    // 0x51 Q
+                    if (aType == 'Q') {
+                        // loc_355380
+                    }
+                    else {
+                        // loc_35597a
+                    }
+                }
+                else {
+                    // loc_3558ee
+                    // 0x49 I
+                    if (aType == 'I') {
+                        // loc_355390
+                    }
+                    // 0x4c L
+                    else if (aType == 'L') {
+                        // loc_355390
+                    }
+                    else {
+                        // loc_35597a
+                    }
+                    
+                }
+            }
+            // C 0x43
+            else if (aType > 'C') {
+                // loc_3553a2
+                if (aType == '#') {
+                    // loc_3553aa
+                }
+                else if (aType == '*') {
+                    // loc_3553aa
+                }
+                else {
+                    // loc_35597a
+                }
+            }
+            else {
+                // loc_355340
+                // rType - 0x3a
+                switch (aType) {
+                    // tb 0x33
+                    case ':': // 0x3a 0
+                    {
+                        // loc_3553aa
+                    }
+                        break;
+                   // // tb 5 dup (0x3e)
+                   // // 1  2  3  4  5
+                   // // 3b 3c 3d 3e 3f
+                   // // ;  <  =  >  ?
+                   // case ';':
+                   // case '<':
+                   // case '=':
+                   // case '>':
+                   // case '?': // 0x3f
+                   // case 'A': // 0x41
+                   // {
+                   //     // loc_3553c0
+                   // }
+                        break
+                    // tb 0x33
+                    case '@': // 0x40
+                    {
+                        // loc_3553aa
+                    }
+                        break;
+                    // tb 0x14
+                    case 'B': // 0x42
+                    {
+                        // loc_35536c
+                    }
+                        break;
+                    // tb 0x14
+                    case 'C': // 0x43
+                    {
+                        // loc_35536c
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_35597a
+                    }
+                        break;
+                }
+            }
+        */
+
+    }
+    else {
+        // loc_3553f0
+        NSString *reason =
+        [NSString stringWithFormat:@"class:%@ cannot find ivar:%s,please check", [cls class], name];
+        @throw [[NSException alloc] initWithName:@"OCSCommonException"
+                                          reason:reason
+                                        userInfo:nil];
+    }
 }
 
 /*
