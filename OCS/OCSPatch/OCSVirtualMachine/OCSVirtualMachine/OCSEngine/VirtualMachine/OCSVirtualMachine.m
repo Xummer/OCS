@@ -1042,7 +1042,7 @@ _getObjectIvar(id obj, const char *name, void *stackPointer) {
     // r8: arg2
     // sl: name
 
-    Ivar ivar = class_getInstanceVariable([obj class], name)
+    Ivar ivar = class_getInstanceVariable([obj class], name);
     if (ivar) {
         // 0035531e
 
@@ -1050,7 +1050,7 @@ _getObjectIvar(id obj, const char *name, void *stackPointer) {
         // r5: offset
 
         ptrdiff_t offset = ivar_getOffset(ivar);
-        const char *type = ivar_getTypeEncoding(ivar, offset);
+        const char *type = ivar_getTypeEncoding(ivar);
 
         switch(type) {
             case '#': // Class
@@ -1414,10 +1414,397 @@ int sub_2a113de(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5) {
  */
 
 void
-_setObjectIvar() {}
+_setObjectIvar(id obj, const char *name, void *stackPointer, NSString *typeString) {
+    // r0: ivar
+    // r1: name
+    // r4: obj
+    // r5: @selector(class)
+    // r6: ivar
+    // r8: stackPointer
+    // sl: name
+    // fp: arg3
+
+    Ivar ivar = class_getInstanceVariable([obj class], name);
+
+    if (ivar) {
+        // r0: type
+        // r5: offset
+
+        ptrdiff_t offset = ivar_getOffset(ivar);
+        const char *type = ivar_getTypeEncoding(ivar);
+
+        switch(type) {
+            case '#': // Class
+            case '*': // char *
+            case ':': // SEL
+            case '@': // id
+            case '^': // pointer
+            {
+                // loc_355542
+
+                // r0: obj
+                // r1: ivar
+                // r2: *(stackPointer + 0x4)
+
+                id value = *(stackPointer + 0x4);
+
+                object_setIvar(obj, ivar, value);
+
+            }
+                break;
+            case 'B': // bool
+            case 'C': // usigned char
+            case 'c': // char
+            {
+                // loc_3554ea
+
+                // r0: *(stackPointer + 0x4)
+                (__bridge void *)obj + offset = *(stackPointer + 0x4);
+                // loc_355596
+
+            }
+                break;
+            case 'I': // unsigned int
+            case 'L': // unsigned long
+            case 'f': // float
+            case 'i': // int
+            case 'l': // long
+            {
+                // loc_3554fe
+                (__bridge void *)obj + offset = *(stackPointer + 0x4);
+                // loc_355596
+            }
+                break;
+            case 'Q': // unsigned long long
+            case 'd': // double
+            case 'q': // long long
+            {
+                // loc_355568
+                // r0: (__bridge void *)obj + offset
+                // d16: *(stackPointer + 0x4)
+
+                (__bridge void *)obj + offset = *(stackPointer + 0x4);
+
+                // loc_355596
+
+            }
+                break;
+            case 'S': // unsigned short
+            case 's': // short
+            {
+                // loc_355560
+                (__bridge void *)obj + offset = *(stackPointer + 0x4);
+
+                // loc_355596
+            }
+                break;
+            // case 'v': // void
+            // {
+                
+            // }
+            //     break;
+            case '{': // struct
+            {
+                // loc_35550e
+                // r0: (__bridge void *)obj + offset
+                // r1: *(*(stackPointer + 0x4) + 0x8)
+                // r2: [ts totalSize]
+                // r5: offset
+                // r6: *(*(stackPointer + 0x4) + 0x8)
+
+                ptrdiff_t offset = ivar_getOffset(ivar);
+                OCS_StructType *st = OCSGetStructType(typeString);
+
+                size_t size = [st->typeStruct totalSize];
+                void *dst = (__bridge void *)obj + offset;
+                const void *src = *(*(stackPointer + 0x4) + 0x8);
+
+                memcpy(dst, src, size);
+
+                // loc_355596
+
+            }
+                break;
+            default:
+            {
+                // loc_355578
+                // r1: @selector(raise:format:)
+                // r2: @"OCSCommonException"
+                // r3: objc_cls_ref_NSException
+                // r6: NSException
+
+                [NSException raise:@"OCSCommonException" format:@"unsupported ivar type %s (self %s)", type, name];
+            }
+                break;
+
+        }
+
+        /*
+            // [ 0x5d
+            if (aType > '[') {
+                // loc_3554cc
+                // aType - 0x63
+                // v 0x63 + 0x10
+                // 0x73
+                if (aType > 0x73) {
+                    // loc_355506
+                    
+                    // ^ 0x5e
+                    if (aType == '^') {
+                        // loc_355542
+                    }
+                    // { 0x7b
+                    else if (aType == '{') {
+                        // loc_35550e
+                    }
+                    else {
+                        // loc_355578
+                    }
+                }
+                else {
+                    // loc_3554d4
+
+                    // aType - 0x63
+                    switch (aType) {
+                        // tb 0x09
+                        case 'c': // 0x63 0
+                        {
+                            // loc_3554ea
+                        }
+                            break;
+                        // tb 0x48
+                        case 'd': // 0x64 1
+                        {
+                            // loc_355568
+                        }
+                            break;
+                       // // tb 0x50
+                       // // tb 2 dup (0x3f)
+                       // // 4  5
+                       // // 67 68
+                       // // g  h
+                       // // tb 2 dup (0x3f)
+                       // // 7  8
+                       // // 6a 6b
+                       // // j  k
+                       // case 'e': // 0x65 2
+                       // case 'g':
+                       // case 'h':
+                       // {
+                       //     // loc_355578
+                       // }
+                       //     break;
+                        // tb 0x13
+                        case 'f': // 0x66 3
+                        {
+                            // loc_3554fe
+                        }
+                            break;
+                        // tb 0x13
+                        case 'i': // 0x69 6
+                        {
+                            // loc_3554fe
+                        }
+                            break;
+                        // tb 0x13
+                        case 'l': // 0x6c 9
+                        {
+                            // loc_3554fe
+                        }
+                            break;
+                        // tb 0x48
+                        case 'q': // 0x71 14
+                        {
+                            // loc_355568
+                        }
+                            break;
+                        // tb 0x44
+                        case 's': // 0x73 16
+                        {
+                            // loc_355560
+                        }
+                            break;
+                        //case 'v': // 0x76 19
+                        //{
+                        //}
+                        //    break;
+                        default:
+                        {
+                            // loc_35597a
+                        }
+                            break;
+                    }
+                }
+            }
+            // H 0x48
+            else if (aType > 'H') {
+                // loc_3554f2
+                // 0x50
+                if (aType > 0x50) {
+                    // loc_355558
+                    // 0x51 Q
+                    if (aType == 'Q') {
+                        // loc_355568
+                    }
+                    // 0x53 S
+                    else if (aType == 'S') {
+                        // loc_355560
+                    }
+                    else {
+                        // loc_35597a
+                    }
+                }
+                else {
+                    // loc_3558ee
+                    // 0x49 I
+                    if (aType == 'I') {
+                        // loc_3554fe
+                    }
+                    // 0x4c L
+                    else if (aType == 'L') {
+                        // loc_3554fe
+                    }
+                    else {
+                        // loc_355578
+                    }
+                    
+                }
+            }
+            // C 0x43
+            else if (aType > 'C') {
+                // loc_35553a
+                if (aType == '#') {
+                    // loc_355542
+                }
+                else if (aType == '*') {
+                    // loc_355542
+                }
+                else {
+                    // loc_35597a
+                }
+            }
+            else {
+                // loc_3554be
+                // rType - 0x3a
+                switch (aType) {
+                    // tb 0x40
+                    case ':': // 0x3a 0
+                    {
+                        // loc_355542
+                    }
+                        break;
+                   // // tb 5 dup (0x3b)
+                   // // 1  2  3  4  5
+                   // // 3b 3c 3d 3e 3f
+                   // // ;  <  =  >  ?
+                   // case ';':
+                   // case '<':
+                   // case '=':
+                   // case '>':
+                   // case '?': // 0x3f
+                   // case 'A': // 0x41
+                   // {
+                   //     // loc_355578
+                   // }
+                   //     break
+                    // tb 0x40
+                    case '@': // 0x40
+                    {
+                        // loc_355542
+                    }
+                        break;
+                    // tb 0x14
+                    case 'B': // 0x42
+                    {
+                        // loc_3554ea
+                    }
+                        break;
+                    // tb 0x14
+                    case 'C': // 0x43
+                    {
+                        // loc_3554ea
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_35597a
+                    }
+                        break;
+                }
+            }
+        */
+    }
+    else {
+        // loc_35559c
+
+        // r0: [NSException alloc]
+        // r1: @selector(initWithName:reason:userInfo:)
+        // r2: @"OCSCommonException"
+        // r3: reason
+        // r4: reason
+        // r6: NSString
+        // 0x0
+
+        NSString *reason = [NSString stringWithFormat:@"class:%@ cannot find ivar:%s,please check", [obj class], name];
+        @throw [[NSException alloc] initWithName:@"OCSCommonException" reason:reason userInfo:nil];
+    }
+
+}
 
 void
-_getObjectStructIvar() {}
+_getObjectStructIvar(OCS_VirtualMachine *vm, id obj, const char *name, NSString *structTypeStr, OCSStrucValueType eValueType, void *stackPointer) {
+
+    // r0: [obj class]
+    // r1: name
+    // r5: @selector(class)
+    // r6: obj
+    // r8: vm
+    // sl: arg3
+    // fp: name
+
+    Ivar ivar = class_getInstanceVariable([obj class], name);
+
+    if (ivar) {
+        // r0: type
+
+        const char *type = ivar_getTypeEncoding(ivar);
+
+        NSCAssert(type == '{', @"NO && \"IVar must be Struct Type, for scalar type, use _getObjectIvar instead.\"");
+
+        // r0: arg3
+        // r1: dst
+        // r4: ivar
+        // r5: eValueType
+        // fp: arg5
+
+        ptrdiff_t offset = ivar_getOffset(ivar);
+
+        const void *data = (__bridge void *)obj + offset;
+
+        OCS_Struct *st;
+        if (eValueType == OCSStrucValueTypeL) {
+            st = OCSCreateLValueStruct(structTypeStr, data);
+        }
+        else {
+            st = OCSCreateRValueStructWithData(structTypeStr, data);
+        }
+
+        // r0: vm
+        // r1: st
+        // r4: st
+
+        _virtualMachineRegisterCStruct(vm, st);
+        
+        *(stackPointer) = 0x11;
+        *(stackPointer + 0x4) = st;
+
+    }
+    else {
+        // loc_35568e
+        NSString *reason = [NSString stringWithFormat:@"class:%@ cannot find ivar:%s,please check", [obj class], name];
+        @throw [[NSException alloc] initWithName:@"OCSCommonException" reason:reason userInfo:nil];
+    }
+}
 
 // sub_2a11474
 // in JSPatch
