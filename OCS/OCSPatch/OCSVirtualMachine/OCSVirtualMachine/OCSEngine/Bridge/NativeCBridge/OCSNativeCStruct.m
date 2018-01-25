@@ -343,32 +343,854 @@ OCSDestroyStruct(OCS_Struct *s) {
 }
 
 void
-OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Struct *s, OCSStrucValueType valueType) {
+OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Param *s, OCSStrucValueType valueType) {
+
+    // r0: typeC.charType
+    // r1: @selector(charType)
+    // r2: arg1
+    // r4: @selector(charType)
+    // r5: arg0->value
+    // r6: typeC
+    // r8: d->value + typeC.startIndex
+    // sl: arg2
+
     OCSTypeStruct *ts = d->structType->typeStruct;
     OCSTypyCommon *typeC = [ts memberStructSizeValues][idx];
-    void *r8 = &(d->value[typeC.startIndex]);
-    switch (typeC.charType) {
-        case '^':
+    // void *r8 = &(d->value[typeC.startIndex]);
+    switch(typeC.charType) {
+        case '#': // Class
+        case '*': // char *
+        case ':': // SEL
+        case '@': // id
+        case 'I': // unsigned int
+        case 'L': // unsigned long
+        case '^': // pointer
+        case 'f': // float
+        case 'i': // int
+        case 'l': // long
         {
-            r8 = r10->_0x4;
+            // loc_357b78
+
+            // var_20: arg2->_0x4
+            // r0: arg2->_0x4
+
+            d->value[typeC.startIndex] = s->arg;
+
+            // loc_357be2
+
         }
             break;
-        case '|':
+        case 'B': // bool
+        case 'C': // usigned char
+        case 'c': // char
         {
-            [typeC totalSize];
-            memcpy(r8, <#const void *__src#>, typeC.totalSize)
+            // loc_357b2a
+            // var_20: s->arg
+            // r0: s->arg
+
+            d->value[typeC.startIndex] = s->arg;
+
+            // loc_357be2
         }
             break;
+        case 'Q': // unsigned long long
+        case 'q': // long long
+        {
+            // loc_357b9e
+
+            // var_20: s->arg, s->arg + 0x4
+            // d16: s->arg, s->arg + 0x4
+
+            // loc_357bde
+            d->value[typeC.startIndex] = s->arg, s->arg;
+
+            // loc_357be2
+
             
-        default:
+        }
             break;
+        case 'S': // unsigned short
+        case 's': // short
+        {
+            // loc_357b8c
+
+            // var_20: s->arg
+            // r0: s->arg
+
+            d->value[typeC.startIndex] = s->arg;
+
+            // loc_357be2
+
+        }
+            break;
+        case 'd': // double
+        {
+            // loc_357bd6
+
+            // var_20: s->arg;
+            // d16: s->arg;
+
+            // loc_357bde
+            d->value[typeC.startIndex] = s->arg;
+
+            // loc_357be2
+        }
+            break;
+        // case 'v': // void
+        // {
+            
+        // }
+        //     break;
+        case '{': // struct
+        {
+            // loc_357b52
+
+            r0: d->value + typeC.startIndex
+            r1: st->type
+            r2: [typeC totalSize]
+            r4: st->type
+
+            OCS_Struct* st = s->arg;
+
+            memcpy(d->value + typeC.startIndex, st->type, [typeC totalSize]);
+
+            // loc_357be2
+        }
+            break;
+        default:
+        {
+            // loc_357bb0
+            [NSException raise:@"OCSCommonException" format:@"OCSPutField Unsupported return type: %c", typeC.charType];
+
+            // loc_357be2
+            
+        }
+            break;
+
     }
+
+    /*
+            // [ 0x5d
+            if (aType > '[') {
+                // loc_357b0c
+                // aType - 0x63
+                // v 0x63 + 0x10
+                // 0x73
+                if (aType > 0x73) {
+                    // loc_357b4a
+                    
+                    // ^ 0x5e
+                    if (aType == '^') {
+                        // loc_357b78
+                    }
+                    // { 0x7b
+                    else if (aType == '{') {
+                        // loc_357b52
+                    }
+                    else {
+                        // loc_357bb0
+                    }
+                }
+                else {
+                    // loc_3554d4
+
+                    // aType - 0x63
+                    switch (aType) {
+                        // tb 0x09
+                        case 'c': // 0x63 0
+                        {
+                            // loc_357b2a
+                        }
+                            break;
+                        // tb 0x5f
+                        case 'd': // 0x64 1
+                        {
+                            // loc_357bd6
+                        }
+                            break;
+                       // // tb 0x4c
+                       // // tb 2 dup (0x3f)
+                       // // 4  5
+                       // // 67 68
+                       // // g  h
+                       // // tb 2 dup (0x3f)
+                       // // 7  8
+                       // // 6a 6b
+                       // // j  k
+                       // case 'e': // 0x65 2
+                       // case 'g':
+                       // case 'h':
+                       // {
+                       //     // loc_357d1c
+                       // }
+                       //     break;
+                        // tb 0x30
+                        case 'f': // 0x66 3
+                        {
+                            // loc_357b78
+                        }
+                            break;
+                        // tb 0x30
+                        case 'i': // 0x69 6
+                        {
+                            // loc_357b78
+                        }
+                            break;
+                        // tb 0x30
+                        case 'l': // 0x6c 9
+                        {
+                            // loc_357b78
+                        }
+                            break;
+                        // tb 0x43
+                        case 'q': // 0x71 14
+                        {
+                            // loc_357b9e
+                        }
+                            break;
+                        // tb 0x3a
+                        case 's': // 0x73 16
+                        {
+                            // loc_357b8c
+                        }
+                            break;
+                        //case 'v': // 0x76 19
+                        //{
+                        //}
+                        //    break;
+                        default:
+                        {
+                            // loc_35597a
+                        }
+                            break;
+                    }
+                }
+            }
+            // H 0x48
+            else if (aType > 'H') {
+                // loc_357b3c
+                // 0x50
+                if (aType > 0x50) {
+                    // loc_357b84
+                    // 0x51 Q
+                    if (aType == 'Q') {
+                        // loc_357b9e
+                    }
+                    // 0x53 S
+                    else if (aType == 'S') {
+                        // loc_357b8c
+                    }
+                    else {
+                        // loc_357bb0
+                    }
+                }
+                else {
+                    // loc_3558ee
+                    // 0x49 I
+                    if (aType == 'I') {
+                        // loc_357b78
+                    }
+                    // 0x4c L
+                    else if (aType == 'L') {
+                        // loc_357b78
+                    }
+                    else {
+                        // loc_357bb0
+                    }
+                    
+                }
+            }
+            // C 0x43
+            else if (aType > 'C') {
+                // loc_357b70
+                if (aType == '#') {
+                    // loc_357b78
+                }
+                else if (aType == '*') {
+                    // loc_357b78
+                }
+                else {
+                    // loc_357bb0
+                }
+            }
+            else {
+                // loc_357c7
+                // rType - 0x3a
+                switch (aType) {
+                    // tb 0x3b
+                    case ':': // 0x3a 0
+                    {
+                        // loc_357b78
+                    }
+                        break;
+                   // // tb 5 dup (0x57)
+                   // // 1  2  3  4  5
+                   // // 3b 3c 3d 3e 3f
+                   // // ;  <  =  >  ?
+                   // case ';':
+                   // case '<':
+                   // case '=':
+                   // case '>':
+                   // case '?': // 0x3f
+                   // case 'A': // 0x41
+                   // {
+                   //     // loc_357bb0
+                   // }
+                   //     break
+                    // tb 0x3b
+                    case '@': // 0x40
+                    {
+                        // loc_357b78
+                    }
+                        break;
+                    // tb 0x14
+                    case 'B': // 0x42
+                    {
+                        // loc_357b2a
+                    }
+                        break;
+                    // tb 0x14
+                    case 'C': // 0x43
+                    {
+                        // loc_357b2a
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_357b2a
+                    }
+                        break;
+                }
+            }
+        */
     
 }
 
 
 void
-OCSGetFieldValue(OCS_Struct *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {}
+OCSGetFieldValue(OCS_Param *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {
+
+    // var_1C: arg0
+
+    // r0: typeC.charType
+    // r1: 0xffff0000
+    // r2: 0x330c68
+    // r4: @selector(charType)
+    // r5: typeC
+    // r6: s->value + typeC.startIndex
+    // r8: s->value
+    // fp: arg3
+    // sl: 0x00000000
+
+    OCSTypeStruct *ts = s->structType->typeStruct;
+
+    OCSTypyCommon *typeC = [ts memberStructSizeValues][ idx ];
+
+
+
+    switch(typeC.charType) {
+        case '#': // Class
+        {
+            // loc_357db8
+
+            // r0: 0x23
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x23);
+
+            // loc_357dca
+            // r4: 0x0
+
+
+        }
+            break;
+        case '*': // char *
+        {
+            // loc_357cfe
+            // r0: 0x2a
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x2a);
+
+            // loc_357dca
+            // r4: 0x0
+
+        }
+            break;
+        case ':': // SEL
+        {
+            // loc_357c8a
+            // r0: 0x3a
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x3a);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case '@': // id
+        {
+            // loc_357d44
+            // r0: 0x40
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x40);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'B': // bool
+        {
+            // loc_357d4c
+            // r0: 0x42
+            // sl: s->value[ typeC.startIndex ] & 0xff
+
+            // loc_357dc6
+            // r0: valueTag(0x42);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'C': // usigned char
+        {
+            // loc_357d5a
+            // r0: 0x43
+            // sl: s->value[ typeC.startIndex ] & 0xff
+
+            // loc_357dc6
+            // r0: valueTag(0x43);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'I': // unsigned int
+        {
+            // loc_357da2
+            // r0: 0x49
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x49);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'L': // unsigned long
+        {
+            // loc_357cca
+            // r0: 0x4c
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x43);
+
+            // loc_357dca
+            // r4: 0x0
+
+            // loc_357dcc
+        }
+            break;
+        case 'Q': // unsigned long long
+        {
+            // loc_357daa
+            // r0: 0x51
+            // r4: s->value[ typeC.startIndex + 0x4 ]
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357db2
+            // r0: valueTag(0x51);
+
+            // loc_357dcc
+        }
+            break;
+        case 'S': // unsigned short
+        {
+            // loc_357d0e
+            // r0: 0x53
+            // r1: 0x0 &  0xffff0000
+            // sl: s->value[ typeC.startIndex ] | (0x0 &  0xffff0000)
+            // loc_357dc6
+            // r0: valueTag(0x53);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+
+        case '^': // pointer
+        {
+            // loc_357dc0
+            // r0: 0x5e
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x5e);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'c': // char
+        {
+            // loc_357cb0
+            // r0: 0x63
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x63);
+
+            // loc_357dca
+            // r4: 0x0
+
+        }
+            break;
+        case 'd': // double
+        {
+            // loc_357d68
+            // r0: 0x64
+            // r4: s->value[ typeC.startIndex + 0x4 ]
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357db2
+            // r0: valueTag(0x64);
+
+            // loc_357dcc
+        }
+            break;
+        case 'f': // float
+        {
+            // loc_357d72
+            // r0: 0x66
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x66);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'i': // int
+        {
+            // loc_357d7a
+            // r0: 0x69
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x69);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'l': // long
+        {
+            // loc_357d82
+            // r0: 0x6c
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357dc6
+            // r0: valueTag(0x6c);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        case 'q': // long long
+        {
+            // loc_357d8a
+            // r0: 0x71
+            // r4: s->value[ typeC.startIndex + 0x4 ]
+            // sl: s->value[ typeC.startIndex ]
+
+            // loc_357db2
+            // r0: valueTag(0x71);
+
+            // loc_357dcc
+        }
+            break;
+        case 's': // short
+        {
+            // loc_357d94
+            // r0: 0x73
+            // r1: 0x0 &  0xffff0000
+            // sl: s->value[ typeC.startIndex ] | (0x0 &  0xffff0000)
+            // loc_357dc6
+            // r0: valueTag(0x73);
+
+            // loc_357dca
+            // r4: 0x0
+        }
+            break;
+        // case 'v': // void
+        // {
+            
+        // }
+        //     break;
+        case '{': // struct
+        {
+            // loc_357cda
+
+            // r0: [typeC encode]
+            // r1: @selector(encode)
+
+            // [typeC encode]
+
+            if (valueType == OCSStrucValueTypeR) {
+                // loc_357ddc
+                // r0: st->value
+                // r1: s->value + typeC.startIndex
+                // r2: [typeC totalSize]
+                // r4: st->value
+                // sl: st
+
+                OCS_Struct *st = OCSCreateRValueStruct([typeC encode]);
+                memcpy(st->value, s->value + typeC.startIndex, [typeC totalSize]);
+
+                // loc_357dfc
+            }
+            else {
+                // 357cec
+
+                // r1: s->value + typeC.startIndex
+                // sl: st
+
+                OCS_Struct *st = OCSCreateLValueStruct([typeC encode], s->value + typeC.startIndex);
+
+                // loc_357dfc
+            }
+
+            // loc_357dfc
+            // r0: 0x11
+            // r4: 0x0
+
+            // loc_357dcc
+
+
+            
+        }
+            break;
+        default:
+        {
+            [NSException raise:@"OCSCommonException" format:@"OCSGetFieldValue Unsupported return type: %c", typeC.charType];
+            
+        }
+            break;
+    }
+
+    /*
+            // [ 0x5d
+            if (aType > '[') {
+                // loc_357c92
+                // aType - 0x63
+                // v 0x63 + 0x10
+                // 0x73
+                if (aType > 0x73) {
+                    // loc_357cd2
+                    
+                    // ^ 0x5e
+                    if (aType == '^') {
+                        // loc_357dc0
+                    }
+                    // { 0x7b
+                    else if (aType == '{') {
+                        // loc_357cda
+                    }
+                    else {
+                        // loc_357d1c
+                    }
+                }
+                else {
+                    // loc_3554d4
+
+                    // aType - 0x63
+                    switch (aType) {
+                        // tb 0x09
+                        case 'c': // 0x63 0
+                        {
+                            // loc_357cb0
+                        }
+                            break;
+                        // tb 0x65
+                        case 'd': // 0x64 1
+                        {
+                            // loc_357d68
+                        }
+                            break;
+                       // // tb 0x3f
+                       // // tb 2 dup (0x3f)
+                       // // 4  5
+                       // // 67 68
+                       // // g  h
+                       // // tb 2 dup (0x3f)
+                       // // 7  8
+                       // // 6a 6b
+                       // // j  k
+                       // case 'e': // 0x65 2
+                       // case 'g':
+                       // case 'h':
+                       // {
+                       //     // loc_357d1c
+                       // }
+                       //     break;
+                        // tb 0x6a
+                        case 'f': // 0x66 3
+                        {
+                            // loc_357d72
+                        }
+                            break;
+                        // tb 0x6e
+                        case 'i': // 0x69 6
+                        {
+                            // loc_357d7a
+                        }
+                            break;
+                        // tb 0x72
+                        case 'l': // 0x6c 9
+                        {
+                            // loc_357d82
+                        }
+                            break;
+                        // tb 0x76
+                        case 'q': // 0x71 14
+                        {
+                            // loc_357d8a
+                        }
+                            break;
+                        // tb 0x7b
+                        case 's': // 0x73 16
+                        {
+                            // loc_357d94
+                        }
+                            break;
+                        //case 'v': // 0x76 19
+                        //{
+                        //}
+                        //    break;
+                        default:
+                        {
+                            // loc_35597a
+                        }
+                            break;
+                    }
+                }
+            }
+            // H 0x48
+            else if (aType > 'H') {
+                // loc_357cbe
+                // 0x50
+                if (aType > 0x50) {
+                    // loc_357d06
+                    // 0x51 Q
+                    if (aType == 'Q') {
+                        // loc_357daa
+                    }
+                    // 0x53 S
+                    else if (aType == 'S') {
+                        // loc_357d0e
+                    }
+                    else {
+                        // loc_357d1c
+                    }
+                }
+                else {
+                    // loc_3558ee
+                    // 0x49 I
+                    if (aType == 'I') {
+                        // loc_357da2
+                    }
+                    // 0x4c L
+                    else if (aType == 'L') {
+                        // loc_357cca
+                    }
+                    else {
+                        // loc_357d1c
+                    }
+                    
+                }
+            }
+            // C 0x43
+            else if (aType > 'C') {
+                // loc_357cf6
+                if (aType == '#') {
+                    // loc_357db8
+                }
+                else if (aType == '*') {
+                    // loc_357cfe
+                }
+                else {
+                    // loc_35597a
+                }
+            }
+            else {
+                // loc_357c7
+                // rType - 0x3a
+                switch (aType) {
+                    // tb 0x05
+                    case ':': // 0x3a 0
+                    {
+                        // loc_357c8a
+                    }
+                        break;
+                   // // tb 5 dup (0x4e)
+                   // // 1  2  3  4  5
+                   // // 3b 3c 3d 3e 3f
+                   // // ;  <  =  >  ?
+                   // case ';':
+                   // case '<':
+                   // case '=':
+                   // case '>':
+                   // case '?': // 0x3f
+                   // case 'A': // 0x41
+                   // {
+                   //     // loc_357d1c
+                   // }
+                   //     break
+                    // tb 0x62
+                    case '@': // 0x40
+                    {
+                        // loc_357d44
+                    }
+                        break;
+                    // tb 0x66
+                    case 'B': // 0x42
+                    {
+                        // loc_357d4c
+                    }
+                        break;
+                    // tb 0x6d
+                    case 'C': // 0x43
+                    {
+                        // loc_357d5a
+                    }
+                        break;
+                    default:
+                    {
+                        // loc_35597a
+                    }
+                        break;
+                }
+            }
+        */
+
+
+    // loc_357dcc
+
+    // r1: arg0
+
+    d->vTag = r0;
+    d->arg = sl;
+    d->arg + 0x4 = r4;
+}
 
 
 void

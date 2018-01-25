@@ -74,9 +74,9 @@ JPForwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation
         // loc_35f486
         
         NSUInteger uiArgCount = numberOfArguments - 2;
-        OCS_ParaList *paraList = NULL;
+        OCS_Param *paraList = NULL;
         if (numberOfArguments > 3) {
-            size_t size = (offsetof(OCS_ParaList, arg) + sizeof(OCS_Struct)) * uiArgCount; //r1 + r1 * (2 << 2);
+            size_t size = (offsetof(OCS_Param, arg) + sizeof(OCS_Struct)) * uiArgCount; //r1 + r1 * (2 << 2);
             paraList = malloc(size);
             memset(paraList, 0, size);
         }

@@ -314,7 +314,7 @@ int sub_2a0bf7e(int arg0) {
 
 // sub_2a0c01c
 void
-OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_ParaList* argList) {
+OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_Param* argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
 
@@ -1810,7 +1810,7 @@ _getObjectStructIvar(OCS_VirtualMachine *vm, id obj, const char *name, NSString 
 // in JSPatch
 // static id callSelector(NSString *className, NSString *selectorName, JSValue *arguments, JSValue *instance, BOOL isSuper)
 void
-_messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_ParaList *paraList, NSString *arg6) {
+_messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_Param *paraList, NSString *arg6) {
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
     if (signature) {
         // loc_35574e
@@ -3436,7 +3436,7 @@ _clearFFiBuff() {}
 
 // sub_2a13770
 void
-OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_ParaList* argList) {
+OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_Param* argList) {
     OCS_CodeBlock *codeBlock = OCSGetCodeBlock(className, methodName);
     OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
     OCSVirtualMachineExecuteWithArr(vm, codeBlock, returnVal, argList);

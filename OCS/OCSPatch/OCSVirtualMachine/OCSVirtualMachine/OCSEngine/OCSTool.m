@@ -10,7 +10,7 @@
 #import "OCSVM_code.h"
 
 OCSValueTag
-_valueTag(char typeEncode) {
+valueTag(char typeEncode) {
     OCSValueTag t;
     switch (typeEncode) {
 #define OCS_VTAG_FROM_ENCODE_CASE(_typeChar, _tag) \
