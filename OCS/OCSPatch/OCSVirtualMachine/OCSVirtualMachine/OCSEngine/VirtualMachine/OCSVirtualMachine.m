@@ -314,7 +314,7 @@ int sub_2a0bf7e(int arg0) {
 
 // sub_2a0c01c
 void
-OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_Param* argList) {
+OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_Value* argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
 
@@ -1810,7 +1810,7 @@ _getObjectStructIvar(OCS_VirtualMachine *vm, id obj, const char *name, NSString 
 // in JSPatch
 // static id callSelector(NSString *className, NSString *selectorName, JSValue *arguments, JSValue *instance, BOOL isSuper)
 void
-_messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_Param *paraList, NSString *arg6) {
+_messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_Value *paraList, NSString *arg6) {
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
     if (signature) {
         // loc_35574e
@@ -1919,7 +1919,7 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                         var_28 = paraList[argIdx].arg;
                     }
                     else {
-                        var_28 = _dynamicCastToInt(paraList[argIdx].arg);
+                        var_28 = _dynamicCastToInt(paraList[argIdx]);
                     }
                 }
                     break;
@@ -1931,7 +1931,7 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                         var_28 = paraList[argIdx].arg;
                     }
                     else {
-                        var_28 = _dynamicCastToLong(paraList[argIdx].arg)
+                        var_28 = _dynamicCastToLong(paraList[argIdx])
                     }
                 }
                     break;
@@ -1995,7 +1995,7 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                             case OCSVTagFloat: // 0xb
                             {
                                 // loc_355a38
-                                _fixsfdi(paraList[argIdx].arg);
+                                __fixsfdi(paraList[argIdx].arg);
                                 // loc_355a9c
                             }
                                 break;
@@ -2005,7 +2005,7 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                                 // loc_355a8c
                                 r0: paraList[argIdx].arg & 0xffff
                                 r1: paraList[argIdx].arg >> 0x10
-                                _fixdfdi(paraList[argIdx].arg & 0xffff);
+                                __fixdfdi(paraList[argIdx].arg & 0xffff);
                                 // loc_355a9c
                             }
                                 break;
@@ -2038,7 +2038,7 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                     }
                     else {
                         // loc_3559c4
-                        var_28 = _dynamicCastToShort(paraList[argIdx].arg)
+                        var_28 = _dynamicCastToShort(paraList[argIdx])
                         // loc_3559c4
                     }
                 }
@@ -2050,7 +2050,7 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
                         var_28 = paraList[argIdx].arg;
                     }
                     else {
-                        var_28 = _dynamicCastToDouble(paraList[argIdx].arg);
+                        var_28 = _dynamicCastToDouble(paraList[argIdx]);
                     }
                 }
                     break;
@@ -2507,6 +2507,12 @@ _messageSendN(int arg0, OCS_VirtualMachine *vm, id target, SEL selector, BOOL is
             case '{': // struct
             {
                 // loc_355b46
+                r0: invocation
+                r1: @selector(getReturnValue:)
+                r2: st->value
+                r4: st
+
+                // var_28
                 eType = 0x11;
                 OCS_Struct *st = OCSCreateRValueStruct(arg6);
                 [invocation getReturnValue:st->value];
@@ -3347,13 +3353,20 @@ int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int 
  */
 
 // sub_2a11c56
-void
-_messageSendStructToNilReceiver(int arg0, OCS_VirtualMachine *vm, NSString *arg2) {
+OCS_Value *
+_messageSendStructToNilReceiver(OCS_VirtualMachine *vm, NSString *arg2) {
     OCS_Struct *s = OCSCreateRValueStruct(arg2);
     OCS_StructType *st = s->structType;
-    memset(value, 0, [s->typeStruct totalSize]);
+    memset(s->value, 0, [s->typeStruct totalSize]);
     _virtualMachineRegisterCStruct(vm, s);
     
+    OCS_Value *param;
+
+    param->vTag = OCSVTagStruct;
+    param->arg = s;
+    param->arg + 0x4 = 0x0;
+
+    return param;
     
     // TODO
     /*
@@ -3387,7 +3400,68 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
  */
 
 void
-_dynamicCastToBool() {}
+_dynamicCastToBool(OCS_Value *ocsValue) {
+
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+
+        }
+            break;
+        default:
+        {
+            return
+        }
+            break;
+    }
+
+    // r1: *(arg0) - 0x1
+
+    if (*(arg0) - 0x1 > 0xb) {
+        // r0: 0x0
+
+    }
+    else {
+        switch (*(arg0) - 0x1) {
+            case 0: 
+            case 1: {
+                // 0x08 0x355f40
+
+                r7: r0 << 18 & r0
+                
+            }
+                break;
+            case 2:
+            case 3: {
+                // 0x0a 0x355f44
+            }
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7: {
+                // 0x06 0x355f3c
+            }
+                break;
+            case 8:
+            case 9: {
+                // 0x0f 0x355f4e
+            }
+                break;
+            case 0xa: {
+                // 0x15 0x355f5a
+            }
+                break;
+            case 0xb: {
+                // 0x1d 0x355f6a
+            }
+                break;
+        }
+    }
+
+
+}
 
 void
 _dynamicCastToChar() {}
@@ -3436,7 +3510,7 @@ _clearFFiBuff() {}
 
 // sub_2a13770
 void
-OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_Param* argList) {
+OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_Value* argList) {
     OCS_CodeBlock *codeBlock = OCSGetCodeBlock(className, methodName);
     OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
     OCSVirtualMachineExecuteWithArr(vm, codeBlock, returnVal, argList);

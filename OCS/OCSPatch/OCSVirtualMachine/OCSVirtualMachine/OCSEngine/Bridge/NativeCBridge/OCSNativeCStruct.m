@@ -343,7 +343,7 @@ OCSDestroyStruct(OCS_Struct *s) {
 }
 
 void
-OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Param *s, OCSStrucValueType valueType) {
+OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType valueType) {
 
     // r0: typeC.charType
     // r1: @selector(charType)
@@ -668,7 +668,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Param *s, OCSStrucValueType value
 
 
 void
-OCSGetFieldValue(OCS_Param *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {
+OCSGetFieldValue(OCS_Value *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {
 
     // var_1C: arg0
 
