@@ -343,7 +343,7 @@ OCSDestroyStruct(OCS_Struct *s) {
 }
 
 void
-OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType valueType) {
+OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_ObjCValue *s, OCSStrucValueType valueType) {
 
     // r0: typeC.charType
     // r1: @selector(charType)
@@ -374,7 +374,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
             // var_20: arg2->_0x4
             // r0: arg2->_0x4
 
-            d->value[typeC.startIndex] = s->arg;
+            d->value[typeC.startIndex] = s->value;
 
             // loc_357be2
 
@@ -388,7 +388,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
             // var_20: s->arg
             // r0: s->arg
 
-            d->value[typeC.startIndex] = s->arg;
+            d->value[typeC.startIndex] = s->value;
 
             // loc_357be2
         }
@@ -402,7 +402,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
             // d16: s->arg, s->arg + 0x4
 
             // loc_357bde
-            d->value[typeC.startIndex] = s->arg, s->arg;
+            d->value[typeC.startIndex] = s->value, s->value;
 
             // loc_357be2
 
@@ -417,7 +417,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
             // var_20: s->arg
             // r0: s->arg
 
-            d->value[typeC.startIndex] = s->arg;
+            d->value[typeC.startIndex] = s->value;
 
             // loc_357be2
 
@@ -431,7 +431,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
             // d16: s->arg;
 
             // loc_357bde
-            d->value[typeC.startIndex] = s->arg;
+            d->value[typeC.startIndex] = s->value;
 
             // loc_357be2
         }
@@ -450,7 +450,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
             r2: [typeC totalSize]
             r4: st->type
 
-            OCS_Struct* st = s->arg;
+            OCS_Struct* st = s->value;
 
             memcpy(d->value + typeC.startIndex, st->type, [typeC totalSize]);
 
@@ -668,7 +668,7 @@ OCSPutField(OCS_Struct *d, NSUInteger idx, OCS_Value *s, OCSStrucValueType value
 
 
 void
-OCSGetFieldValue(OCS_Value *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {
+OCSGetFieldValue(OCS_ObjCValue *d, OCS_Struct *s, NSUInteger idx, OCSStrucValueType valueType) {
 
     // var_1C: arg0
 

@@ -314,7 +314,7 @@ int sub_2a0bf7e(int arg0) {
 
 // sub_2a0c01c
 void
-OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_Value* argList) {
+OCSVirtualMachineExecuteWithArr(OCS_VirtualMachine* vm, OCS_CodeBlock* codeBlock, OCS_ReturnValue *returnVal, OCS_ObjCValue* argList) {
     NSCAssert(vm, @"vm && \"Execute on NULL OCSVirtualMachine\"");
     NSCAssert(codeBlock, @"codeBlock && \"Execute NULL OCSCodeBlock\"");
 
@@ -982,7 +982,7 @@ int sub_2a0e360(int arg0) {
 
 void
 _cleanLocalStruct(OCS_Struct *s, void *context) {
-    OCSDestroyStruct(s, context);
+    OCSDestroyStruct(s);
 }
 
 int
@@ -1810,7 +1810,7 @@ _getObjectStructIvar(OCS_VirtualMachine *vm, id obj, const char *name, NSString 
 // in JSPatch
 // static id callSelector(NSString *className, NSString *selectorName, JSValue *arguments, JSValue *instance, BOOL isSuper)
 void
-_messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_Value *paraList, NSString *arg6) {
+_messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS_ObjCValue *paraList, NSString *arg6) {
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
     if (signature) {
         // loc_35574e
@@ -3353,14 +3353,14 @@ int sub_2a11ad0(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int 
  */
 
 // sub_2a11c56
-OCS_Value *
+OCS_ObjCValue *
 _messageSendStructToNilReceiver(OCS_VirtualMachine *vm, NSString *arg2) {
     OCS_Struct *s = OCSCreateRValueStruct(arg2);
     OCS_StructType *st = s->structType;
     memset(s->value, 0, [s->typeStruct totalSize]);
     _virtualMachineRegisterCStruct(vm, s);
     
-    OCS_Value *param;
+    OCS_ObjCValue *param;
 
     param->vTag = OCSVTagStruct;
     param->arg = s;
@@ -3400,7 +3400,7 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
  */
 
 void
-_dynamicCastToBool(OCS_Value *ocsValue) {
+_dynamicCastToBool(OCS_ObjCValue *ocsValue) {
 
     switch (ocsValue->vTag) {
         case OCSVTagChar:
@@ -3510,7 +3510,7 @@ _clearFFiBuff() {}
 
 // sub_2a13770
 void
-OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_Value* argList) {
+OCSRunWithParaList(NSString *className, NSString *methodName, OCS_ReturnValue * returnVal, OCS_ObjCValue* argList) {
     OCS_CodeBlock *codeBlock = OCSGetCodeBlock(className, methodName);
     OCS_VirtualMachine *vm = OCSGetCurrentThreadVirtualMachine();
     OCSVirtualMachineExecuteWithArr(vm, codeBlock, returnVal, argList);

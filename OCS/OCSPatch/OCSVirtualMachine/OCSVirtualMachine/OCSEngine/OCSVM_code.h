@@ -70,6 +70,28 @@ typedef struct OCS_Struct_t {
     void *              value; // +0x8 | 64 +0x10
 } OCS_Struct; // +0xc
 
+/*
+enum _NSObjCValueType {
+    NSObjCNoType = 0,
+    NSObjCVoidType = 'v',
+    NSObjCCharType = 'c',
+    NSObjCShortType = 's',
+    NSObjCLongType = 'l',
+    NSObjCLonglongType = 'q',
+    NSObjCFloatType = 'f',
+    NSObjCDoubleType = 'd',
+    NSObjCBoolType = 'B',
+    NSObjCSelectorType = ':',
+    NSObjCObjectType = '@',
+    NSObjCStructType = '{',
+    NSObjCPointerType = '^',
+    NSObjCStringType = '*',
+    NSObjCArrayType = '[',
+    NSObjCUnionType = '(',
+    NSObjCBitfield = 'b'
+} API_DEPRECATED("Not supported", macos(10.0,10.5), ios(2.0,2.0), watchos(2.0,2.0), tvos(9.0,9.0));
+ */
+
 typedef NS_ENUM(NSUInteger, OCSValueTag) {
     OCSVTagVoid = 0,    // 0x0 'v'
     OCSVTagChar,        // 0x1 'c'
@@ -91,11 +113,29 @@ typedef NS_ENUM(NSUInteger, OCSValueTag) {
     OCSVTagStruct,      // 0x11 '{'
 };
 
-typedef struct OCS_Value_t {
-    OCSValueTag vTag; //
-    OCS_Struct* arg; // +0x4 |64 + 0x8
-    // +0x8
-} OCS_Value;
+//typedef struct OCS_Value_t {
+//    OCSValueTag vTag; //
+//    OCS_Struct* arg; // +0x4 |64 + 0x8
+//    // +0x8
+//} OCS_Value;
+
+typedef struct {
+    OCSValueTag type;
+    union {
+        char charValue;
+        short shortValue;
+        long longValue;
+        long long longlongValue;
+        float floatValue;
+        double doubleValue;
+        bool boolValue;
+        SEL selectorValue;
+        id objectValue;
+        void *pointerValue;
+        void *structLocation;
+        char *cStringLocation;
+    } value; // +0x4 |64 + 0x8
+} OCS_ObjCValue;
 
 typedef struct OCS_ReturnValue_t {
     char typeEncode; // +0x0
@@ -151,7 +191,7 @@ typedef struct OCS_Frame_t {
     int32_t pc; // class +0x8   |64 +0x10
     OCS_CodeBlock *codeBlock; // +0xc   |64 +0x18
     OCS_Class *cls; // +0x10    |64 +0x20
-    OCS_Value *paramList; // +0x14 |64 +0x28
+    OCS_ObjCValue *paramList; // +0x14 |64 +0x28
     CFArrayRef arrCStruct; // +0x18 CStruct
 } OCS_Frame; // 0x39c
 
@@ -226,7 +266,7 @@ OCSGetExecutable(NSString *executableName, NSUInteger *errorCode);
 
 // sub_2a11118
 void
-OCSDestroyStruct(OCS_Struct *s, void *context);
+OCSDestroyStruct(OCS_Struct *s);
 
 // sub_2a137d4
 OCS_Executable*
