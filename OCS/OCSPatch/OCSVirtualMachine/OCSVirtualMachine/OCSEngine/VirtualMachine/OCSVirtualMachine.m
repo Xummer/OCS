@@ -3495,7 +3495,7 @@ _init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, int arg3, const ch
             [?? my_ffi_type];
         }
         else {
-            getFfi_typeForCharType(cstr);
+            ffi_type *ffiType = getFfi_typeForCharType(cstr);
         }
     }
     

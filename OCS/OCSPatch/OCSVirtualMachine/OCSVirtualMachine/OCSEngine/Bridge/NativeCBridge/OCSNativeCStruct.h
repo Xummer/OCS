@@ -9,6 +9,8 @@
 #ifndef OCSNativeCStruct_h
 #define OCSNativeCStruct_h
 
+#import "ffi.h"
+
 void
 OCSSetUpEnvironment();
 
