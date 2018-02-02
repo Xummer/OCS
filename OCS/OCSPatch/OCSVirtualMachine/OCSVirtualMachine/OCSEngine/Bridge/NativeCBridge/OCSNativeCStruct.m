@@ -39,9 +39,9 @@ OCSSetUpCFunctionEnvironment() {
         CFDictionaryAddValue(dictRef, @"__CGSizeApplyAffineTransform", &__CGSizeApplyAffineTransform);
         CFDictionaryAddValue(dictRef, @"__CGPointApplyAffineTransform", &__CGPointApplyAffineTransform);
         CFDictionaryAddValue(dictRef, @"__CGAffineTransformMake", &__CGAffineTransformMake);
-        dictCFunction = dictRef;
-        dict_367d20c = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
-        dict_367d210 = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
+        dictInlineCFunction = dictRef;
+        dictAppCFunction = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
+        dictAppCVar = CFDictionaryCreateMutable(CFAllocatorGetDefault(), 0, &kCFTypeDictionaryKeyCallBacks, 0);
         cInvokeReadWriteQueue = dispatch_queue_create("ocscript.cInvokeRead.read-write-qeueu", DISPATCH_QUEUE_CONCURRENT);
     });
 }
@@ -83,6 +83,46 @@ void sub_2a123e6(void * _block) {
     return;
 }
  */
+
+const void *
+getInlineCFunctionPtr(const void *key) {
+    return CFDictionaryGetValue(dictInlineCFunction, key);
+}
+
+
+void
+setAppCFuntion(const void *key, const void *value) {
+    dispatch_barrier_async(cInvokeReadWriteQueue, ^{
+        CFDictionaryAddValue(dictAppCFunction, key, value);
+    });
+}
+
+const void *
+getAppCFunctionPtr(const void *key) {
+    __block const void * ptr = NULL;
+    dispatch_sync(cInvokeReadWriteQueue, ^{
+        ptr = CFDictionaryGetValue(dictAppCFunction, key);
+    });
+
+    return ptr;
+}
+
+void
+setAppCVar(const void *key, const void *value) {
+    dispatch_barrier_async(cInvokeReadWriteQueue, ^{
+        CFDictionaryAddValue(dictAppCVar, key, value);
+    });
+}
+
+const void *
+getAppVarPtr(const void *key) {
+    __block const void * ptr = NULL;
+    dispatch_sync(cInvokeReadWriteQueue, ^{
+        ptr = CFDictionaryGetValue(dictAppCVar, key);
+    });
+
+    return ptr;
+}
 
 // sub_2a12b08
 void

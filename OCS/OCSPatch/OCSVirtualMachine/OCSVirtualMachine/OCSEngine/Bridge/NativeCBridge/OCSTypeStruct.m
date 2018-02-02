@@ -49,8 +49,8 @@
     // r8: 0x0
     // fp: 0x0
 
-    r8 = 0x0;
-
+    NSUInteger index = 0;
+    size_t currentMaxSize = 0;
     // loc_360660
 
     // r0: &@selector(maxMemberSize)
@@ -77,22 +77,22 @@
 
         // 0x0/item.maxMemberSize
         
-        r8 = r8/item.maxMemberSize + 0x1;
-        if (r8%item.maxMemberSize != 0)  {
-            r8 = r8 + 0x1;
+        r8 = index/item.maxMemberSize;
+        if (index%item.maxMemberSize != 0)  {
+            r8 = r8 + 1;
         }
 
         // item.maxMemberSize * r8
 
         item.setStartIndex(item.maxMemberSize * r8);
 
-        if (item.maxMemberSize > fp) {
+        if (item.maxMemberSize > currentMaxSize) {
             // 003606f2
 
             // r0: item
             // r1: maxMemberSize
 
-            fp = item.maxMemberSize;
+            currentMaxSize = item.maxMemberSize;
         }
         
         // loc_3606fc
@@ -100,7 +100,7 @@
         // r0: var_84
         // sl: 0x1
 
-
+        index = item.totalSize + item.startIndex；
 
     }
 
@@ -121,9 +121,9 @@
     // r2: fp
     // r4: self
 
-    self.maxMemberSize = fp;
+    self.maxMemberSize = currentMaxSize;
 
-    if (fp == 0) {
+    if (_maxMemberSize == 0) {
         // loc_360764
 
         [NSException raise:@"OCSException" format:@"maxMemberSize is 0!"];
@@ -135,25 +135,25 @@
 
         // __umodsi3(r8, fp)
 
-        if (r8%fp != 0x0) {
-            // 0036074c
-            r0: self
-            r1: @selector(setTotalSize:)
-            r2: (r8/fp + 0x1) * fp
+        // if (index%_maxMemberSize != 0x0) {
+        //     // 0036074c
+        //     r0: self
+        //     r1: @selector(setTotalSize:)
+        //     r2: (index/_maxMemberSize + 0x1) * _maxMemberSize
 
-            // loc_360788
-        }
-        else {
-            // loc_36077e
+        //     // loc_360788
+        // }
+        // else {
+        //     // loc_36077e
 
-            r0: self
-            r1: @selector(setTotalSize:)
-            r2: r8
+        //     r0: self
+        //     r1: @selector(setTotalSize:)
+        //     r2: index
 
-            // loc_360788
-        }
+        //     // loc_360788
+        // }
 
-        self.totalSize = ;
+        self.totalSize = (index%_maxMemberSize != 0x0) ? (index + _maxMemberSize) : index;
     }
 
     // r0: ___stack_chk_guard
@@ -162,7 +162,33 @@
 }
 
 - (void)makeFfi_type {
-    // TODO
+    /*
+    typedef struct _ffi_type
+    {
+      size_t size;
+      unsigned short alignment;
+      unsigned short type;
+      struct _ffi_type **elements;
+    } ffi_type;
+    */
+
+    ffi_type type = malloc(sizeof(ffi_type));
+
+    NSUInteger count = [self->_memberStructSizeValues count];
+
+    ffi_type *elements[] = malloc((count + 1) * sizeof(ffi_type *));
+
+    NSUInteger i = 0;
+    for (; i < count; i ++) {
+        OCSTypyCommon *item = _memberStructSizeValues[ i ];
+        elements[i] = item.my_ffi_type;
+    }
+
+    elements[i] = NULL;
+
+    type.elements = elements;
+
+    self.my_ffi_type = type;
 }
 
 - (BOOL)isHomogeneousFloatingPoint {

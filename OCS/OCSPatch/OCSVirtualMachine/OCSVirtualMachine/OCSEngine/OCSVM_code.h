@@ -232,9 +232,9 @@ static dispatch_queue_t exeClassNameTablesQueue; // *0x367d1fc | *0x720678
 static NSMutableDictionary *codeBlockCache; // *0x367d200 <className, OCS_CodeBlock*> | *0x720684
 static dispatch_queue_t classMethodBlockQueue; // | *0x720680
 
-static CFMutableDictionaryRef dictCFunction; // *0x367d208 | *0x72068c
-static CFMutableDictionaryRef dict_367d20c; // *0x367d20c | *0x720690
-static CFMutableDictionaryRef dict_367d210; // *0x367d210 | *0x720694
+static CFMutableDictionaryRef dictInlineCFunction; // *0x367d208 | *0x72068c
+static CFMutableDictionaryRef dictAppCFunction; // *0x367d20c | *0x720690
+static CFMutableDictionaryRef dictAppCVar; // *0x367d210 | *0x720694
 static dispatch_queue_t structTypeDictReadWriteQueue;// *0x367d21c | *0x7206a0
 static CFMutableDictionaryRef dictStructType; // *0x367d220 | *0x7206a4
 static dispatch_queue_t cInvokeReadWriteQueue; // *0x367d214 | *0x720698

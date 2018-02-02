@@ -3399,7 +3399,7 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
 }
  */
 
-void
+bool
 _dynamicCastToBool(OCS_ObjCValue *ocsValue) {
 
     switch (ocsValue->vTag) {
@@ -3482,11 +3482,608 @@ void
 _dynamicCastToDouble() {}
 
 void
-_init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, int arg3, const char * memEncode, int arg5) {
+_init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, OCS_ObjCValue *arg3, const char * memEncode, BOOL isObjectValue) {
     
-    // TODO
+    // ; Variables:
+    //     ;    arg_4: 12
+    //     ;    ret_addr: 8
+    //     ;    var_1C: -28 arrComponents
+    //     ;    var_20: -32 *(arg1 + 0x4) @selector(UTF8String)
+    //     ;    var_24: -36 a + *(arg1 + 0x4) << 0x2
+    //     ;    var_28: -40 b + *(arg1 + 0x4) << 0x2
+    //     ;    var_2C: -44 @selector(my_ffi_type)
+    //     ;    var_30: -48 c + *(arg1 + 0x4)
+    //     ;    var_34: -52 @selector(raise:format:)
+    //     ;    var_38: -56 arg3
+    //     ;    var_3C: -60 arg2
+    //     ;    var_40: -64 vm
+    //     ;    var_44: -68
+
+    // r0: c
+    // r1: 0x0
+    // r2: size
+    // r4: size
+    // r5: c
+    // r6: 0x0
+    // r8: b
+    // sl: arg1
+    // fp: a
+
+
+    size_t size = *(arg1) + *(arg1 + 0x4);
+
+    void * a = malloc(size << 0x2);
+    void * b = malloc(size << 0x2);
+    void * c = malloc(size);
+
+    memset(c, 0, size);
+
+    // r0: arg3
+    // r1: a + *(arg1 + 0x4) << 0x2
+    // r2: *(arg1 + 0x4)
+    // r4: arg3 + 0x4
+    // fp: @selector(objectAtIndexedSubscript:)
+
+    arg1->_0x8 = a;
+    arg1->_0xc = b;
+    arg1->_0x10 = c;
     
     NSArray *arrComponents = [OCSStructTypeParser componentsOfMembersEncode:[NSString stringWithUTF8String:memEncode]];
+
+    // loc_35620e
+    // r0: arg1->_0x0
+
+    if (0 > arg1->_0x0) {
+        // loc_356438
+
+        // r0: pType
+        // r1: @selector(UTF8String)
+        // r4: pType
+        // r5: [arrComponents lastObject]
+
+        const char *cstr = [[arrComponents lastObject] UTF8String];
+        char pType = cstr[0];
+
+        // 0x7b
+        if (pType == '{') {
+            // 00356456
+        }
+        else {
+            // loc_356466
+        }
+    }
+    else {
+        int i = 0; // r6
+        // 00356218
+
+        // r0: pType
+        // r1: @selector(UTF8String)
+        // r2: i
+        // r5: arg3 + 0x4 - 0x4
+        // r6: i
+        // r8: pType
+
+        const char *cstr = [[arrComponents objectAtIndexedSubscript:i] UTF8String];
+        char pType = cstr[0];
+
+        ffi_type * ffiType;
+        // 0x7b
+        if (pType == '{') {
+            // 00356236
+
+            // r0: arg3->_0x4->_0x0->_0x4
+            // r1: @selector(my_ffi_type)
+
+            OCS_ObjCValue *objcValue = arg3;
+
+            OCS_Struct *st = objcValue->value->structLocation;
+
+            OCSTypeStruct *typeSt = st->structType->typeStruct;
+
+            ffiType = [typeSt my_ffi_type];
+
+            // x0: [typeSt my_ffi_type]
+
+        }
+        else {
+            // loc_356244
+
+            // x0: getFfi_typeForCharType(pType)
+
+            ffiType = getFfi_typeForCharType(pType);
+
+        }
+
+        // loc_35624a
+
+        // r1: a + *(arg1 + 0x4) << 0x2
+
+        *(a + *(arg1 + 0x4)<<0x2 + i << 0x2) = ffiType;
+
+        switch(pType) {
+            case '#': // Class
+            case '*': // char *
+            case ':': // SEL
+            case '?': // unknow
+            case '@': // id
+            case '^': // pointer
+            {
+                // loc_356418
+
+                // r0: b + *(arg1 + 0x4) << 0x2
+
+                *(b + *(arg1 + 0x4)<<0x2 + i << 0x2) = arg3->value;
+
+                // loc_35620a
+
+            }
+                break;
+            case 'B': // bool
+            {
+                // 0x356286
+
+                // r0: arg5
+
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // 00356290
+
+                    // r0: *(arg3 + 0x4 - 0x4)
+
+                    if (arg3->type == OCSVTagChar) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: malloc(0x1)
+                        // r8: bValue
+
+                        // void * bValue = malloc(0x1);
+                        bool* bValue = malloc(sizeof(bool));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+                        
+                        *bValue = _dynamicCastToBool(ocsValue);
+
+
+                        // loc_3562f4
+                        // loc_3563a2
+                        // r0: b + *(arg1 + 0x4) << 0x2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = bValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+            }
+                break;
+            case 'C': // usigned char
+            case 'c': // char
+            {
+                // 0x3562d0
+
+                // r0: arg5
+
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // 3562da
+
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type < OCSVTagUShort) {
+                        // loc_356418
+                    }
+                    else {
+                        // 3562e6
+
+                        // r0: malloc(sizeof(char)); // malloc(sizeof(usigned char))
+                        // r8: charValue
+
+                        char* charValue = malloc(sizeof(char)); // malloc(sizeof(usigned char))
+                        OCS_ObjCValue *ocsValue = arg3;
+                        
+                        *charValue = _dynamicCastToChar(ocsValue);
+
+                        // loc_3562f4
+                        // loc_3563a2
+                        // r0: b + *(arg1 + 0x4) << 0x2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = charValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+
+
+                }
+            }
+                break;
+            case 'I': // unsigned int
+            case 'i': // int
+            {
+                // 0x356320
+
+                // r0: isObjectValue
+
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type < OCSVTagUInt) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: _dynamicCastToInt(ocsValue)
+                        // r8: intValue
+
+                        int * intValue = malloc(sizeof(int));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+
+                        *intValue = _dynamicCastToInt(ocsValue);
+
+                        // loc_35639e
+
+                        // loc_3563a2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = intValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+
+            }
+                break;
+            case 'L': // unsigned long
+            case 'l': // long
+            {
+                // 0x356342
+
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type > OCSVTagULong) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: _dynamicCastToInt(ocsValue)
+                        // r8: intValue
+
+                        long * longValue = malloc(sizeof(long));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+
+                        *longValue = _dynamicCastToLong(ocsValue);
+
+                        // loc_35639e
+
+                        // loc_3563a2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = longValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+            }
+                break;
+            case 'Q': // unsigned long long
+            case 'q': // long long
+            {
+                // loc_35637e
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type > OCSVTagULongLong) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: _dynamicCastToInt(ocsValue)
+                        // r8: intValue
+
+                        long long * longlongValue = malloc(sizeof(long long));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+
+                        *longlongValue = _dynamicCastToLong(ocsValue);
+
+                        // loc_35639e
+
+                        // loc_3563a2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = longlongValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+            }
+                break;
+            case 'S': // unsigned short
+            case 's': // short
+            {
+                // loc_356352
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type > OCSVTagUShort) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: _dynamicCastToInt(ocsValue)
+                        // r8: intValue
+
+                        short * shortValue = malloc(sizeof(short));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+
+                        *shortValue = _dynamicCastToLong(ocsValue);
+
+                        // loc_35639e
+
+                        // loc_3563a2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = shortValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+            }
+                break;
+            case 'd': // double
+            {
+                // 0x3563dc
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type == OCSVTagDouble) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: _dynamicCastToInt(ocsValue)
+                        // r8: intValue
+
+                        double * doubleValue = malloc(sizeof(double));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+
+                        *doubleValue = _dynamicCastToDouble(ocsValue);
+
+                        // loc_35639e
+
+                        // loc_3563a2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = doubleValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+            }
+                break;
+            case 'f': // float
+            {
+                // 0x356408
+                if (isObjectValue) {
+                    // loc_356418
+                }
+                else {
+                    // r0: *(arg3 + 0x4 - 0x4) - 0x1
+
+                    if (arg3->type == OCSVTagFloat) {
+                        // loc_356418
+                    }
+                    else {
+                        // r0: _dynamicCastToInt(ocsValue)
+                        // r8: intValue
+
+                        float * floatValue = malloc(sizeof(float));
+
+                        OCS_ObjCValue *ocsValue = arg3;
+
+                        *floatValue = _dynamicCastToFloat(ocsValue);
+
+                        // loc_35639e
+
+                        // loc_3563a2
+
+                        *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = floatValue;
+
+                        // r0: c + *(arg1 + 0x4)
+                        // r1: 0x1
+
+                        *(c + *(arg1 + 0x4) + i) = 0x1;
+
+                        // loc_35620a
+                    }
+                }
+            }
+                break;
+            // case 'v': // void
+            // {
+                
+            // }
+            //     break;
+            case '{': // struct
+            {
+                // 0x3563b6
+
+                r0: st->value
+                r1: b + *(arg1 + 0x4) << 0x2
+
+
+                OCS_Struct *st = arg3->value->structLocation;
+
+                *(b + *(arg1 + 0x4) << 0x2 + i << 0x2) = st->value;
+
+                // loc_35620a
+
+            }
+                break;
+            default:
+            {
+                // 0x3563c2
+                [NSException raise:@"OCSCommonException" format:@"Unsupported argument type: %c", pType];
+
+                // loc_35620a
+                
+            }
+                break;
+
+        }
+
+        /*
+            //  0x52
+            if (r8 > 0x52) {
+                // loc_3562aa
+
+                if ( <= 0x62) {
+                    // loc_356312
+
+                    0x53 S
+                        loc_356352
+                    0x5e ^
+                        loc_356418
+                }
+                // r8 - 0x63
+                else if (>= 0x73) {
+                    // loc_3563b0
+
+                    0x7b {
+                        0x3563b6
+                }
+                else {
+                    0x63 c 0 0x09
+                        0x3562d0
+                    0x64 d 1 0x8f
+                        0x3563dc
+                    0x65 2 0x82
+                        0x3563c2
+                    0x66 f 3 0xa5
+                        0x356408
+                    0x67 4 0x82
+                    0x68 5
+
+                    0x69 i 6 0x31
+                        0x356320
+                    0x6a 7 0x82
+                    0x6b 8
+
+                    0x6c l 9 0x42
+                        0x356342
+                    0x6d 10 0x82
+                    0x6e 11
+                    0x6f 12
+                    0x70 13
+
+                    0x71 q 14 0x60
+                        0x35637e
+                    0x72 15 0x82
+
+                    0x73 s 16 0x4a
+                        0x356352
+                }
+            }
+            else if (r8 <= 0x3e) {
+                // loc_3562fa
+                0x23 #
+                    loc_356418
+                0x2a *
+                    loc_356418
+                0x3a :
+                    loc_356418
+
+            }
+            // r8 - 0x3f
+            else if ( > 0x4c) { // 0xd
+                // loc_356378 
+                0x51 Q
+                    loc_35637e
+            }
+            else {
+                0x3f ? 0 0x00d7
+                0x40 @ 1 
+                    0x356418
+                0x41 2 0x00ac
+                    0x3563c2
+                0x42 B 3 0x000e
+                    0x356286
+                0x43 C 4 0x0033 
+                    0x3562d0
+                0x44 5 0x00ac
+                0x45 6
+                0x46 7
+                0x47 8
+                0x48 9 
+            
+                0x49 I 10 0x005b
+                    0x356320
+                0x4a 11 0x00ac
+                0x4b 12
+
+                0x4c L 13 0x006c
+                    0x356342
+
+
+            }
+
+        */
+
+        // loc_35620a
+
+        r4: 
+        r4 += 0xc;
+        i ++;
+    }
+
     
     for (int i = 0; i < arg1->0x0 ; ++i) {
         const char *cstr = [[arrComponents objectAtIndexedSubscript:i] UTF8String];
