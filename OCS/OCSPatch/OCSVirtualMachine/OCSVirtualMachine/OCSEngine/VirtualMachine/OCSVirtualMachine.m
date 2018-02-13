@@ -3524,9 +3524,9 @@ _init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, OCS_ObjCValue *arg
     // r4: arg3 + 0x4
     // fp: @selector(objectAtIndexedSubscript:)
 
-    arg1->_0x8 = a;
-    arg1->_0xc = b;
-    arg1->_0x10 = c;
+    arg1->_0x8 = a;  // ffiTypes
+    arg1->_0xc = b;  // values
+    arg1->_0x10 = c; // isCasteds
     
     NSArray *arrComponents = [OCSStructTypeParser componentsOfMembersEncode:[NSString stringWithUTF8String:memEncode]];
 

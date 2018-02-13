@@ -219,6 +219,11 @@ typedef struct OCS_PropertyAttributes_t {
     char *type;
 } OCS_PropertyAttributes;
 
+typedef struct OCS_FFiBuff_t {
+    ffi_type * ffiTypes; // +0x8
+    void * values;      // +0xc
+    BOOL * isCasteds;   // +0x10
+} OCS_FFiBuff
 
 static void *_OCSExecutableManagerLoadDataCallback_fun; // *0x35d3dc0 | *0x760634
 static void *_vmRunBlock;
