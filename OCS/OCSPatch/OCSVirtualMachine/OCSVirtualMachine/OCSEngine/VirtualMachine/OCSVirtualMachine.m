@@ -2314,13 +2314,13 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
         // r 0x72
         char rType = returnType[0] == 'r' ? returnType[1] : returnType[0];
 
-        int eType = 0;
+        OCSValueTag eType = 0;
 
         switch(rType) {
             case '#': // Class
             {
                 // loc_355c24
-                eType = 0xd;
+                eType = OCSVTagClass; //0xd;
                 // loc_355c32
 
                 // r2: (sp+0x20)OR 0x4
@@ -2334,7 +2334,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
                 // loc_355b78
                 // r4: (sp+0x20)OR 0x4
                 // loc_355bd2
-                eType = 0x10;
+                eType = OCSVTagPointer; //0x10;
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
                 // loc_355c42
@@ -2343,7 +2343,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case ':': // SEL
             {
                 // loc_355afe
-                eType = 0xf;
+                eType = OCSVTagSel; //0xf;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2353,7 +2353,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case '@': // id
             {
                 // loc_355baa
-                eType = 0xe;
+                eType = OCSVTagID; //0xe;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2363,7 +2363,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'B': // bool
             {
                 // loc_355b26
-                eType = 0x1;
+                eType = OCSVTagChar; //0x1;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2373,7 +2373,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'C': // usigned char
             {
                 // loc_355bb2
-                eType = 0x2;
+                eType = OCSVTagUChar; //0x2;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2383,7 +2383,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'I': // unsigned int
             {
                 // loc_355c14
-                eType = 0x6;
+                eType = OCSVTagUInt; //0x6;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2393,7 +2393,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'L': // unsigned long
             {
                 // loc_355b3a
-                eType = 0x8;
+                eType = OCSVTagULong; //0x8;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2403,7 +2403,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'Q': // unsigned long long
             {
                 // loc_355c1c
-                eType = 0xa;
+                eType = OCSVTagULongLong; //0xa;
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
             }
@@ -2411,7 +2411,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'S': // unsigned short
             {
                 // loc_355b88
-                eType = 0x4;
+                eType = OCSVTagUShort; //0x4;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2422,7 +2422,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case '^': // pointer
             {
                 // loc_355c2c
-                eType = 0x10;
+                eType = OCSVTagPointer; //0x10;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2432,7 +2432,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'c': // char
             {
                 // loc_355b26
-                eType = 0x1;
+                eType = OCSVTagChar; //0x1;
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
                 // loc_355c42
@@ -2442,7 +2442,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'd': // double
             {
                 // loc_355bba
-                eType = 0xc;
+                eType = OCSVTagDouble; //0xc;
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
             }
@@ -2450,7 +2450,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'f': // float
             {
                 // loc_355be6
-                eType = 0xb;
+                eType = OCSVTagFloat; //0xb;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2460,7 +2460,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'i': // int
             {
                 // loc_355bee
-                eType = 0x5;
+                eType = OCSVTagInt; //0x5;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2470,7 +2470,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'l': // long
             {
                 // loc_355bf6
-                eType = 0x7;
+                eType = OCSVTagLong; //0x7;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2480,7 +2480,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'q': // long long
             {
                 // loc_355bfe
-                eType = 0x9;
+                eType = OCSVTagLongLong; //0x9;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2490,7 +2490,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 's': // short
             {
                 // loc_355c06
-                eType = 0x3;
+                eType = OCSVTagShort; //0x3;
                 // loc_355c32
                 // r2: (sp+0x20)OR 0x4
                 [invocation getReturnValue:];
@@ -2500,7 +2500,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
             case 'v': // void
             {
                 // loc_355c0e
-                eType = 0;
+                eType = OCSVTagVoid; //0;
                 // loc_355c42
             }
                 break;
@@ -2513,7 +2513,7 @@ _messageSendN(OCS_VirtualMachine *vm, id target, SEL selector, BOOL isSuper, OCS
                 r4: st
 
                 // var_28
-                eType = 0x11;
+                eType = OCSVTagStruct; //0x11;
                 OCS_Struct *st = OCSCreateRValueStruct(arg6);
                 [invocation getReturnValue:st->value];
                 _virtualMachineRegisterCStruct(vm, st);
@@ -3401,85 +3401,402 @@ int sub_2a11c56(int arg0, int arg1, int arg2) {
 
 bool
 _dynamicCastToBool(OCS_ObjCValue *ocsValue) {
-
+    bool res;
     switch (ocsValue->vTag) {
         case OCSVTagChar:
         case OCSVTagUChar:
         {
-
+            // 0x355f40
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            // 0x355f44
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            // 0x355f3c
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            // 0x355f4e
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            // 0x355f5a
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            // 0x355f6a
+            res = ocsValue->value;
         }
             break;
         default:
         {
-            return
+            res = false;
         }
             break;
     }
 
     // r1: *(arg0) - 0x1
 
-    if (*(arg0) - 0x1 > 0xb) {
-        // r0: 0x0
+    /*
 
-    }
-    else {
-        switch (*(arg0) - 0x1) {
-            case 0: 
-            case 1: {
-                // 0x08 0x355f40
+        if (*(arg0) - 0x1 > 0xb) {
+            // r0: 0x0
 
-                r7: r0 << 18 & r0
-                
-            }
-                break;
-            case 2:
-            case 3: {
-                // 0x0a 0x355f44
-            }
-                break;
-            case 4:
-            case 5:
-            case 6:
-            case 7: {
-                // 0x06 0x355f3c
-            }
-                break;
-            case 8:
-            case 9: {
-                // 0x0f 0x355f4e
-            }
-                break;
-            case 0xa: {
-                // 0x15 0x355f5a
-            }
-                break;
-            case 0xb: {
-                // 0x1d 0x355f6a
-            }
-                break;
         }
-    }
+        else {
+            switch (*(arg0) - 0x1) {
+                case 0: 
+                case 1: {
+                    // 0x08 0x355f40
 
+                    r7: r0 << 18 & r0
+                    
+                }
+                    break;
+                case 2:
+                case 3: {
+                    // 0x0a 0x355f44
+                }
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7: {
+                    // 0x06 0x355f3c
+                }
+                    break;
+                case 8:
+                case 9: {
+                    // 0x0f 0x355f4e
+                }
+                    break;
+                case 0xa: {
+                    // 0x15 0x355f5a
+                }
+                    break;
+                case 0xb: {
+                    // 0x1d 0x355f6a
+                }
+                    break;
+            }
+        }
 
+    */
+
+    return res;
 }
 
-void
-_dynamicCastToChar() {}
+char
+_dynamicCastToChar(OCS_ObjCValue *ocsValue) {
+    char res;
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        default:
+        {
+            res = 0;
+        }
+            break;
+    }
 
-void
-_dynamicCastToShort() {}
+    return res;
+}
 
-void
-_dynamicCastToInt() {}
+short
+_dynamicCastToShort(OCS_ObjCValue *ocsValue) {
+    short res;
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        default:
+        {
+            res = 0;
+        }
+            break;
+    }
+    return res;
+}
 
-void
-_dynamicCastToLong() {}
+int
+_dynamicCastToInt(OCS_ObjCValue *ocsValue) {
+    int res;
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        default:
+        {
+            res = 0;
+        }
+            break;
+    }
+    return res;
+}
 
-void
-_dynamicCastToFloat() {}
+long
+_dynamicCastToLong(OCS_ObjCValue *ocsValue) {
+    long res;
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        default:
+        {
+            res = 0;
+        }
+            break;
+    }
+    return res;
+}
 
-void
-_dynamicCastToDouble() {}
+float
+_dynamicCastToFloat(OCS_ObjCValue *ocsValue) {
+    float res;
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        default:
+        {
+            res = 0;
+        }
+            break;
+    }
+    return res;
+}
+
+double
+_dynamicCastToDouble(OCS_ObjCValue *ocsValue) {
+    double res;
+    switch (ocsValue->vTag) {
+        case OCSVTagChar:
+        case OCSVTagUChar:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagShort:
+        case OCSVTagUShort:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagInt:
+        case OCSVTagUInt:
+        case OCSVTagLong:
+        case OCSVTagULong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagLongLong:
+        case OCSVTagULongLong:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagFloat:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        case OCSVTagDouble:
+        {
+            res = ocsValue->value;
+        }
+            break;
+        default:
+        {
+            res = 0;
+        }
+            break;
+    }
+    return res;
+}
 
 void
 _init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, OCS_ObjCValue *arg3, const char * memEncode, BOOL isObjectValue) {
@@ -3524,9 +3841,9 @@ _init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, OCS_ObjCValue *arg
     // r4: arg3 + 0x4
     // fp: @selector(objectAtIndexedSubscript:)
 
-    arg1->_0x8 = a;  // ffiTypes
-    arg1->_0xc = b;  // values
-    arg1->_0x10 = c; // isCasteds
+    arg1->ffiTypes = a;  // ffiTypes
+    arg1->values = b;  // values
+    arg1->isCasteds = c; // isCasteds
     
     NSArray *arrComponents = [OCSStructTypeParser componentsOfMembersEncode:[NSString stringWithUTF8String:memEncode]];
 
@@ -4101,7 +4418,15 @@ _init_OCS_FFiBuff(OCS_VirtualMachine *vm, int arg1, int arg2, OCS_ObjCValue *arg
 }
 
 void
-_clearFFiBuff() {}
+_clearFFiBuff(OCS_FFiBuff arg0) {
+
+    x8 : arg0->_0x18
+    x19: arg0
+
+    if (arg0->values != 0) {
+        // loc_3e8d40
+    }
+}
 
 
 
